@@ -1,7 +1,6 @@
 #include <anton/detail/string_common.hpp>
 
 #include <anton/assert.hpp>
-#include <anton/exception.hpp>
 #include <anton/math/math.hpp>
 
 namespace anton {

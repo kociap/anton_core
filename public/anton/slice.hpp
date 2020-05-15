@@ -31,7 +31,8 @@ namespace anton {
         using const_iterator = T const*;
 
         Slice(): _data(nullptr), _size(0) {}
-        Slice(T* const first, size_type const length): _data(first), _size(length) {}
+        template<typename Integral, enable_if<is_integral<Integral>, i64> = 0>
+        Slice(T* const first, Integral const length): _data(first), _size(length) {}
         Slice(T* const first, T* const last): _data(first), _size(last - first) {}
         template<typename Container>
         Slice(Container& c,

@@ -34,8 +34,9 @@ namespace anton {
         Slice(T* const first, size_type const length): _data(first), _size(length) {}
         Slice(T* const first, T* const last): _data(first), _size(last - first) {}
         template<typename Container>
-        Slice(Container& c, enable_if<!is_slice<Container> && is_convertible<remove_pointer<decltype(data(c))> (*)[], value_type (*)[]>, void*> = nullptr)
-            : _data(data(c)), _size(size(c)) {}
+        Slice(Container& c,
+              enable_if<!is_slice<Container> && is_convertible<remove_pointer<decltype(anton::data(c))> (*)[], value_type (*)[]>, void*> = nullptr)
+            : _data(anton::data(c)), _size(anton::size(c)) {}
         template<typename U>
         Slice(Slice<U> const& other, enable_if<is_convertible<U (*)[], value_type (*)[]>, void*> = nullptr): _data(other.data()), _size(other.size()) {}
         Slice(Slice const& other): _data(other._data), _size(other._size) {}

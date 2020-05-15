@@ -94,7 +94,7 @@ namespace anton {
             case 4:
                 return (_data[0] & 0x1F << 18) | (_data[1] & 0x3F << 12) | (_data[2] & 0x3F << 6) | (_data[3] & 0x3F);
             default:
-                ANTON_FAIL(u8"Unsupported UTF-8 codepoint size.");
+                ANTON_FAIL(false, u8"Unsupported UTF-8 codepoint size.");
         }
     }
 

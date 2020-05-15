@@ -1,13 +1,13 @@
 #include <anton/string.hpp>
 
+#include <anton/assert.hpp>
+#include <anton/detail/crt.hpp>
 #include <anton/detail/utility_common.hpp>
 #include <anton/math/math.hpp>
 #include <anton/memory.hpp>
 #include <anton/string_utils.hpp>
 #include <anton/type_traits.hpp>
 #include <anton/unicode/common.hpp>
-#include <anton/detail/crt.hpp>
-#include <anton/assert.hpp>
 
 // TODO: Replace with format.
 #include <stdio.h> // sprintf
@@ -15,7 +15,7 @@
 namespace anton {
     String String::from_utf16(char16 const* str_utf16) {
         i32 const buffer_size = unicode::convert_utf16_to_utf8(str_utf16, -1, nullptr);
-        String str{reserve, buffer_size - 1};
+        String str{anton::reserve, buffer_size - 1};
         str.force_size(buffer_size - 1);
         unicode::convert_utf16_to_utf8(str_utf16, -1, str.data());
         return str;
@@ -28,7 +28,7 @@ namespace anton {
         memset(_data, 0, _capacity);
     }
 
-    String::String(Reserve_Tag, size_type n): String(reserve, n, allocator_type()) {}
+    String::String(Reserve_Tag, size_type n): String(anton::reserve, n, allocator_type()) {}
 
     String::String(Reserve_Tag, size_type n, allocator_type const& allocator): _allocator(allocator) {
         _capacity = math::max(_capacity - 1, n) + 1;
@@ -322,21 +322,21 @@ namespace anton {
     }
 
     String operator+(String const& lhs, String const& rhs) {
-        String str(reserve, lhs.size_bytes() + rhs.size_bytes());
+        String str(anton::reserve, lhs.size_bytes() + rhs.size_bytes());
         str.append(lhs);
         str.append(rhs);
         return str;
     }
 
     String operator+(String_View lhs, String const& rhs) {
-        String str(reserve, lhs.size_bytes() + rhs.size_bytes());
+        String str(anton::reserve, lhs.size_bytes() + rhs.size_bytes());
         str.append(lhs);
         str.append(rhs);
         return str;
     }
 
     String operator+(String const& lhs, String_View rhs) {
-        String str(reserve, lhs.size_bytes() + rhs.size_bytes());
+        String str(anton::reserve, lhs.size_bytes() + rhs.size_bytes());
         str.append(lhs);
         str.append(rhs);
         return str;

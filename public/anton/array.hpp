@@ -92,9 +92,9 @@ namespace anton {
         void assign(Input_Iterator first, Input_Iterator last);
 
         template<typename... Args>
-        void insert(const_iterator position, Args&&... args);
+        void insert(Variadic_Construct_Tag, const_iterator position, Args&&... args);
         template<typename... Args>
-        void insert(size_type position, Args&&... args);
+        void insert(Variadic_Construct_Tag, size_type position, Args&&... args);
         template<typename Input_Iterator>
         void insert(size_type position, Input_Iterator first, Input_Iterator last);
         void insert_unsorted(const_iterator position, value_type const& value);

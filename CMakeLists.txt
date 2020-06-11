@@ -9,6 +9,7 @@ option(ANTON_DISABLE_VERIFY "Disable ANTON_VERIFY" OFF)
 option(ANTON_CHECK_OPTIONAL_VALUE "Enable checking whether optional holds a value" OFF)
 
 add_library(anton_core)
+set_target_properties(anton_core PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
 target_include_directories(anton_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/public")
 target_sources(anton_core 
     PUBLIC

@@ -46,7 +46,7 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/tuple.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/type_traits.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/utility.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/vector.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/array.hpp"
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/private/allocator.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/assert.cpp"

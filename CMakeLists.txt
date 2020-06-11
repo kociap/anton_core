@@ -30,6 +30,7 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/assert.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/compiletime.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/diagnostic_macros.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/filesystem.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/fixed_array.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/flat_hash_map.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/functors.hpp"
@@ -40,6 +41,7 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/pair.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/shared_ptr.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/slice.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/stream.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/string_utils.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/string_view.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/string.hpp"
@@ -51,6 +53,7 @@ target_sources(anton_core
     PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/private/allocator.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/assert.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/private/filesystem.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string_common.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/unicode/common.cpp"

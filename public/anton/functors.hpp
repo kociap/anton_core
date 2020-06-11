@@ -1,5 +1,4 @@
-#ifndef CORE_ATL_DETAIL_FUNCTORS_HPP_INCLUDE
-#define CORE_ATL_DETAIL_FUNCTORS_HPP_INCLUDE
+#pragma once
 
 #include <anton/hashing/murmurhash2.hpp>
 #include <anton/type_traits.hpp>
@@ -63,5 +62,3 @@ namespace anton {
     template<typename T>
     constexpr bool is_transparent = Is_Transparent<T>::value;
 } // namespace anton
-
-#endif // !CORE_ATL_DETAIL_FUNCTORS_HPP_INCLUDE

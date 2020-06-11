@@ -252,10 +252,6 @@ namespace anton {
         return _data;
     }
 
-    auto String::c_str() const -> value_type const* {
-        return _data;
-    }
-
     String::allocator_type& String::get_allocator() {
         return _allocator;
     }

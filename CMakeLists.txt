@@ -59,6 +59,8 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/private/unicode/common.cpp"
 )
 
+target_compile_definitions(anton_core PRIVATE _CRT_SECURE_NO_WARNINGS)
+
 if(ANTON_UNICODE_VALIDATE_ENCODING)
     target_compile_definitions(anton_core PUBLIC ANTON_UNICODE_VALIDATE_ENCODING=1)
 else()

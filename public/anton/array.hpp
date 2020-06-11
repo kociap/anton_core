@@ -419,7 +419,7 @@ namespace anton {
                 i64 const target_offset = math::max(position + dist, _size);
                 anton::uninitialized_move_n(get_ptr(position + elems_inside), elems_outside, get_ptr(target_offset));
                 anton::move_backward(get_ptr(position), get_ptr(position + elems_inside), get_ptr(position + dist + elems_inside));
-                anton::destruct_n(get_ptr(position), elems_inside);
+                anton::destruct_n(get_ptr(position), dist);
                 anton::uninitialized_copy(first, last, get_ptr(position));
                 _size += dist;
             } else {

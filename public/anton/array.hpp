@@ -193,7 +193,7 @@ namespace anton {
     Array<T, Allocator>::Array(Variadic_Construct_Tag, Args&&... args) {
         _capacity = math::max(_capacity, static_cast<size_type>(sizeof...(Args)));
         _data = allocate(_capacity);
-        uninitialized_variadic_construct(_data, forward<Args>(args)...);
+        uninitialized_variadic_construct(_data, anton::forward<Args>(args)...);
         _size = static_cast<size_type>(sizeof...(Args));
     }
 
@@ -363,7 +363,7 @@ namespace anton {
     template<typename T, typename Allocator>
     template<typename... Args>
     void Array<T, Allocator>::insert(const_iterator position, Args&&... args) {
-        insert(position - begin(), forward<Args>(args)...);
+        insert(position - begin(), anton::forward<Args>(args)...);
     }
 
     template<typename T, typename Allocator>
@@ -377,7 +377,7 @@ namespace anton {
             if(_size != _capacity) {
                 uninitialized_move_n(get_ptr(_size - 1), 1, get_ptr(_size));
                 move_backward(get_ptr(position), get_ptr(_size - 1), get_ptr(_size));
-                construct(get_ptr(position), forward<Args>(args)...);
+                construct(get_ptr(position), anton::forward<Args>(args)...);
                 _size += 1;
             } else {
                 i64 const new_capacity = _capacity * 2;
@@ -385,7 +385,7 @@ namespace anton {
                 i64 moved = 0;
                 uninitialized_move(get_ptr(0), get_ptr(position), new_data);
                 moved = position;
-                construct(new_data + position, forward<Args>(args)...);
+                construct(new_data + position, anton::forward<Args>(args)...);
                 moved += 1;
                 uninitialized_move(get_ptr(position), get_ptr(_size), new_data + moved);
 
@@ -397,7 +397,7 @@ namespace anton {
             }
         } else {
             // Quick path when position points to end and we have room for one more element.
-            construct(get_ptr(_size), forward<Args>(args)...);
+            construct(get_ptr(_size), anton::forward<Args>(args)...);
             _size += 1;
         }
     }
@@ -494,7 +494,7 @@ namespace anton {
     auto Array<T, Allocator>::emplace_back(Args&&... args) -> reference {
         ensure_capacity(_size + 1);
         T* elem_ptr = get_ptr(_size);
-        construct(elem_ptr, forward<Args>(args)...);
+        construct(elem_ptr, anton::forward<Args>(args)...);
         ++_size;
         return *elem_ptr;
     }

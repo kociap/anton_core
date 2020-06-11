@@ -353,51 +353,51 @@ namespace anton {
     template<typename T, typename Allocator>
     template<typename Input_Iterator>
     void Array<T, Allocator>::assign(Input_Iterator first, Input_Iterator last) {
-        destruct_n(_data, _size);
+        anton::destruct_n(_data, _size);
         _size = 0;
         ensure_capacity(last - first);
-        uninitialized_copy(first, last, _data);
+        anton::uninitialized_copy(first, last, _data);
         _size = last - first;
     }
 
     template<typename T, typename Allocator>
     template<typename... Args>
-    void Array<T, Allocator>::insert(const_iterator position, Args&&... args) {
+    void Array<T, Allocator>::insert(Variadic_Construct_Tag, const_iterator position, Args&&... args) {
         insert(position - begin(), anton::forward<Args>(args)...);
     }
 
     template<typename T, typename Allocator>
     template<typename... Args>
-    void Array<T, Allocator>::insert(size_type const position, Args&&... args) {
+    void Array<T, Allocator>::insert(Variadic_Construct_Tag, size_type const position, Args&&... args) {
         if constexpr(ANTON_ITERATOR_DEBUG) {
             ANTON_FAIL(position <= _size && position >= 0, u8"Index out of bounds.");
         }
 
         if(_size == _capacity || position != _size) {
             if(_size != _capacity) {
-                uninitialized_move_n(get_ptr(_size - 1), 1, get_ptr(_size));
-                move_backward(get_ptr(position), get_ptr(_size - 1), get_ptr(_size));
-                construct(get_ptr(position), anton::forward<Args>(args)...);
+                anton::uninitialized_move_n(get_ptr(_size - 1), 1, get_ptr(_size));
+                anton::move_backward(get_ptr(position), get_ptr(_size - 1), get_ptr(_size));
+                anton::construct(get_ptr(position), anton::forward<Args>(args)...);
                 _size += 1;
             } else {
                 i64 const new_capacity = _capacity * 2;
                 T* const new_data = allocate(new_capacity);
                 i64 moved = 0;
-                uninitialized_move(get_ptr(0), get_ptr(position), new_data);
+                anton::uninitialized_move(get_ptr(0), get_ptr(position), new_data);
                 moved = position;
-                construct(new_data + position, anton::forward<Args>(args)...);
+                anton::construct(new_data + position, anton::forward<Args>(args)...);
                 moved += 1;
-                uninitialized_move(get_ptr(position), get_ptr(_size), new_data + moved);
+                anton::uninitialized_move(get_ptr(position), get_ptr(_size), new_data + moved);
 
-                destruct_n(_data, _size);
-                deallocate(_data, _capacity);
+                anton::destruct_n(_data, _size);
+                anton::deallocate(_data, _capacity);
                 _capacity = new_capacity;
                 _data = new_data;
                 _size += 1;
             }
         } else {
             // Quick path when position points to end and we have room for one more element.
-            construct(get_ptr(_size), anton::forward<Args>(args)...);
+            anton::construct(get_ptr(_size), anton::forward<Args>(args)...);
             _size += 1;
         }
     }
@@ -417,10 +417,10 @@ namespace anton {
                 i64 const elems_outside = math::min(_size - position, dist);
                 i64 const elems_inside = total_elems - elems_outside;
                 i64 const target_offset = math::max(position + dist, _size);
-                uninitialized_move_n(get_ptr(position + elems_inside), elems_outside, get_ptr(target_offset));
-                move_backward(get_ptr(position), get_ptr(position + elems_inside), get_ptr(position + dist + elems_inside));
-                destruct_n(get_ptr(position), elems_inside);
-                uninitialized_copy(first, last, get_ptr(position));
+                anton::uninitialized_move_n(get_ptr(position + elems_inside), elems_outside, get_ptr(target_offset));
+                anton::move_backward(get_ptr(position), get_ptr(position + elems_inside), get_ptr(position + dist + elems_inside));
+                anton::destruct_n(get_ptr(position), elems_inside);
+                anton::uninitialized_copy(first, last, get_ptr(position));
                 _size += dist;
             } else {
                 i64 new_capacity = _capacity * 2;
@@ -430,11 +430,11 @@ namespace anton {
 
                 T* const new_data = allocate(new_capacity);
                 i64 moved = 0;
-                uninitialized_move(get_ptr(0), get_ptr(position), new_data);
+                anton::uninitialized_move(get_ptr(0), get_ptr(position), new_data);
                 moved = position;
-                uninitialized_copy(first, last, new_data + moved);
+                anton::uninitialized_copy(first, last, new_data + moved);
                 moved += dist;
-                uninitialized_move(get_ptr(position), get_ptr(_size), new_data + moved);
+                anton::uninitialized_move(get_ptr(position), get_ptr(_size), new_data + moved);
 
                 destruct_n(_data, _size);
                 deallocate(_data, _capacity);
@@ -444,7 +444,7 @@ namespace anton {
             }
         } else {
             // Quick path when position points to end and we have room for dist elements.
-            uninitialized_copy(first, last, get_ptr(_size));
+            anton::uninitialized_copy(first, last, get_ptr(_size));
             _size += dist;
         }
     }

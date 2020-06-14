@@ -411,6 +411,7 @@ namespace anton {
 
         // TODO: Distance and actual support for input iterators.
         i64 const dist = last - first;
+        ANTON_ASSERT(dist >= 0, "the difference of first and last must not be negative");
         if(_size + dist > _capacity || position != _size) {
             if(_size + dist <= _capacity) {
                 i64 const total_elems = _size - position;

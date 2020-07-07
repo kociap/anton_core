@@ -30,6 +30,7 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/assert.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/compiletime.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/diagnostic_macros.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/expected.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/filesystem.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/fixed_array.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/flat_hash_map.hpp"

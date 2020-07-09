@@ -148,15 +148,6 @@ namespace anton {
     [[nodiscard]] String operator+(char8 const*, String const&);
     [[nodiscard]] String operator+(String const&, char8 const*);
 
-    // compare
-    // Compares two strings.
-    // CURRENTLY COMPARES ONLY ASCII
-    // Returns: -1 if lhs < rhs, 0 if lhs == rhs and 1 if lhs > rhs.
-    //
-    // TODO: Consider creating a dedicated class for the return type
-    //
-    [[nodiscard]] i32 compare(String const& lhs, String const& rhs);
-
     String to_string(i32);
     String to_string(u32);
     String to_string(i64);

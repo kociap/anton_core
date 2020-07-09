@@ -124,6 +124,31 @@ namespace anton {
         return !(lhs == rhs);
     }
 
+    // compare
+    // Orders two strings lexicographically by comparing codepoints.
+    // Returns: -1 if lhs < rhs, 0 if lhs == rhs and 1 if lhs > rhs.
+    //
+    [[nodiscard]] inline i32 compare(String_View const lhs, String_View const rhs) {
+        auto lhs_i = lhs.chars_begin(), rhs_i = rhs.chars_begin(), lhs_end = lhs.chars_end(), rhs_end = rhs.chars_end();
+        for(; lhs_i != lhs_end && rhs_i != rhs_end; ++lhs_i, ++rhs_i) {
+            char32 const c1 = *lhs_i;
+            char32 const c2 = *rhs_i;
+            if(c1 < c2) {
+                return -1;
+            } else if(c1 > c2) {
+                return 1;
+            }
+        }
+
+        if(lhs_i == lhs_end && rhs_i != rhs_end) {
+            return -1;
+        } else if(lhs_i != lhs_end && rhs_i == rhs_end) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
     constexpr u64 hash(String_View const view) {
         return murmurhash2_64(view.bytes_begin(), view.size_bytes());
     }

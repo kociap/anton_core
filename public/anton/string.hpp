@@ -42,8 +42,7 @@ namespace anton {
         // Reserve space to fit a string of length n and null-terminator.
         String(Reserve_Tag, size_type n, allocator_type const&);
         // Constructs String from null-terminated UTF-8 string
-        // TODO: Consider making explicit
-        String(value_type const*);
+        explicit String(value_type const*);
         // Constructs String from null-terminated UTF-8 string
         String(value_type const*, allocator_type const&);
         // Constructs String from null-terminated UTF-8 string
@@ -143,10 +142,10 @@ namespace anton {
     String& operator+=(String&, String_View);
 
     [[nodiscard]] String operator+(String const& lhs, String const& rhs);
-    [[nodiscard]] String operator+(String_View, String const&);
-    [[nodiscard]] String operator+(String const&, String_View);
-    [[nodiscard]] String operator+(char8 const*, String const&);
-    [[nodiscard]] String operator+(String const&, char8 const*);
+    [[nodiscard]] String operator+(String_View lhs, String const& rhs);
+    [[nodiscard]] String operator+(String const& lhs, String_View rhs);
+    [[nodiscard]] String operator+(char8 const* lhs, String const& rhs);
+    [[nodiscard]] String operator+(String const& lhs, char8 const* rhs);
 
     String to_string(i32);
     String to_string(u32);

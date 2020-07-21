@@ -102,6 +102,10 @@ namespace anton {
         return _data;
     }
 
+    i64 UTF8_Char_Iterator::get_offset() const {
+        return _offset;
+    }
+
     UTF8_Bytes::UTF8_Bytes(value_type* first, value_type* last): _begin(first), _end(last) {}
 
     auto UTF8_Bytes::begin() -> iterator {

@@ -59,6 +59,7 @@ namespace anton {
         [[nodiscard]] value_type operator*() const;
 
         char8 const* get_underlying_pointer() const;
+        i64 get_offset() const;
 
         [[nodiscard]] bool operator==(UTF8_Char_Iterator const& b) const {
             return _data == b._data;

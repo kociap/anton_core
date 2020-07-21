@@ -274,7 +274,7 @@ namespace anton::fs {
 
     char32 Input_File_Stream::peek() {
         char32 const c = get();
-        unget(c);
+        unget();
         return c;
     }
 

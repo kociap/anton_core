@@ -95,7 +95,7 @@ namespace anton::fs {
         virtual void read(Slice<u8> buffer) override;
         virtual char32 peek() override;
         virtual char32 get() override;
-        virtual void unget(char32) override;
+        virtual void unget() override;
         virtual void seek(Seek_Dir dir, i64 offset) override;
         virtual i64 tell() override;
 

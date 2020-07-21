@@ -38,7 +38,7 @@ namespace anton {
         virtual void read(Slice<u8> buffer) = 0;
         virtual char32 peek() = 0;
         virtual char32 get() = 0;
-        virtual void unget(char32) = 0;
+        virtual void unget() = 0;
         virtual void seek(Seek_Dir dir, i64 offset) = 0;
         virtual i64 tell() = 0;
     };

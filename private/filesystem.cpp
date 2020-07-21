@@ -115,108 +115,6 @@ namespace anton::fs {
         return fs_path_to_string(a.parent_path());
     }
 
-    Input_File_Stream::Input_File_Stream() {}
-
-    Input_File_Stream::Input_File_Stream(String const& filename) {
-        open(filename);
-    }
-
-    Input_File_Stream::Input_File_Stream(String const& filename, Open_Mode const open_mode) {
-        open(filename, open_mode);
-    }
-
-    Input_File_Stream::Input_File_Stream(Input_File_Stream&& other): _buffer(other._buffer) {
-        other._buffer = nullptr;
-    }
-
-    Input_File_Stream& Input_File_Stream::operator=(Input_File_Stream&& other) {
-        swap(_buffer, other._buffer);
-        return *this;
-    }
-
-    Input_File_Stream::~Input_File_Stream() {
-        close();
-    }
-
-    Input_File_Stream::operator bool() const {
-        return is_open();
-    }
-
-    bool Input_File_Stream::open(String const& filename) {
-        if(_buffer) {
-            fclose((FILE*)_buffer);
-        }
-
-        _buffer = fopen(filename.data(), "rb");
-        return _buffer != nullptr;
-    }
-
-    bool Input_File_Stream::open(String const& filename, Open_Mode const open_mode) {
-        if(_buffer) {
-            fclose((FILE*)_buffer);
-        }
-
-        // TODO: implement open modes.
-        _buffer = fopen(filename.data(), open_mode != Open_Mode::windows_translate_newline ? "rb" : "r");
-        return _buffer != nullptr;
-    }
-
-    void Input_File_Stream::close() {
-        if(_buffer) {
-            fclose((FILE*)_buffer);
-        }
-    }
-
-    bool Input_File_Stream::is_open() const {
-        return _buffer != nullptr;
-    }
-
-    void Input_File_Stream::read(void* buffer, i64 count) {
-        ANTON_ASSERT(_buffer, "Attempting to read from the stream, but no file has been opened.");
-        fread(buffer, count, 1, (FILE*)_buffer);
-    }
-
-    void Input_File_Stream::read(Slice<u8> const buffer) {
-        ANTON_ASSERT(_buffer, "Attempting to read from the stream, but no file has been opened.");
-        fread(buffer.data(), buffer.size(), 1, (FILE*)_buffer);
-    }
-
-    char32 Input_File_Stream::peek() {
-        char32 const c = get();
-        unget(c);
-        return c;
-    }
-
-    char32 Input_File_Stream::get() {
-        ANTON_ASSERT(_buffer, "Attempting to read from the stream, but no file has been opened.");
-        return fgetc((FILE*)_buffer);
-    }
-
-    void Input_File_Stream::unget(char32 c) {
-        ANTON_ASSERT(_buffer, "Attempting to unget to the stream, but no file has been opened.");
-        ungetc(c, (FILE*)_buffer);
-    }
-
-    void Input_File_Stream::seek(Seek_Dir dir, i64 offset) {
-        ANTON_ASSERT(_buffer, "Attempting to seek in the stream, but no file has been opened.");
-        fseek((FILE*)_buffer, offset, (int)(dir));
-    }
-
-    i64 Input_File_Stream::tell() {
-        ANTON_ASSERT(_buffer, "Attempting to tell the stream, but no file has been opened.");
-        return ftell((FILE*)_buffer);
-    }
-
-    bool Input_File_Stream::eof() const {
-        ANTON_ASSERT(_buffer, "Attempting to get error state from the stream, but no file has been opened.");
-        return feof((FILE*)_buffer);
-    }
-
-    bool Input_File_Stream::error() const {
-        ANTON_ASSERT(_buffer, "Attempting to get error state the stream, but no file has been opened.");
-        return ferror((FILE*)_buffer);
-    }
-
     Output_File_Stream::Output_File_Stream() {}
 
     Output_File_Stream::Output_File_Stream(String const& filename) {
@@ -306,5 +204,108 @@ namespace anton::fs {
     i64 Output_File_Stream::tell() {
         ANTON_ASSERT(_buffer, "Attempting to tell the stream, but no file has been opened.");
         return ftell((FILE*)_buffer);
+    }
+
+    Input_File_Stream::Input_File_Stream() {}
+
+    Input_File_Stream::Input_File_Stream(String const& filename) {
+        open(filename);
+    }
+
+    Input_File_Stream::Input_File_Stream(String const& filename, Open_Mode const open_mode) {
+        open(filename, open_mode);
+    }
+
+    Input_File_Stream::Input_File_Stream(Input_File_Stream&& other): _buffer(other._buffer) {
+        other._buffer = nullptr;
+    }
+
+    Input_File_Stream& Input_File_Stream::operator=(Input_File_Stream&& other) {
+        swap(_buffer, other._buffer);
+        return *this;
+    }
+
+    Input_File_Stream::~Input_File_Stream() {
+        close();
+    }
+
+    Input_File_Stream::operator bool() const {
+        return is_open();
+    }
+
+    bool Input_File_Stream::open(String const& filename) {
+        if(_buffer) {
+            fclose((FILE*)_buffer);
+        }
+
+        _buffer = fopen(filename.data(), "rb");
+        return _buffer != nullptr;
+    }
+
+    bool Input_File_Stream::open(String const& filename, Open_Mode const open_mode) {
+        if(_buffer) {
+            fclose((FILE*)_buffer);
+        }
+
+        // TODO: implement open modes.
+        _buffer = fopen(filename.data(), open_mode != Open_Mode::windows_translate_newline ? "rb" : "r");
+        return _buffer != nullptr;
+    }
+
+    void Input_File_Stream::close() {
+        if(_buffer) {
+            fclose((FILE*)_buffer);
+        }
+    }
+
+    bool Input_File_Stream::is_open() const {
+        return _buffer != nullptr;
+    }
+
+    void Input_File_Stream::read(void* buffer, i64 count) {
+        ANTON_ASSERT(_buffer, "Attempting to read from the stream, but no file has been opened.");
+        fread(buffer, count, 1, (FILE*)_buffer);
+    }
+
+    void Input_File_Stream::read(Slice<u8> const buffer) {
+        ANTON_ASSERT(_buffer, "Attempting to read from the stream, but no file has been opened.");
+        fread(buffer.data(), buffer.size(), 1, (FILE*)_buffer);
+    }
+
+    char32 Input_File_Stream::peek() {
+        char32 const c = get();
+        unget(c);
+        return c;
+    }
+
+    char32 Input_File_Stream::get() {
+        ANTON_ASSERT(_buffer, "Attempting to read from the stream, but no file has been opened.");
+        return fgetc((FILE*)_buffer);
+    }
+
+    void Input_File_Stream::unget() {
+        ANTON_ASSERT(_buffer, "Attempting to unget to the stream, but no file has been opened.");
+        i64 n = tell();
+        seek(Seek_Dir::cur, n - 1);
+    }
+
+    void Input_File_Stream::seek(Seek_Dir dir, i64 offset) {
+        ANTON_ASSERT(_buffer, "Attempting to seek in the stream, but no file has been opened.");
+        fseek((FILE*)_buffer, offset, (int)(dir));
+    }
+
+    i64 Input_File_Stream::tell() {
+        ANTON_ASSERT(_buffer, "Attempting to tell the stream, but no file has been opened.");
+        return ftell((FILE*)_buffer);
+    }
+
+    bool Input_File_Stream::eof() const {
+        ANTON_ASSERT(_buffer, "Attempting to get error state from the stream, but no file has been opened.");
+        return feof((FILE*)_buffer);
+    }
+
+    bool Input_File_Stream::error() const {
+        ANTON_ASSERT(_buffer, "Attempting to get error state the stream, but no file has been opened.");
+        return ferror((FILE*)_buffer);
     }
 } // namespace anton::fs

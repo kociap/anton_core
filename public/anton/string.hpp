@@ -168,7 +168,7 @@ namespace anton {
     [[nodiscard]] String to_string(u64 v);
     [[nodiscard]] String to_string(f32 v);
     [[nodiscard]] String to_string(f64 v);
-    [[nodiscard]] String to_string(void* v);
+    [[nodiscard]] String to_string(void const* v);
 
     // TODO: Implement in terms of String_View.
     [[nodiscard]] f32 str_to_f32(String const& string);

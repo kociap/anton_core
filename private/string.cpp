@@ -444,7 +444,7 @@ namespace anton {
         return {buffer, written_chars};
     }
 
-    String to_string(void* value) {
+    String to_string(void const* value) {
         char buffer[50] = {};
         usize address = reinterpret_cast<usize>(value);
         i32 written_chars = sprintf(buffer, "0x%016llx", address);

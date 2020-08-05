@@ -9,7 +9,7 @@
 namespace anton::fs {
     static String fs_path_to_string(std::filesystem::path const& path) {
         std::string gen_str = path.generic_string();
-        return {gen_str.data(), (i64)gen_str.size()};
+        return String{gen_str.data(), (i64)gen_str.size()};
     }
 
     String normalize_path(String_View const path) {
@@ -111,7 +111,6 @@ namespace anton::fs {
 
     String parent_path(String_View const path) {
         std::filesystem::path a(std::string_view(path.data(), path.size_bytes()));
-
         return fs_path_to_string(a.parent_path());
     }
 

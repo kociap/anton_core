@@ -52,17 +52,17 @@ namespace anton {
         String();
         explicit String(allocator_type const&);
         // Reserve space to fit a string of length n and null-terminator.
-        String(Reserve_Tag, size_type n);
+        explicit String(Reserve_Tag, size_type n);
         // Reserve space to fit a string of length n and null-terminator.
-        String(Reserve_Tag, size_type n, allocator_type const&);
+        explicit String(Reserve_Tag, size_type n, allocator_type const&);
         // Constructs String from null-terminated UTF-8 string
         explicit String(value_type const*);
         // Constructs String from null-terminated UTF-8 string
-        String(value_type const*, allocator_type const&);
+        explicit String(value_type const*, allocator_type const&);
         // Constructs String from null-terminated UTF-8 string
-        String(value_type const*, size_type);
+        explicit String(value_type const*, size_type);
         // Constructs String from null-terminated UTF-8 string
-        String(value_type const*, size_type, allocator_type const&);
+        explicit String(value_type const*, size_type, allocator_type const&);
         explicit String(String_View);
         explicit String(String_View, allocator_type const&);
         // Does not copy the allocator

@@ -128,7 +128,7 @@ namespace anton {
         Array<String_View> string_slices;
         Array<Format_Field> format_fields;
         if(!parse_format_string(format_string, string_slices, format_fields)) {
-            return "";
+            return String{""};
         }
 
         String out;

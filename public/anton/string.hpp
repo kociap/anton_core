@@ -50,19 +50,23 @@ namespace anton {
 
     public:
         String();
-        explicit String(allocator_type const&);
+        explicit String(allocator_type const& allocator);
         // Reserve space to fit a string of length n and null-terminator.
         explicit String(Reserve_Tag, size_type n);
         // Reserve space to fit a string of length n and null-terminator.
-        explicit String(Reserve_Tag, size_type n, allocator_type const&);
+        explicit String(Reserve_Tag, size_type n, allocator_type const& allocator);
         // Constructs String from null-terminated UTF-8 string
-        explicit String(value_type const*);
+        explicit String(value_type const* string);
         // Constructs String from null-terminated UTF-8 string
-        explicit String(value_type const*, allocator_type const&);
-        // Constructs String from null-terminated UTF-8 string
-        explicit String(value_type const*, size_type);
-        // Constructs String from null-terminated UTF-8 string
-        explicit String(value_type const*, size_type, allocator_type const&);
+        explicit String(value_type const* string, allocator_type const& allocator);
+        // Constructs String from a string of size n
+        explicit String(value_type const* string, size_type n);
+        // Constructs String from a string of size n
+        explicit String(value_type const* string, size_type n, allocator_type const& allocator);
+        // Constructs String from the range [first, last[
+        explicit String(value_type const* first, value_type const* last);
+        // Constructs String from the range [first, last[
+        explicit String(value_type const* first, value_type const* last, allocator_type const& allocator);
         explicit String(String_View);
         explicit String(String_View, allocator_type const&);
         // Does not copy the allocator

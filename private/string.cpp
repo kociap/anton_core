@@ -67,6 +67,16 @@ namespace anton {
         copy(cstr, cstr + n, _data);
     }
 
+    String::String(value_type const* first, value_type const* last): String(first, last, allocator_type()) {}
+
+    String::String(value_type const* first, value_type const* last, allocator_type const& allocator) {
+        _size = last - first;
+        _capacity = math::max(_capacity - 1, _size) + 1;
+        _data = reinterpret_cast<value_type*>(_allocator.allocate(_capacity, alignof(value_type)));
+        memset(_data + _size, 0, _capacity - _size);
+        copy(first, last, _data);
+    }
+
     String::String(String_View const sv): String(sv, allocator_type()) {}
 
     String::String(String_View const sv, allocator_type const& allocator): _allocator(allocator) {
@@ -374,10 +384,7 @@ namespace anton {
             v /= 10;
         } while(v > 0);
         buffer[i] = '-';
-        i32 len = 12 - i - !has_sign;
-        // TODO: Implement (ptr, ptr) string ctor
-        // return {buffer + i, buffer + 12};
-        return {buffer + i + !has_sign, len - 1};
+        return String{buffer + i + !has_sign, buffer + 11};
     }
 
     String to_string(u32 v) {
@@ -389,10 +396,9 @@ namespace anton {
             --i;
             v /= 10;
         } while(v > 0);
-        i32 len = 12 - i - 1;
-        // TODO: Implement (ptr, ptr) string ctor
-        // return {buffer + i + 1, buffer + 11};
-        return {buffer + i + 1, len - 1};
+        // We add 1 to readjust after the last decrement in the loop
+        // that takes us to a position before the first digit.
+        return String{buffer + i + 1, buffer + 10};
     }
 
     String to_string(i64 v) {
@@ -411,10 +417,7 @@ namespace anton {
             v /= 10;
         } while(v > 0);
         buffer[i] = '-';
-        i32 len = 22 - i - !has_sign;
-        // TODO: Implement (ptr, ptr) string ctor
-        // return {buffer + i, buffer + 22};
-        return {buffer + i + !has_sign, len - 1};
+        return String{buffer + i + !has_sign, buffer + 21};
     }
 
     String to_string(u64 v) {
@@ -426,29 +429,28 @@ namespace anton {
             --i;
             v /= 10;
         } while(v > 0);
-        i64 len = 21 - i - 1;
-        // TODO: Implement (ptr, ptr) string ctor
-        // return {buffer + i + 1, buffer + 22};
-        return {buffer + i + 1, len - 1};
+        // We add 1 to readjust after the last decrement in the loop
+        // that takes us to a position before the first digit.
+        return String{buffer + i + 1, buffer + 21};
     }
 
     String to_string(f32 value) {
         char buffer[50] = {};
         i32 written_chars = sprintf(buffer, "%.7f", value);
-        return {buffer, written_chars};
+        return String{buffer, written_chars};
     }
 
     String to_string(f64 value) {
         char buffer[50] = {};
         i32 written_chars = sprintf(buffer, "%.14f", value);
-        return {buffer, written_chars};
+        return String{buffer, written_chars};
     }
 
     String to_string(void const* value) {
         char buffer[50] = {};
         usize address = reinterpret_cast<usize>(value);
         i32 written_chars = sprintf(buffer, "0x%016llx", address);
-        return {buffer, written_chars};
+        return String{buffer, written_chars};
     }
 
     f32 str_to_f32(String const& string) {

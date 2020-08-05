@@ -17,8 +17,9 @@ namespace anton {
     // use this for views
     constexpr bool compare_equal(char8 const* lhs, char8 const* rhs, i64 length) {
         for(i64 i = 0; i < length; ++i) {
-            if(*lhs != *rhs)
+            if(*lhs != *rhs) {
                 return false;
+            }
             ++lhs;
             ++rhs;
         }

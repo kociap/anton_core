@@ -32,7 +32,21 @@ namespace anton {
         using char_iterator = UTF8_Char_Iterator;
 
     public:
-        [[nodiscard]] static String from_utf16(char16 const*);
+        // from_utf32
+        // Construct String from UTF-32 encoded string.
+        //
+        // length is the number of bytes to be used to construct String. If length is -1,
+        // the function will convert all characters up until and including the null-terminator.
+        //
+        [[nodiscard]] static String from_utf32(char32 const* string, i64 length = -1);
+
+        // from_utf16
+        // Construct String from UTF-16 encoded string.
+        //
+        // length is the number of bytes to be used to construct String. If length is -1,
+        // the function will convert all characters up until and including the null-terminator.
+        //
+        [[nodiscard]] static String from_utf16(char16 const* string, i64 length = -1);
 
     public:
         String();
@@ -122,6 +136,7 @@ namespace anton {
 
         [[nodiscard]] value_type* data();
         [[nodiscard]] value_type const* data() const;
+        [[nodiscard]] value_type const* c_str() const;
         [[nodiscard]] allocator_type& get_allocator();
         [[nodiscard]] allocator_type const& get_allocator() const;
 
@@ -147,16 +162,16 @@ namespace anton {
     [[nodiscard]] String operator+(char8 const* lhs, String const& rhs);
     [[nodiscard]] String operator+(String const& lhs, char8 const* rhs);
 
-    String to_string(i32);
-    String to_string(u32);
-    String to_string(i64);
-    String to_string(u64);
-    String to_string(f32);
-    String to_string(f64);
-    String to_string(void*);
+    [[nodiscard]] String to_string(i32 v);
+    [[nodiscard]] String to_string(u32 v);
+    [[nodiscard]] String to_string(i64 v);
+    [[nodiscard]] String to_string(u64 v);
+    [[nodiscard]] String to_string(f32 v);
+    [[nodiscard]] String to_string(f64 v);
+    [[nodiscard]] String to_string(void* v);
 
     // TODO: Implement in terms of String_View.
-    f32 str_to_f32(String const& string);
+    [[nodiscard]] f32 str_to_f32(String const& string);
 
     template<>
     struct Default_Hash<String> {

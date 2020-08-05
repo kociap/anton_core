@@ -25,7 +25,7 @@ namespace anton {
         virtual void write(String_View buffer) = 0;
         virtual void put(char32) = 0;
         virtual void seek(Seek_Dir dir, i64 offset) = 0;
-        virtual i64 tell() = 0;
+        [[nodiscard]] virtual i64 tell() = 0;
     };
 
     class Input_Stream {
@@ -36,10 +36,10 @@ namespace anton {
 
         virtual void read(void* buffer, i64 count) = 0;
         virtual void read(Slice<u8> buffer) = 0;
-        virtual char32 peek() = 0;
+        [[nodiscard]] virtual char32 peek() = 0;
         virtual char32 get() = 0;
         virtual void unget() = 0;
         virtual void seek(Seek_Dir dir, i64 offset) = 0;
-        virtual i64 tell() = 0;
+        [[nodiscard]] virtual i64 tell() = 0;
     };
 } // namespace anton

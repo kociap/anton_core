@@ -57,14 +57,14 @@ namespace anton {
         [[nodiscard]] size_type capacity() const;
 
         // resize
-        // Resizes the vector allocating additional memory if n is greater than capacity.
+        // Resizes the array allocating additional memory if n is greater than capacity.
         // If n is greater than size, the new elements are default constructed.
         // If n is less than size, the excess elements are destroyed.
         //
         void resize(size_type n);
 
         // resize
-        // Resizes the vector allocating additional memory if n is greater than capacity.
+        // Resizes the array allocating additional memory if n is greater than capacity.
         // If n is greater than size, the new elements are copy constructed from v.
         // If n is less than size, the excess elements are destroyed.
         //
@@ -83,8 +83,8 @@ namespace anton {
         void set_capacity(size_type n);
 
         // force_size
-        // Changes the size of the vector to n. Useful in situations when the user
-        // writes to the vector via external means.
+        // Changes the size of the array to n. Useful in situations when the user
+        // writes to the array via external means.
         //
         void force_size(size_type n);
 

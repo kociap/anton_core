@@ -17,6 +17,14 @@ namespace anton::unicode {
         return byte_count;
     }
 
+    static char32 surrogate_pair_to_codepoint(char16 const high_surrogate, char16 const low_surrogate) {
+        // Subtract 0xD800 from high surrogate. Subtract 0xDC00 from low surrogate.
+        // Subtract 0x10000 from the merged surrogates.
+        // 0x35FDC00 = (0xD800 << 10) + 0xDC00 - 0x10000
+        char32 const codepoint = (((high_surrogate & 0x3FF) << 10) | (low_surrogate & 0x3FF)) - 0x35FDC00;
+        return codepoint;
+    }
+
     i64 convert_utf32_to_utf8(char32 const* buffer_utf32, i64 const count, char8* buffer_utf8) {
         if constexpr(ANTON_UNICODE_VALIDATE_ENCODING) {
             // TODO: Implement
@@ -62,17 +70,9 @@ namespace anton::unicode {
             // TODO: Implement
         }
 
-        if(char16 const high_surrogate = *buffer_utf16; high_surrogate > 0xD7FF && high_surrogate < 0xE000) {
-            // Surrogate pair
-            u16 const low_surrogate = buffer_utf16[1];
-            char32 const codepoint = (((high_surrogate & 0x3FF) >> 10) | (low_surrogate & 0x3FF)) + 0x10000;
-            buffer_utf8[0] = 0xF0 | ((codepoint & 0x1C0000) >> 18);
-            buffer_utf8[1] = 0x80 | ((codepoint & 0x3F000) >> 12);
-            buffer_utf8[2] = 0x80 | ((codepoint & 0xFC0) >> 6);
-            buffer_utf8[3] = 0x80 | (codepoint & 0x3F);
-            return 4;
-        } else {
-            char16 const codepoint = *buffer_utf16;
+        // U+0000 to U+D7FF and U+E000 to U+FFFF are encoded as single 16bit chars, which we expect to be the more common case.
+        if(char16 const high_surrogate = *buffer_utf16; high_surrogate <= 0xD7FF || high_surrogate >= 0xE000) {
+            char32 const codepoint = high_surrogate;
             if(codepoint <= 0x7F) {
                 *buffer_utf8 = codepoint;
                 return 1;
@@ -86,6 +86,14 @@ namespace anton::unicode {
                 buffer_utf8[2] = 0x80 | (codepoint & 0x3F);
                 return 3;
             }
+        } else {
+            char16 const low_surrogate = buffer_utf16[1];
+            char32 const codepoint = surrogate_pair_to_codepoint(high_surrogate, low_surrogate);
+            buffer_utf8[0] = 0xF0 | ((codepoint & 0x1C0000) >> 18);
+            buffer_utf8[1] = 0x80 | ((codepoint & 0x3F000) >> 12);
+            buffer_utf8[2] = 0x80 | ((codepoint & 0xFC0) >> 6);
+            buffer_utf8[3] = 0x80 | (codepoint & 0x3F);
+            return 4;
         }
     }
 
@@ -98,15 +106,9 @@ namespace anton::unicode {
             i64 bytes = 0;
             i64 bytes_read = 0;
             while(true) {
-                if(char16 const high_surrogate = *buffer_utf16; high_surrogate > 0xD7FF && high_surrogate < 0xE000) {
-                    bytes += 4;
-                    bytes_read += 4;
-                    buffer_utf16 += 2;
-                    if(count != -1 && bytes_read >= count) {
-                        return bytes;
-                    }
-                } else {
-                    char16 const codepoint = *buffer_utf16;
+                // U+0000 to U+D7FF and U+E000 to U+FFFF are encoded as single 16bit chars, which we expect to be the more common case.
+                if(char16 const high_surrogate = *buffer_utf16; high_surrogate <= 0xD7FF || high_surrogate >= 0xE000) {
+                    char16 const codepoint = high_surrogate;
                     // If codepoint is less than 0x7FF, it's 2 bytes in UTF-8. If it's less than 0x7F, it's 1 byte in UTF-8.
                     // Otherwise it's 3 bytes.
                     bytes += 3 - (codepoint <= 0x7FF) - (codepoint <= 0x7F);
@@ -115,29 +117,22 @@ namespace anton::unicode {
                     if((count == -1 && codepoint == u'\0') || (count != -1 && bytes_read >= count)) {
                         return bytes;
                     }
+                } else {
+                    bytes += 4;
+                    bytes_read += 4;
+                    buffer_utf16 += 2;
+                    if(count != -1 && bytes_read >= count) {
+                        return bytes;
+                    }
                 }
             }
         } else {
             i64 bytes_written = 0;
             i64 bytes_read = 0;
             while(true) {
-                if(char16 const high_surrogate = *buffer_utf16; high_surrogate > 0xD7FF && high_surrogate < 0xE000) {
-                    // Surrogate pair
-                    u16 const low_surrogate = buffer_utf16[1];
-                    char32 const codepoint = (((high_surrogate & 0x3FF) >> 10) | (low_surrogate & 0x3FF)) + 0x10000;
-                    buffer_utf8[0] = 0xF0 | ((codepoint & 0x1C0000) >> 18);
-                    buffer_utf8[1] = 0x80 | ((codepoint & 0x3F000) >> 12);
-                    buffer_utf8[2] = 0x80 | ((codepoint & 0xFC0) >> 6);
-                    buffer_utf8[3] = 0x80 | (codepoint & 0x3F);
-                    buffer_utf8 += 4;
-                    bytes_written += 4;
-                    bytes_read += 4;
-                    buffer_utf16 += 2;
-                    if(count != -1 && bytes_read >= count) {
-                        return bytes_written;
-                    }
-                } else {
-                    char16 const codepoint = *buffer_utf16;
+                // U+0000 to U+D7FF and U+E000 to U+FFFF are encoded as single 16bit chars, which we expect to be the more common case.
+                if(char16 const high_surrogate = *buffer_utf16; high_surrogate <= 0xD7FF || high_surrogate >= 0xE000) {
+                    char32 const codepoint = high_surrogate;
                     if(codepoint <= 0x7F) {
                         *buffer_utf8 = codepoint;
                         buffer_utf8 += 1;
@@ -157,6 +152,20 @@ namespace anton::unicode {
                     bytes_read += 2;
                     buffer_utf16 += 1;
                     if((count == -1 && codepoint == u'\0') || (count != -1 && bytes_read >= count)) {
+                        return bytes_written;
+                    }
+                } else {
+                    char16 const low_surrogate = buffer_utf16[1];
+                    char32 const codepoint = surrogate_pair_to_codepoint(high_surrogate, low_surrogate);
+                    buffer_utf8[0] = 0xF0 | ((codepoint & 0x1C0000) >> 18);
+                    buffer_utf8[1] = 0x80 | ((codepoint & 0x3F000) >> 12);
+                    buffer_utf8[2] = 0x80 | ((codepoint & 0xFC0) >> 6);
+                    buffer_utf8[3] = 0x80 | (codepoint & 0x3F);
+                    buffer_utf8 += 4;
+                    bytes_written += 4;
+                    bytes_read += 4;
+                    buffer_utf16 += 2;
+                    if(count != -1 && bytes_read >= count) {
                         return bytes_written;
                     }
                 }

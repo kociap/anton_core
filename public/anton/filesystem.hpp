@@ -7,35 +7,35 @@
 namespace anton::fs {
     // normalize_path
     //
-    String normalize_path(String_View path);
+    [[nodiscard]] String normalize_path(String_View path);
 
     // concat_paths
     // Concatenate paths with separator.
     //
-    String concat_paths(String_View path1, String_View path2);
+    [[nodiscard]] String concat_paths(String_View path1, String_View path2);
 
-    String_View remove_filename(String_View path);
-    String_View remove_extension(String_View path);
-    String_View get_filename(String_View path);
-    String_View get_filename_no_extension(String_View path);
-    String_View get_extension(String_View path);
+    [[nodiscard]] String_View remove_filename(String_View path);
+    [[nodiscard]] String_View remove_extension(String_View path);
+    [[nodiscard]] String_View get_filename(String_View path);
+    [[nodiscard]] String_View get_filename_no_extension(String_View path);
+    [[nodiscard]] String_View get_extension(String_View path);
 
-    String parent_path(String_View const path);
+    [[nodiscard]] String parent_path(String_View const path);
 
     // get_directory_name
     // Does not support paths using "file:".
     //
-    String_View get_directory_name(String_View path);
+    [[nodiscard]] String_View get_directory_name(String_View path);
 
     // get_last_write_time
     // Returns time in ms since 1970 (TODO: document exact time) of the last modification of a file.
     // TODO: Currently returns gods know what time.
     //
-    i64 get_last_write_time(String_View path);
+    [[nodiscard]] i64 get_last_write_time(String_View path);
 
-    bool has_extension(String_View path);
-    bool has_filename(String_View path);
-    bool exists(String_View path);
+    [[nodiscard]] bool has_extension(String_View path);
+    [[nodiscard]] bool has_filename(String_View path);
+    [[nodiscard]] bool exists(String_View path);
 
     enum class Open_Mode {
         // Has effect only on Windows. Makes all reading operations translate the \n\r sequences into \n.
@@ -67,7 +67,7 @@ namespace anton::fs {
         virtual void write(String_View buffer) override;
         virtual void put(char32) override;
         virtual void seek(Seek_Dir dir, i64 offset) override;
-        virtual i64 tell() override;
+        [[nodiscard]] virtual i64 tell() override;
 
     private:
         void* _buffer = nullptr;
@@ -93,11 +93,11 @@ namespace anton::fs {
 
         virtual void read(void* buffer, i64 count) override;
         virtual void read(Slice<u8> buffer) override;
-        virtual char32 peek() override;
+        [[nodiscard]] virtual char32 peek() override;
         virtual char32 get() override;
         virtual void unget() override;
         virtual void seek(Seek_Dir dir, i64 offset) override;
-        virtual i64 tell() override;
+        [[nodiscard]] virtual i64 tell() override;
 
         // eof
         // Checks whether the stream has reached end-of-file.

@@ -111,5 +111,6 @@ extern "C" {
 void* operator new(size_t size, void*) noexcept;
 void operator delete(void* ptr, void* place) noexcept;
 
+#undef ANTON_NOEXCEPT
 #undef ANTON_CRT_IMPORT
 #undef size_t

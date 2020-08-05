@@ -13,11 +13,19 @@
 #include <stdio.h> // sprintf
 
 namespace anton {
-    String String::from_utf16(char16 const* str_utf16) {
-        i32 const buffer_size = unicode::convert_utf16_to_utf8(str_utf16, -1, nullptr);
+    String String::from_utf32(char32 const* string, i64 const length) {
+        i32 const buffer_size = unicode::convert_utf32_to_utf8(string, length, nullptr);
         String str{anton::reserve, buffer_size - 1};
         str.force_size(buffer_size - 1);
-        unicode::convert_utf16_to_utf8(str_utf16, -1, str.data());
+        unicode::convert_utf32_to_utf8(string, length, str.data());
+        return str;
+    }
+
+    String String::from_utf16(char16 const* string, i64 const length) {
+        i32 const buffer_size = unicode::convert_utf16_to_utf8(string, length, nullptr);
+        String str{anton::reserve, buffer_size - 1};
+        str.force_size(buffer_size - 1);
+        unicode::convert_utf16_to_utf8(string, length, str.data());
         return str;
     }
 
@@ -252,6 +260,10 @@ namespace anton {
         return _data;
     }
 
+    auto String::c_str() const -> value_type const* {
+        return _data;
+    }
+
     String::allocator_type& String::get_allocator() {
         return _allocator;
     }
@@ -346,28 +358,78 @@ namespace anton {
         return lhs + String_View(rhs);
     }
 
-    String to_string(i32 value) {
-        char buffer[50] = {};
-        i32 written_chars = sprintf(buffer, "%d", value);
-        return {buffer, written_chars};
+    String to_string(i32 v) {
+        // We don't need null-terminator or initialized elements.
+        char buffer[11];
+        bool has_sign = false;
+        if(v < 0) {
+            has_sign = true;
+            v = -v;
+        }
+
+        i32 i = 10;
+        do {
+            buffer[i] = (v % 10) | '0';
+            --i;
+            v /= 10;
+        } while(v > 0);
+        buffer[i] = '-';
+        i32 len = 12 - i - !has_sign;
+        // TODO: Implement (ptr, ptr) string ctor
+        // return {buffer + i, buffer + 12};
+        return {buffer + i + !has_sign, len - 1};
     }
 
-    String to_string(u32 value) {
-        char buffer[50] = {};
-        i32 written_chars = sprintf(buffer, "%u", value);
-        return {buffer, written_chars};
+    String to_string(u32 v) {
+        // We don't need null-terminator or initialized elements.
+        char buffer[10];
+        i32 i = 9;
+        do {
+            buffer[i] = (v % 10) | '0';
+            --i;
+            v /= 10;
+        } while(v > 0);
+        i32 len = 12 - i - 1;
+        // TODO: Implement (ptr, ptr) string ctor
+        // return {buffer + i + 1, buffer + 11};
+        return {buffer + i + 1, len - 1};
     }
 
-    String to_string(i64 value) {
-        char buffer[50] = {};
-        i32 written_chars = sprintf(buffer, "%lld", value);
-        return {buffer, written_chars};
+    String to_string(i64 v) {
+        // We don't need null-terminator or initialized elements.
+        char buffer[21];
+        bool has_sign = false;
+        if(v < 0) {
+            has_sign = true;
+            v = -v;
+        }
+
+        i32 i = 20;
+        do {
+            buffer[i] = (v % 10) | '0';
+            --i;
+            v /= 10;
+        } while(v > 0);
+        buffer[i] = '-';
+        i32 len = 22 - i - !has_sign;
+        // TODO: Implement (ptr, ptr) string ctor
+        // return {buffer + i, buffer + 22};
+        return {buffer + i + !has_sign, len - 1};
     }
 
-    String to_string(u64 value) {
-        char buffer[50] = {};
-        i32 written_chars = sprintf(buffer, "%llu", value);
-        return {buffer, written_chars};
+    String to_string(u64 v) {
+        // We don't need null-terminator or initialized elements.
+        char buffer[21];
+        i64 i = 20;
+        do {
+            buffer[i] = (v % 10) | '0';
+            --i;
+            v /= 10;
+        } while(v > 0);
+        i64 len = 21 - i - 1;
+        // TODO: Implement (ptr, ptr) string ctor
+        // return {buffer + i + 1, buffer + 22};
+        return {buffer + i + 1, len - 1};
     }
 
     String to_string(f32 value) {

@@ -184,7 +184,7 @@ namespace anton {
     struct Is_Empty: public Bool_Constant<__is_empty(T)> {};
 
     template<typename T>
-    constexpr bool is_empty = Is_Empty<T>::value;
+    constexpr bool is_empty = __is_empty(T);
 
     // Is_Enum
     //
@@ -192,7 +192,7 @@ namespace anton {
     struct Is_Enum: public Bool_Constant<__is_enum(T)> {};
 
     template<typename T>
-    constexpr bool is_enum = Is_Enum<T>::value;
+    constexpr bool is_enum = __is_enum(T);
 
     // Underlying_Type
     //
@@ -202,18 +202,15 @@ namespace anton {
     };
 
     template<typename T>
-    using underlying_type = typename Underlying_Type<T>::type;
+    using underlying_type = __underlying_type(T);
 
     // Is_Trivial
     //
     template<typename T>
-    struct Is_Trivial: public Bool_Constant<__is_trivial(T)> {
-        static_assert(disjunction<Is_Complete_Type<T>, Is_Void<T>, Is_Unbounded_Array<T>>,
-                      u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Trivial: public Bool_Constant<__is_trivial(T)> {};
 
     template<typename T>
-    constexpr bool is_trivial = Is_Trivial<T>::value;
+    constexpr bool is_trivial = __is_trivial(T);
 
     // Is_Assignable
     //
@@ -221,68 +218,50 @@ namespace anton {
     // which apparently is the case for Clang, MSVC and GCC
     //
     template<typename To, typename From>
-    struct Is_Assignable: Bool_Constant<__is_assignable(To, From)> {
-        static_assert(disjunction<Is_Complete_Type<To>, Is_Void<To>, Is_Unbounded_Array<To>, Is_Complete_Type<From>, Is_Void<From>, Is_Unbounded_Array<From>>,
-                      u8"Template arguments must be complete types, void or unbounded arrays.");
-    };
+    struct Is_Assignable: Bool_Constant<__is_assignable(To, From)> {};
 
-    template<typename T, typename U>
-    constexpr bool is_assignable = Is_Assignable<T, U>::value;
+    template<typename To, typename From>
+    constexpr bool is_assignable = __is_assignable(To, From);
 
     // Is_Copy_Assignable
     //
     template<typename T>
-    struct Is_Copy_Assignable: Is_Assignable<add_lvalue_reference<T>, add_lvalue_reference<T>> {
-        static_assert(disjunction<Is_Complete_Type<T>, Is_Void<T>, Is_Unbounded_Array<T>>,
-                      u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Copy_Assignable: Bool_Constant<__is_assignable(add_lvalue_reference<T>, add_lvalue_reference<T>)> {};
 
     template<typename T>
-    constexpr bool is_copy_assignable = Is_Copy_Assignable<T>::value;
+    constexpr bool is_copy_assignable = __is_assignable(add_lvalue_reference<T>, add_lvalue_reference<T>);
 
     // Is_Move_Assignable
     //
     template<typename T>
-    struct Is_Move_Assignable: Is_Assignable<add_lvalue_reference<T>, add_rvalue_reference<T>> {
-        static_assert(disjunction<Is_Complete_Type<T>, Is_Void<T>, Is_Unbounded_Array<T>>,
-                      u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Move_Assignable: Bool_Constant<__is_assignable(add_lvalue_reference<T>, add_rvalue_reference<T>)> {};
 
     template<typename T>
-    constexpr bool is_move_assignable = Is_Move_Assignable<T>::value;
+    constexpr bool is_move_assignable = __is_assignable(add_lvalue_reference<T>, add_rvalue_reference<T>);
 
     // Is_Trivially_Assignable
     //
     template<typename To, typename From>
-    struct Is_Trivially_Assignable: Bool_Constant<__is_trivially_assignable(To, From)> {
-        static_assert(disjunction<Is_Complete_Type<To>, Is_Void<To>, Is_Unbounded_Array<To>, Is_Complete_Type<From>, Is_Void<From>, Is_Unbounded_Array<From>>,
-                      u8"Template arguments must be complete types, void or unbounded arrays.");
-    };
+    struct Is_Trivially_Assignable: Bool_Constant<__is_trivially_assignable(To, From)> {};
 
     template<typename To, typename From>
-    constexpr bool is_trivially_assignable = Is_Trivially_Assignable<To, From>::value;
+    constexpr bool is_trivially_assignable = __is_trivially_assignable(To, From);
 
     // Is_Trivially_Copy_Assignable
     //
     template<typename T>
-    struct Is_Trivially_Copy_Assignable: Is_Trivially_Assignable<add_lvalue_reference<T>, add_lvalue_reference<T>> {
-        static_assert(disjunction<Is_Complete_Type<T>, Is_Void<T>, Is_Unbounded_Array<T>>,
-                      u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Trivially_Copy_Assignable: Bool_Constant<__is_trivially_assignable(add_lvalue_reference<T>, add_lvalue_reference<T>)> {};
 
     template<typename T>
-    constexpr bool is_trivially_copy_assignable = Is_Trivially_Copy_Assignable<T>::value;
+    constexpr bool is_trivially_copy_assignable = __is_trivially_assignable(add_lvalue_reference<T>, add_lvalue_reference<T>);
 
     // Is_Trivially_Move_Assignable
     //
     template<typename T>
-    struct Is_Trivially_Move_Assignable: Is_Trivially_Assignable<add_lvalue_reference<T>, add_rvalue_reference<T>> {
-        static_assert(disjunction<Is_Complete_Type<T>, Is_Void<T>, Is_Unbounded_Array<T>>,
-                      u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Trivially_Move_Assignable: Bool_Constant<__is_trivially_assignable(add_lvalue_reference<T>, add_rvalue_reference<T>)> {};
 
     template<typename T>
-    constexpr bool is_trivially_move_assignable = Is_Trivially_Move_Assignable<T>::value;
+    constexpr bool is_trivially_move_assignable = __is_trivially_assignable(add_lvalue_reference<T>, add_rvalue_reference<T>);
 
     // Is_Constructible
     //
@@ -290,78 +269,57 @@ namespace anton {
     // which apparently is the case for Clang, MSVC and GCC
     //
     template<typename T, typename... Args>
-    struct Is_Constructible: Bool_Constant<__is_constructible(T, Args...)> {
-        static_assert(disjunction<Is_Complete_Type<T>, Is_Void<T>, Is_Unbounded_Array<T>>,
-                      u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Constructible: Bool_Constant<__is_constructible(T, Args...)> {};
 
     template<typename T, typename... Args>
-    constexpr bool is_constructible = Is_Constructible<T, Args...>::value;
+    constexpr bool is_constructible = __is_constructible(T, Args...);
 
     // Is_Default_Constructible
     template<typename T>
-    struct Is_Default_Constructible: Is_Constructible<T> {
-        static_assert(disjunction<Is_Complete_Type<T>, Is_Void<T>, Is_Unbounded_Array<T>>,
-                      u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Default_Constructible: Bool_Constant<__is_constructible(T)> {};
 
     template<typename T>
-    constexpr bool is_default_constructible = Is_Default_Constructible<T>::value;
+    constexpr bool is_default_constructible = __is_constructible(T);
 
     // Is_Copy_Constructible
     //
     template<typename T>
-    struct Is_Copy_Constructible: Is_Constructible<T, add_lvalue_reference<T const>> {
-        static_assert(disjunction<Is_Complete_Type<T>, Is_Void<T>, Is_Unbounded_Array<T>>,
-                      u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Copy_Constructible: Bool_Constant<__is_constructible(T, add_lvalue_reference<T const>)> {};
 
     template<typename T>
-    constexpr bool is_copy_constructible = Is_Copy_Constructible<T>::value;
+    constexpr bool is_copy_constructible = __is_constructible(T, add_lvalue_reference<T const>);
 
     // Is_Move_Constructible
     //
     template<typename T>
-    struct Is_Move_Constructible: Is_Constructible<T, add_rvalue_reference<T>> {
-        static_assert(disjunction<Is_Complete_Type<T>, Is_Void<T>, Is_Unbounded_Array<T>>,
-                      u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Move_Constructible: Bool_Constant<__is_constructible(T, add_rvalue_reference<T>)> {};
 
     template<typename T>
-    constexpr bool is_move_constructible = Is_Move_Constructible<T>::value;
+    constexpr bool is_move_constructible = __is_constructible(T, add_rvalue_reference<T>);
 
     // Is_Trivially_Constructible
     //
     template<typename T, typename... Args>
-    struct Is_Trivially_Constructible: public Bool_Constant<__is_trivially_constructible(T, Args...)> {
-        static_assert(disjunction<Is_Complete_Type<T>, Is_Void<T>, Is_Unbounded_Array<T>>,
-                      u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Trivially_Constructible: Bool_Constant<__is_trivially_constructible(T, Args...)> {};
 
     template<typename T, typename... Args>
-    constexpr bool is_trivially_constructible = Is_Trivially_Constructible<T, Args...>::value;
+    constexpr bool is_trivially_constructible = __is_trivially_constructible(T, Args...);
 
     // Is_Trivially_Copy_Constructible
     //
     template<typename T>
-    struct Is_Trivially_Copy_Constructible: public Bool_Constant<__is_trivially_constructible(T, add_lvalue_reference<T const>)> {
-        static_assert(disjunction<Is_Complete_Type<T>, Is_Void<T>, Is_Unbounded_Array<T>>,
-                      u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Trivially_Copy_Constructible: Bool_Constant<__is_trivially_constructible(T, add_lvalue_reference<T const>)> {};
 
     template<typename T>
-    constexpr bool is_trivially_copy_constructible = Is_Trivially_Copy_Constructible<T>::value;
+    constexpr bool is_trivially_copy_constructible = __is_trivially_constructible(T, add_lvalue_reference<T const>);
 
     // Is_Trivially_Move_Constructible
     //
     template<typename T>
-    struct Is_Trivially_Move_Constructible: public Bool_Constant<__is_trivially_constructible(T, add_rvalue_reference<T>)> {
-        static_assert(disjunction<Is_Complete_Type<T>, Is_Void<T>, Is_Unbounded_Array<T>>,
-                      u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Trivially_Move_Constructible: Bool_Constant<__is_trivially_constructible(T, add_rvalue_reference<T>)> {};
 
     template<typename T>
-    constexpr bool is_trivially_move_constructible = Is_Trivially_Move_Constructible<T>::value;
+    constexpr bool is_trivially_move_constructible = __is_trivially_constructible(T, add_rvalue_reference<T>);
 
     namespace detail {
         // Is_Implicitly_Default_Constructible
@@ -386,13 +344,10 @@ namespace anton {
     // Both Clang and MSVC support __is_convertible_to
 
     template<typename From, typename To>
-    struct Is_Convertible: Bool_Constant<__is_convertible_to(From, To)> {
-        static_assert(disjunction<Is_Complete_Type<From>, Is_Complete_Type<To>, Is_Void<From>, Is_Void<To>, Is_Unbounded_Array<From>, Is_Unbounded_Array<To>>,
-                     u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Convertible: Bool_Constant<__is_convertible_to(From, To)> {};
 
     template<typename From, typename To>
-    constexpr bool is_convertible = Is_Convertible<From, To>::value;
+    constexpr bool is_convertible = __is_convertible_to(From, To);
 #else
     // Sadly GCC does not offer any intrinsic similar to __is_convertible_to
 
@@ -426,12 +381,7 @@ namespace anton {
     } // namespace detail
 
     template<typename From, typename To>
-    struct Is_Convertible: detail::Is_Convertible_Helper<From, To>::type {
-        static_assert(disjunction<Is_Complete_Type<From>, Is_Void<From>, Is_Unbounded_Array<From>>,
-                      u8"From template argument must be a complete type, void or an unbounded array.");
-        static_assert(disjunction<Is_Complete_Type<To>, Is_Void<To>, Is_Unbounded_Array<To>>,
-                      u8"To template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Convertible: detail::Is_Convertible_Helper<From, To>::type {};
 
     template<typename From, typename To>
     constexpr bool is_convertible = Is_Convertible<From, To>::value;
@@ -464,10 +414,7 @@ namespace anton {
     // Is_Destructible
     //
     template<typename T>
-    struct Is_Destructible: detail::Is_Destructible<T>::type {
-        static_assert(disjunction<Is_Complete_Type<T>, Is_Void<T>, Is_Unbounded_Array<T>>,
-                      u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Destructible: detail::Is_Destructible<T>::type {};
 
     template<typename T>
     constexpr bool is_destructible = Is_Destructible<T>::value;
@@ -476,27 +423,21 @@ namespace anton {
     //
 #if ANTON_COMPILER_CLANG || ANTON_COMPILER_MSVC
     template<typename T>
-    struct Is_Trivially_Destructible: Bool_Constant<__is_trivially_destructible(T)> {
-        static_assert(disjunction<Is_Complete_Type<T>, Is_Void<T>, Is_Unbounded_Array<T>>,
-                      u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Trivially_Destructible: Bool_Constant<__is_trivially_destructible(T)> {};
 
     template<typename T>
-    constexpr bool is_trivially_destructible = Is_Trivially_Destructible<T>::value;
+    constexpr bool is_trivially_destructible = __is_trivially_destructible(T)
 #else
     // GCC provides __has_trivial_destructor instead of __is_trivially_destructible
 
     template<typename T>
-    struct Is_Trivially_Destructible: Bool_Constant<__has_trivial_destructor(T)> {
-        static_assert(disjunction<Is_Complete_Type<T>, Is_Void<T>, Is_Unbounded_Array<T>>,
-                      u8"Template argument must be a complete type, void or an unbounded array.");
-    };
+    struct Is_Trivially_Destructible: Bool_Constant<__has_trivial_destructor(T)> {};
 
     template<typename T>
-    constexpr bool is_trivially_destructible = Is_Trivially_Destructible<T>::value;
+    constexpr bool is_trivially_destructible = __has_trivial_destructor(T);
 #endif // ANTON_COMPILER_CLANG || ANTON_COMPILER_MSVC
 
-    namespace detail {
+        namespace detail {
         template<typename T>
         struct Is_Integral: False_Type {};
         // clang-format off
@@ -576,5 +517,4 @@ namespace anton {
 
     template<typename T>
     inline constexpr bool is_unsigned = Is_Unsigned<T>::value;
-
 } // namespace anton

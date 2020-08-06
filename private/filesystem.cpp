@@ -285,7 +285,7 @@ namespace anton::fs {
     void Input_File_Stream::unget() {
         ANTON_ASSERT(_buffer, "Attempting to unget to the stream, but no file has been opened.");
         i64 n = tell();
-        seek(Seek_Dir::cur, n - 1);
+        seek(Seek_Dir::beg, n - 1);
     }
 
     void Input_File_Stream::seek(Seek_Dir dir, i64 offset) {

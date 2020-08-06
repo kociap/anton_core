@@ -5,6 +5,8 @@
 #include <anton/types.hpp>
 
 namespace anton {
+    constexpr char8 eof_char8 = (char8)-1;
+    constexpr char16 eof_char16 = (char16)-1;
     constexpr char32 eof_char32 = (char32)-1;
 
     enum class Seek_Dir {

@@ -37,10 +37,10 @@ namespace anton::fs {
     [[nodiscard]] bool has_filename(String_View path);
     [[nodiscard]] bool exists(String_View path);
 
-    enum class Open_Mode {
+    enum class Open_Mode : u32 {
         // Has effect only on Windows. Makes all reading operations translate the \n\r sequences into \n.
         // Opposite of std::ios_base::open_mode::binary.
-        windows_translate_newline,
+        windows_translate_newline = 1,
     };
 
     class Output_File_Stream: public Output_Stream {
@@ -95,6 +95,11 @@ namespace anton::fs {
         virtual void read(Slice<u8> buffer) override;
         [[nodiscard]] virtual char32 peek() override;
         virtual char32 get() override;
+
+        // unget
+        // Steps 1 character back in the stream.
+        // If the stream has been opened in text mode, this function has no effect.
+        //
         virtual void unget() override;
         virtual void seek(Seek_Dir dir, i64 offset) override;
         [[nodiscard]] virtual i64 tell() override;
@@ -111,5 +116,6 @@ namespace anton::fs {
 
     private:
         void* _buffer = nullptr;
+        Open_Mode _open_mode;
     };
 } // namespace anton::fs

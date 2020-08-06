@@ -205,13 +205,13 @@ namespace anton::fs {
         return ftell((FILE*)_buffer);
     }
 
-    Input_File_Stream::Input_File_Stream() {}
+    Input_File_Stream::Input_File_Stream(): _open_mode((Open_Mode)0) {}
 
-    Input_File_Stream::Input_File_Stream(String const& filename) {
+    Input_File_Stream::Input_File_Stream(String const& filename): _open_mode((Open_Mode)0) {
         open(filename);
     }
 
-    Input_File_Stream::Input_File_Stream(String const& filename, Open_Mode const open_mode) {
+    Input_File_Stream::Input_File_Stream(String const& filename, Open_Mode const open_mode): _open_mode(open_mode) {
         open(filename, open_mode);
     }
 
@@ -254,6 +254,7 @@ namespace anton::fs {
     void Input_File_Stream::close() {
         if(_buffer) {
             fclose((FILE*)_buffer);
+            _buffer = nullptr;
         }
     }
 
@@ -273,7 +274,12 @@ namespace anton::fs {
 
     char32 Input_File_Stream::peek() {
         char32 const c = get();
-        unget();
+        // Do not call unget when the next char is eof because that will push
+        // us back in the stream to the character before eof (next call to get will
+        // return the character right before eof).
+        if(c != eof_char32) {
+            unget();
+        }
         return c;
     }
 
@@ -284,8 +290,12 @@ namespace anton::fs {
 
     void Input_File_Stream::unget() {
         ANTON_ASSERT(_buffer, "Attempting to unget to the stream, but no file has been opened.");
-        i64 n = tell();
-        seek(Seek_Dir::beg, n - 1);
+        // We can't guarantee reliable unget when the file is in non-binary mode.
+        bool const text_mode = (u32)_open_mode & (u32)Open_Mode::windows_translate_newline;
+        if(!text_mode) {
+            i64 n = tell();
+            seek(Seek_Dir::beg, n - 1);
+        }
     }
 
     void Input_File_Stream::seek(Seek_Dir dir, i64 offset) {

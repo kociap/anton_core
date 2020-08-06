@@ -32,10 +32,10 @@ namespace anton {
 
     template<typename T, typename... Args>
     void construct(T* pointer, Args&&... args) {
-        if constexpr(is_constructible<T, decltype(forward<Args>(args))...>) {
-            ::new((void*)pointer) T(forward<Args>(args)...);
+        if constexpr(is_constructible<T, decltype(anton::forward<Args>(args))...>) {
+            ::new((void*)pointer) T(anton::forward<Args>(args)...);
         } else {
-            ::new((void*)pointer) T{forward<Args>(args)...};
+            ::new((void*)pointer) T{anton::forward<Args>(args)...};
         }
     }
 
@@ -67,7 +67,7 @@ namespace anton {
     template<typename Input_Iterator, typename Forward_Iterator>
     Forward_Iterator uninitialized_copy(Input_Iterator first, Input_Iterator last, Forward_Iterator dest) {
         for(; first != last; ++first, ++dest) {
-            construct(addressof(*dest), *first);
+            anton::construct(addressof(*dest), *first);
         }
         return dest;
     }
@@ -75,7 +75,7 @@ namespace anton {
     template<typename Input_Iterator, typename Count, typename Forward_Iterator>
     Forward_Iterator uninitialized_copy_n(Input_Iterator first, Count n, Forward_Iterator dest) {
         for(; n > 0; --n, ++first, ++dest) {
-            construct(addressof(*dest), *first);
+            anton::construct(addressof(*dest), *first);
         }
         return dest;
     }
@@ -83,7 +83,7 @@ namespace anton {
     template<typename Input_Iterator, typename Forward_Iterator>
     Forward_Iterator uninitialized_move(Input_Iterator first, Input_Iterator last, Forward_Iterator dest) {
         for(; first != last; ++first, ++dest) {
-            construct(addressof(*dest), move(*first));
+            anton::construct(addressof(*dest), anton::move(*first));
         }
         return dest;
     }
@@ -91,7 +91,7 @@ namespace anton {
     template<typename Input_Iterator, typename Count, typename Forward_Iterator>
     Forward_Iterator uninitialized_move_n(Input_Iterator first, Count n, Forward_Iterator dest) {
         for(; n > 0; --n, ++first, ++dest) {
-            construct(addressof(*dest), move(*first));
+            anton::construct(addressof(*dest), anton::move(*first));
         }
         return dest;
     }
@@ -101,7 +101,7 @@ namespace anton {
         using value_type = typename Iterator_Traits<Forward_Iterator>::value_type;
         if constexpr(!is_trivially_constructible<value_type>) {
             for(; first != last; ++first) {
-                construct(addressof(*first));
+                anton::construct(anton::addressof(*first));
             }
         }
     }
@@ -111,7 +111,7 @@ namespace anton {
         using value_type = typename Iterator_Traits<Forward_Iterator>::value_type;
         if constexpr(!is_trivially_constructible<value_type>) {
             for(; n > 0; --n, ++first) {
-                construct(addressof(*first));
+                anton::construct(anton::addressof(*first));
             }
         }
     }
@@ -119,20 +119,20 @@ namespace anton {
     template<typename Forward_Iterator, typename T>
     void uninitialized_fill(Forward_Iterator first, Forward_Iterator last, T const& val) {
         for(; first != last; ++first) {
-            construct(addressof(*first), val);
+            anton::construct(anton::addressof(*first), val);
         }
     }
 
     template<typename Forward_Iterator, typename Count, typename T>
     void uninitialized_fill_n(Forward_Iterator first, Count n, T const& val) {
         for(; n > 0; --n, ++first) {
-            construct(addressof(*first), val);
+            anton::construct(anton::addressof(*first), val);
         }
     }
 
     template<typename Forward_Iterator, typename... Ts>
     void uninitialized_variadic_construct(Forward_Iterator first, Ts&&... vals) {
-        (..., construct(addressof(*(first++)), forward<Ts>(vals)));
+        (..., anton::construct(anton::addressof(*(first++)), anton::forward<Ts>(vals)));
     }
 
     // copy
@@ -227,7 +227,7 @@ namespace anton {
             return dest + (last - first);
         } else {
             for(; first != last; ++first, ++dest) {
-                *dest = move(*first);
+                *dest = anton::move(*first);
             }
             return dest;
         }

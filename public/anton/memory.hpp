@@ -98,6 +98,7 @@ namespace anton {
 
     template<typename Forward_Iterator>
     void uninitialized_default_construct(Forward_Iterator first, Forward_Iterator last) {
+        using value_type = typename Iterator_Traits<Forward_Iterator>::value_type;
         if constexpr(!is_trivially_constructible<value_type>) {
             for(; first != last; ++first) {
                 construct(addressof(*first));
@@ -107,6 +108,7 @@ namespace anton {
 
     template<typename Forward_Iterator, typename Count>
     void uninitialized_default_construct_n(Forward_Iterator first, Count n) {
+        using value_type = typename Iterator_Traits<Forward_Iterator>::value_type;
         if constexpr(!is_trivially_constructible<value_type>) {
             for(; n > 0; --n, ++first) {
                 construct(addressof(*first));

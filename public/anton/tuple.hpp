@@ -9,6 +9,8 @@ namespace anton {
         template<u64 Index, typename Type>
         class Tuple_Child {
         public:
+            constexpr Tuple_Child() = default;
+
             template<typename T>
             constexpr Tuple_Child(T&& arg): _element(forward<T>(arg)) {}
 
@@ -21,6 +23,8 @@ namespace anton {
         template<u64... Indices, typename... Types>
         class Tuple_Expand<Integer_Sequence<u64, Indices...>, Types...>: public Tuple_Child<Indices, Types>... {
         public:
+            constexpr Tuple_Expand() = default;
+
             template<typename... Args>
             constexpr Tuple_Expand(Variadic_Construct_Tag, Args&&... args): Tuple_Child<Indices, Types>(forward<Args>(args))... {}
         };
@@ -32,6 +36,8 @@ namespace anton {
         using base_t = detail::Tuple_Expand<make_integer_sequence<u64, sizeof...(Ts)>, Ts...>;
 
     public:
+        constexpr Tuple() = default;
+
         // TODO: Add conditional explicit
         template<typename... Args, enable_if<sizeof...(Args) == sizeof...(Ts) && (sizeof...(Args) > 0), int> = 0>
         constexpr Tuple(Args&&... args): base_t(variadic_construct, forward<Args>(args)...) {}

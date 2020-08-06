@@ -33,9 +33,9 @@ namespace anton {
     template<typename T, typename... Args>
     void construct(T* pointer, Args&&... args) {
         if constexpr(is_constructible<T, decltype(forward<Args>(args))...>) {
-            ::new(pointer) T(forward<Args>(args)...);
+            ::new((void*)pointer) T(forward<Args>(args)...);
         } else {
-            ::new(pointer) T{forward<Args>(args)...};
+            ::new((void*)pointer) T{forward<Args>(args)...};
         }
     }
 
@@ -66,80 +66,71 @@ namespace anton {
 
     template<typename Input_Iterator, typename Forward_Iterator>
     Forward_Iterator uninitialized_copy(Input_Iterator first, Input_Iterator last, Forward_Iterator dest) {
-        using value_type = typename Iterator_Traits<Forward_Iterator>::value_type;
         for(; first != last; ++first, ++dest) {
-            ::new(addressof(*dest)) value_type(*first);
+            construct(addressof(*dest), *first);
         }
         return dest;
     }
 
     template<typename Input_Iterator, typename Count, typename Forward_Iterator>
     Forward_Iterator uninitialized_copy_n(Input_Iterator first, Count n, Forward_Iterator dest) {
-        using value_type = typename Iterator_Traits<Forward_Iterator>::value_type;
         for(; n > 0; --n, ++first, ++dest) {
-            ::new(addressof(*dest)) value_type(*first);
+            construct(addressof(*dest), *first);
         }
         return dest;
     }
 
     template<typename Input_Iterator, typename Forward_Iterator>
     Forward_Iterator uninitialized_move(Input_Iterator first, Input_Iterator last, Forward_Iterator dest) {
-        using value_type = typename Iterator_Traits<Forward_Iterator>::value_type;
         for(; first != last; ++first, ++dest) {
-            ::new(addressof(*dest)) value_type(move(*first));
+            construct(addressof(*dest), move(*first));
         }
         return dest;
     }
 
     template<typename Input_Iterator, typename Count, typename Forward_Iterator>
     Forward_Iterator uninitialized_move_n(Input_Iterator first, Count n, Forward_Iterator dest) {
-        using value_type = typename Iterator_Traits<Forward_Iterator>::value_type;
         for(; n > 0; --n, ++first, ++dest) {
-            ::new(addressof(*dest)) value_type(move(*first));
+            construct(addressof(*dest), move(*first));
         }
         return dest;
     }
 
     template<typename Forward_Iterator>
     void uninitialized_default_construct(Forward_Iterator first, Forward_Iterator last) {
-        using value_type = typename Iterator_Traits<Forward_Iterator>::value_type;
         if constexpr(!is_trivially_constructible<value_type>) {
             for(; first != last; ++first) {
-                ::new(addressof(*first)) value_type();
+                construct(addressof(*first));
             }
         }
     }
 
     template<typename Forward_Iterator, typename Count>
     void uninitialized_default_construct_n(Forward_Iterator first, Count n) {
-        using value_type = typename Iterator_Traits<Forward_Iterator>::value_type;
         if constexpr(!is_trivially_constructible<value_type>) {
             for(; n > 0; --n, ++first) {
-                ::new(addressof(*first)) value_type();
+                construct(addressof(*first));
             }
         }
     }
 
     template<typename Forward_Iterator, typename T>
     void uninitialized_fill(Forward_Iterator first, Forward_Iterator last, T const& val) {
-        using value_type = typename Iterator_Traits<Forward_Iterator>::value_type;
         for(; first != last; ++first) {
-            ::new(addressof(*first)) value_type(val);
+            construct(addressof(*first), val);
         }
     }
 
     template<typename Forward_Iterator, typename Count, typename T>
     void uninitialized_fill_n(Forward_Iterator first, Count n, T const& val) {
-        using value_type = typename Iterator_Traits<Forward_Iterator>::value_type;
         for(; n > 0; --n, ++first) {
-            ::new(addressof(*first)) value_type(val);
+            construct(addressof(*first), val);
         }
     }
 
     template<typename Forward_Iterator, typename... Ts>
     void uninitialized_variadic_construct(Forward_Iterator first, Ts&&... vals) {
-        using value_type = typename Iterator_Traits<Forward_Iterator>::value_type;
-        (..., ::new(addressof(*(first++))) value_type(forward<Ts>(vals)));
+        (..., construct(addressof(*(first++)), forward<Ts>(vals)));
     }
 
     // copy

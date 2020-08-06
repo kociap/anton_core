@@ -363,7 +363,7 @@ namespace anton {
     template<typename T, typename Allocator>
     template<typename... Args>
     void Array<T, Allocator>::insert(Variadic_Construct_Tag, const_iterator position, Args&&... args) {
-        insert(position - begin(), anton::forward<Args>(args)...);
+        insert(variadic_construct, position - begin(), anton::forward<Args>(args)...);
     }
 
     template<typename T, typename Allocator>

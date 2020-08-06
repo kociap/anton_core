@@ -65,8 +65,6 @@ namespace anton {
 
         T* get_ptr(size_type);
         T const* get_ptr(size_type) const;
-        template<typename... Args>
-        void construct(void* ptr, Args&&... args);
 
         friend void swap(Fixed_Array& a1, Fixed_Array& a2) {
             Fixed_Array tmp = move(a1);
@@ -264,15 +262,5 @@ namespace anton {
     template<typename T, i64 Capacity>
     T const* Fixed_Array<T, Capacity>::get_ptr(size_type const index) const {
         return launder(reinterpret_cast<T const*>(_data + index));
-    }
-
-    template<typename T, i64 Capacity>
-    template<typename... Args>
-    void Fixed_Array<T, Capacity>::construct(void* ptr, Args&&... args) {
-        if constexpr(is_constructible<T, Args&&...>) {
-            ::new(ptr) T(forward<Args>(args)...);
-        } else {
-            ::new(ptr) T{forward<Args>(args)...};
-        }
     }
 } // namespace anton

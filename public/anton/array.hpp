@@ -390,7 +390,7 @@ namespace anton {
                 anton::uninitialized_move(get_ptr(position), get_ptr(_size), new_data + moved);
 
                 anton::destruct_n(_data, _size);
-                anton::deallocate(_data, _capacity);
+                deallocate(_data, _capacity);
                 _capacity = new_capacity;
                 _data = new_data;
                 _size += 1;
@@ -438,7 +438,7 @@ namespace anton {
                     moved += dist;
                     anton::uninitialized_move(get_ptr(position), get_ptr(_size), new_data + moved);
 
-                    destruct_n(_data, _size);
+                    anton::destruct_n(_data, _size);
                     deallocate(_data, _capacity);
                     _capacity = new_capacity;
                     _data = new_data;

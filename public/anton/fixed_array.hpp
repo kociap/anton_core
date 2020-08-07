@@ -49,7 +49,17 @@ namespace anton {
         [[nodiscard]] const_iterator cbegin() const;
         [[nodiscard]] const_iterator cend() const;
 
+        // size
+        // The number of elements contained in the array.
+        //
         [[nodiscard]] size_type size() const;
+
+        // size_bytes
+        // The size of all the elements contained in the array in bytes.
+        // Equivalent to 'sizeof(T) * size()'.
+        //
+        [[nodiscard]] size_type size_bytes() const;
+
         [[nodiscard]] size_type capacity() const;
 
         void resize(size_type count);
@@ -201,6 +211,11 @@ namespace anton {
     template<typename T, i64 Capacity>
     auto Fixed_Array<T, Capacity>::size() const -> size_type {
         return _size;
+    }
+
+    template<typename T, i64 Capacity>
+    auto Fixed_Array<T, Capacity>::size_bytes() const -> size_type {
+        return _size * sizeof(T);
     }
 
     template<typename T, i64 Capacity>

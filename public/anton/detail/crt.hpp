@@ -108,8 +108,21 @@ extern "C" {
 
 // C++ Runtime Forward Declarations
 
-void* operator new(size_t size, void*) noexcept;
-void operator delete(void* ptr, void* place) noexcept;
+#if defined(_WIN64)
+    // On windows the following placement functions are defined inline in vcruntime_new.h
+
+    [[nodiscard]] inline void* operator new(size_t _Size, void* _Where) noexcept {
+        (void)_Size;
+        return _Where;
+    }
+
+    inline void operator delete(void*, void*) noexcept {
+        return;
+    }
+#else
+    void* operator new(size_t size, void*) noexcept;
+    void operator delete(void* ptr, void* place) noexcept;
+#endif 
 
 #undef ANTON_NOEXCEPT
 #undef ANTON_CRT_IMPORT

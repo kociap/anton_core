@@ -25,7 +25,7 @@ namespace anton {
         constexpr Pair(Pair&& pair) = default;
         constexpr Pair& operator=(Pair const& pair) = default;
         constexpr Pair& operator=(Pair&& pair) = default;
-        constexpr ~Pair() = default;
+        ~Pair() = default;
     };
 
     template<typename U1, typename U2>

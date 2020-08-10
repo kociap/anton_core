@@ -109,16 +109,18 @@ extern "C" {
 // C++ Runtime Forward Declarations
 
 #if defined(_WIN64)
-    // On windows the following placement functions are defined inline in vcruntime_new.h
+    // The following placement functions are defined inline in vcruntime_new.h
+    #ifndef __PLACEMENT_NEW_INLINE
+        #define __PLACEMENT_NEW_INLINE
+        [[nodiscard]] inline void* operator new(size_t _Size, void* _Where) noexcept {
+            (void)_Size;
+            return _Where;
+        }
 
-    [[nodiscard]] inline void* operator new(size_t _Size, void* _Where) noexcept {
-        (void)_Size;
-        return _Where;
-    }
-
-    inline void operator delete(void*, void*) noexcept {
-        return;
-    }
+        inline void operator delete(void*, void*) noexcept {
+            return;
+        }
+    #endif // !__PLACEMENT_NEW_INLINE
 #else
     void* operator new(size_t size, void*) noexcept;
     void operator delete(void* ptr, void* place) noexcept;

@@ -112,7 +112,7 @@ namespace anton {
     Output_Iterator set_difference(Input_Iterator1 first1, Input_Iterator1 last1, Input_Iterator2 first2, Input_Iterator2 last2, Output_Iterator dest) {
         while(first1 != last1 && first2 != last2) {
             if(*first1 < *first2) {
-                *dest = *first;
+                *dest = *first1;
                 ++dest;
                 ++first1;
             } else if(*first2 < *first1) {
@@ -137,7 +137,7 @@ namespace anton {
                                    Compare compare) {
         while(first1 != last1 && first2 != last2) {
             if(compare(*first1, *first2)) {
-                *dest = *first;
+                *dest = *first1;
                 ++dest;
                 ++first1;
             } else if(compare(*first2, *first1)) {

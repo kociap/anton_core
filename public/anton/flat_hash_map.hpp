@@ -518,7 +518,7 @@ namespace anton {
             rehash();
         } else {
             i64 const required_slots = _size + new_elements_count;
-            i64 const required_capacity = math::ceil((f32)required_slots / max_load_factor());
+            i64 const required_capacity = (i64)math::ceil((f32)required_slots / max_load_factor());
             i64 new_capacity = _capacity != 0 ? _capacity : 64;
             while(new_capacity < required_capacity) {
                 new_capacity *= 2;

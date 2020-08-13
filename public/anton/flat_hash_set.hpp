@@ -8,6 +8,7 @@
 #include <anton/tags.hpp>
 #include <anton/type_traits.hpp>
 #include <anton/types.hpp>
+#include <anton/utility.hpp>
 
 namespace anton {
     // Stores both keys and values in the main array, which minimizes memory indirections.

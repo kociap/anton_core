@@ -114,7 +114,7 @@ namespace anton {
     template<typename Input_Iterator>
     Fixed_Array<T, Capacity>::Fixed_Array(Range_Construct_Tag, Input_Iterator first, Input_Iterator last) {
         i64 const distance = last - first;
-        ANTON_VERIFY(distance <= Capacity, u8"Distance between last and first is greater than the capacity.")
+        ANTON_VERIFY(distance <= Capacity, u8"Distance between last and first is greater than the capacity.");
         uninitialized_copy(first, last, get_ptr(0));
     }
 

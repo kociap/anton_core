@@ -118,4 +118,43 @@ namespace anton {
 
     template<typename Return, typename Fn, typename... Args>
     constexpr bool is_invocable_r = Is_Invocable_R<Return, Fn, Args...>::value;
+
+    namespace detail {
+        template<i64 Arg_Count, typename... Arguments>
+        struct Reflect_Function_Args {
+            static constexpr i64 arg_count = Arg_Count;
+            using arguments = Type_List<Arguments...>;
+            using first_argument = tuple_element<0, arguments>;
+        };
+
+        template<typename... Arguments>
+        struct Reflect_Function_Args<0, Arguments...> {
+            static constexpr i64 arg_count = Arg_Count;
+            using arguments = Type_List<>;
+        };
+
+        template<typename Return_Type, typename... Arguments>
+        struct Reflect_Function: Reflect_Function_Args<sizeof...(Arguments), Arguments...> {
+            using return_type = Return_Type;
+        };
+
+        template<typename Return_Type, typename... Arguments>
+        auto fn_refl_decay(Return_Type (*)(Arguments...)) -> Reflect_Function<Return_Type, Arguments...>;
+
+        template<typename Class, typename Return_Type, typename... Arguments>
+        auto fn_refl_decay(Return_Type (Class::*)(Arguments...)) -> Reflect_Function<Return_Type, Arguments...>;
+
+        template<typename Class, typename Return_Type, typename... Arguments>
+        auto fn_refl_decay(Return_Type (Class::*)(Arguments...) const) -> Reflect_Function<Return_Type, Arguments...>;
+
+        template<typename T>
+        auto fn_refl_decay(T &&) -> decltype(fn_refl_decay(&T::operator()));
+    } // namespace detail
+
+    // Reflect_Function
+    // Function reflection trait that allows to access the return type and arguments of a callable.
+    // Requires that Fn be a function pointer, a member function pointer, a functor or a non-generic lambda.
+    //
+    template<typename T>
+    struct Reflect_Function: decltype(detail::fn_refl_decay(anton::declval<T>())) {};
 } // namespace anton

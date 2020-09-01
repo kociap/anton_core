@@ -2,6 +2,7 @@
 
 #include <anton/detail/traits_base.hpp>
 #include <anton/detail/traits_common.hpp>
+#include <anton/type_list.hpp>
 
 // TODO: calling conventions support
 #define ANTON_DEFINE_CALL_QUALIFIER(CLASS, CONST_OPT, REF_OPT, NOEXCEPT_OPT) CLASS(/* CALL */, CONST_OPT, REF_OPT, NOEXCEPT_OPT)
@@ -129,7 +130,7 @@ namespace anton {
 
         template<typename... Arguments>
         struct Reflect_Function_Args<0, Arguments...> {
-            static constexpr i64 arg_count = Arg_Count;
+            static constexpr i64 arg_count = 0;
             using arguments = Type_List<>;
         };
 

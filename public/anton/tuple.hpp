@@ -1,6 +1,6 @@
 #pragma once
 
-#include <anton/detail/utility_common.hpp>
+#include <anton/detail/tuple.hpp>
 #include <anton/tags.hpp>
 #include <anton/types.hpp>
 

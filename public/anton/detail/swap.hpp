@@ -1,6 +1,7 @@
 #pragma once
 
 #include <anton/detail/traits_base.hpp>
+#include <anton/detail/traits_utility.hpp>
 
 namespace anton {
     template<typename T>

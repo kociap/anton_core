@@ -1,5 +1,6 @@
 #pragma once
 
+#include <anton/detail/traits_base.hpp>
 #include <anton/detail/tuple.hpp>
 
 namespace anton {

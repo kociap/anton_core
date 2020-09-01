@@ -37,6 +37,6 @@ namespace anton {
 
     template<u64 Index, typename... Types>
     struct Tuple_Element<Index, Type_List<Types...> const> {
-        using type = add_const<typename detail::Tuple_Element<Index, 0, Type_List<Types...>>::type>;
+        using type = typename detail::Tuple_Element<Index, 0, Type_List<Types...>>::type const;
     };
 } // namespace anton

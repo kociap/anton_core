@@ -1,6 +1,6 @@
 #pragma once
 
-#include <anton/detail/utility_common.hpp>
+#include <anton/detail/swap.hpp>
 #include <anton/type_traits.hpp>
 #include <anton/types.hpp>
 

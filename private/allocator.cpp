@@ -1,6 +1,6 @@
 #include <anton/allocator.hpp>
 
-#include <anton/detail/utility_common.hpp>
+#include <anton/detail/swap.hpp>
 #include <anton/math/math.hpp>
 #include <new>
 

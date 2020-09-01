@@ -2,7 +2,7 @@
 
 #include <anton/assert.hpp>
 #include <anton/detail/crt.hpp>
-#include <anton/detail/utility_common.hpp>
+#include <anton/detail/swap.hpp>
 #include <anton/math/math.hpp>
 #include <anton/memory.hpp>
 #include <anton/string_utils.hpp>

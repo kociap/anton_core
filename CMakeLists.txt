@@ -7,6 +7,7 @@ option(ANTON_STRING_VERIFY_ENCODING "Enable unicode validation in anton::String"
 option(ANTON_ITERATOR_DEBUG "Enable iterator checking" OFF)
 option(ANTON_DISABLE_VERIFY "Disable ANTON_VERIFY" OFF)
 option(ANTON_CHECK_OPTIONAL_VALUE "Enable checking whether optional holds a value" OFF)
+option(ANTON_UNREACHABLE_ASSERTS "ANTON_UNREACHABLE will use assert instead of an intrinsic" OFF)
 
 # Add anton_math
 FetchContent_Declare(
@@ -116,6 +117,12 @@ if(ANTON_CHECK_OPTIONAL_VALUE)
     target_compile_definitions(anton_core PUBLIC ANTON_CHECK_OPTIONAL_VALUE=1)
 else()
     target_compile_definitions(anton_core PUBLIC ANTON_CHECK_OPTIONAL_VALUE=0)
+endif()
+
+if(ANTON_UNREACHABLE_ASSERTS)
+    target_compile_definitions(anton_core PUBLIC ANTON_UNREACHABLE_ASSERTS=1)
+else()
+    target_compile_definitions(anton_core PUBLIC ANTON_UNREACHABLE_ASSERTS=0)
 endif()
 
 target_link_libraries(anton_core PUBLIC anton_math)

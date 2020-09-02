@@ -74,7 +74,7 @@ namespace anton::unicode {
         if(char16 const high_surrogate = *buffer_utf16; high_surrogate <= 0xD7FF || high_surrogate >= 0xE000) {
             char32 const codepoint = high_surrogate;
             if(codepoint <= 0x7F) {
-                *buffer_utf8 = codepoint;
+                *buffer_utf8 = static_cast<char8>(codepoint);
                 return 1;
             } else if(codepoint <= 0x7FF) {
                 buffer_utf8[0] = 0xC0 | ((codepoint & 0x7C0) >> 6);
@@ -134,7 +134,7 @@ namespace anton::unicode {
                 if(char16 const high_surrogate = *buffer_utf16; high_surrogate <= 0xD7FF || high_surrogate >= 0xE000) {
                     char32 const codepoint = high_surrogate;
                     if(codepoint <= 0x7F) {
-                        *buffer_utf8 = codepoint;
+                        *buffer_utf8 = static_cast<char8>(codepoint);
                         buffer_utf8 += 1;
                         bytes_written += 1;
                     } else if(codepoint <= 0x7FF) {

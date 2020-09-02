@@ -14,7 +14,7 @@
 
 namespace anton {
     String String::from_utf32(char32 const* string, i64 const length) {
-        i32 const buffer_size = unicode::convert_utf32_to_utf8(string, length, nullptr);
+        i64 const buffer_size = unicode::convert_utf32_to_utf8(string, length, nullptr);
         String str{anton::reserve, buffer_size - 1};
         str.force_size(buffer_size - 1);
         unicode::convert_utf32_to_utf8(string, length, str.data());
@@ -22,7 +22,7 @@ namespace anton {
     }
 
     String String::from_utf16(char16 const* string, i64 const length) {
-        i32 const buffer_size = unicode::convert_utf16_to_utf8(string, length, nullptr);
+        i64 const buffer_size = unicode::convert_utf16_to_utf8(string, length, nullptr);
         String str{anton::reserve, buffer_size - 1};
         str.force_size(buffer_size - 1);
         unicode::convert_utf16_to_utf8(string, length, str.data());

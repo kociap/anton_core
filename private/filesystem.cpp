@@ -197,7 +197,7 @@ namespace anton::fs {
 
     void Output_File_Stream::seek(Seek_Dir dir, i64 offset) {
         ANTON_ASSERT(_buffer, "Attempting to seek the stream, but no file has been opened.");
-        fseek((FILE*)_buffer, offset, (int)(dir));
+        fseek((FILE*)_buffer, (long)offset, (int)(dir));
     }
 
     i64 Output_File_Stream::tell() {
@@ -300,7 +300,7 @@ namespace anton::fs {
 
     void Input_File_Stream::seek(Seek_Dir dir, i64 offset) {
         ANTON_ASSERT(_buffer, "Attempting to seek in the stream, but no file has been opened.");
-        fseek((FILE*)_buffer, offset, (int)(dir));
+        fseek((FILE*)_buffer, (long)offset, (int)(dir));
     }
 
     i64 Input_File_Stream::tell() {

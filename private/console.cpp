@@ -30,7 +30,7 @@ namespace anton {
     }
 
     void Console_Output::seek(Seek_Dir dir, i64 offset) {
-        fseek(stdout, offset, (int)(dir));
+        fseek(stdout, (long)offset, (int)(dir));
     }
 
     i64 Console_Output::tell() {

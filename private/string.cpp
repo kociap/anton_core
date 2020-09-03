@@ -15,16 +15,20 @@
 namespace anton {
     String String::from_utf32(char32 const* string, i64 const length) {
         i64 const buffer_size = unicode::convert_utf32_to_utf8(string, length, nullptr);
-        String str{anton::reserve, buffer_size - 1};
-        str.force_size(buffer_size - 1);
+        // null-terminator is present when length == -1 in which case we have to subtract it from the size since
+        // String automatically takes care of that
+        i64 const str_size = (length == -1 ? buffer_size - 1 : buffer_size);
+        String str{anton::reserve, str_size};
+        str.force_size(str_size);
         unicode::convert_utf32_to_utf8(string, length, str.data());
         return str;
     }
 
     String String::from_utf16(char16 const* string, i64 const length) {
         i64 const buffer_size = unicode::convert_utf16_to_utf8(string, length, nullptr);
-        String str{anton::reserve, buffer_size - 1};
-        str.force_size(buffer_size - 1);
+        i64 const str_size = (length == -1 ? buffer_size - 1 : buffer_size);
+        String str{anton::reserve, str_size};
+        str.force_size(str_size);
         unicode::convert_utf16_to_utf8(string, length, str.data());
         return str;
     }

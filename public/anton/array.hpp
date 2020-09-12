@@ -43,6 +43,13 @@ namespace anton {
 
         [[nodiscard]] reference operator[](size_type);
         [[nodiscard]] const_reference operator[](size_type) const;
+
+        // back
+        // Accesses the last element of the array. The behaviour is undefined when the array is empty.
+        //
+        [[nodiscard]] reference back();
+        [[nodiscard]] const_reference back() const;
+
         [[nodiscard]] pointer data();
         [[nodiscard]] const_pointer data() const;
 
@@ -245,7 +252,7 @@ namespace anton {
     template<typename T, typename Allocator>
     auto Array<T, Allocator>::operator[](size_type index) -> reference {
         if constexpr(ANTON_ITERATOR_DEBUG) {
-            ANTON_FAIL(index < _size && index >= 0, u8"Index out of bounds.");
+            ANTON_FAIL(index < _size && index >= 0, u8"index out of bounds");
         }
 
         return *get_ptr(index);
@@ -254,10 +261,28 @@ namespace anton {
     template<typename T, typename Allocator>
     auto Array<T, Allocator>::operator[](size_type index) const -> const_reference {
         if constexpr(ANTON_ITERATOR_DEBUG) {
-            ANTON_FAIL(index < _size && index >= 0, u8"Index out of bounds.");
+            ANTON_FAIL(index < _size && index >= 0, u8"index out of bounds");
         }
 
         return *get_ptr(index);
+    }
+
+    template<typename T, typename Allocator>
+    auto Array<T, Allocator>::back() -> reference {
+        if constexpr(ANTON_ITERATOR_DEBUG) {
+            ANTON_FAIL(_size > 0, u8"attempting to call back() on empty Array");
+        }
+
+        return _data[_size - 1];
+    }
+
+    template<typename T, typename Allocator>
+    auto Array<T, Allocator>::back() const -> const_reference {
+        if constexpr(ANTON_ITERATOR_DEBUG) {
+            ANTON_FAIL(_size > 0, u8"attempting to call back() on empty Array");
+        }
+
+        return _data[_size - 1];
     }
 
     template<typename T, typename Allocator>

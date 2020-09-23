@@ -122,7 +122,7 @@ namespace anton {
     template<typename... Args>
     Fixed_Array<T, Capacity>::Fixed_Array(Variadic_Construct_Tag, Args&&... args): _size(sizeof...(Args)) {
         static_assert(sizeof...(Args) <= Capacity, u8"Attempting to construct Fixed_Array with more elements than capacity.");
-        uninitialized_variadic_construct(get_ptr(0), ANTON_FWD<Args>(args)...);
+        uninitialized_variadic_construct(get_ptr(0), ANTON_FWD(args)...);
     }
 
     template<typename T, i64 Capacity>
@@ -256,7 +256,7 @@ namespace anton {
     auto Fixed_Array<T, Capacity>::emplace_back(Args&&... args) -> reference {
         ANTON_VERIFY(_size < Capacity, u8"Cannot emplace_back element in a full Fixed_Array.");
         T* const elem = get_ptr(_size);
-        construct(elem, ANTON_FWD<Args>(args)...);
+        construct(elem, ANTON_FWD(args)...);
         _size += 1;
         return *elem;
     }

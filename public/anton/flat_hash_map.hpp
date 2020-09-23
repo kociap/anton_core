@@ -328,7 +328,7 @@ namespace anton {
             Value value;
 
             template<typename K, typename... Args, enable_if<!is_same<remove_const_ref<K>, Slot>, int> = 0>
-            Slot(K&& k, Args&&... args): key(ANTON_FWD<K>(k)), value(ANTON_FWD<Args>(args)...) {}
+            Slot(K&& k, Args&&... args): key(ANTON_FWD(k)), value(ANTON_FWD(args)...) {}
             Slot(Slot const&) = default;
             Slot(Slot&&) = default;
             Slot& operator=(Slot const&) = default;
@@ -453,7 +453,7 @@ namespace anton {
         if(iter != end()) {
             return iter;
         } else {
-            return emplace(key, ANTON_FWD<Args>(args)...);
+            return emplace(key, ANTON_FWD(args)...);
         }
     }
 
@@ -467,7 +467,7 @@ namespace anton {
             State const state = _states[index];
             if(state != State::active) {
                 _states[index] = State::active;
-                construct(_slots + index, key, ANTON_FWD<Args>(args)...);
+                construct(_slots + index, key, ANTON_FWD(args)...);
                 _size += 1;
                 _empty_slots_left -= 1;
                 return iterator(_slots + index, _states + index);
@@ -475,7 +475,7 @@ namespace anton {
                 if(_key_equal(key, _slots[index].key)) {
                     Value* ptr = &_slots[index].value;
                     destruct(ptr);
-                    construct(ptr, ANTON_FWD<Args>(args)...);
+                    construct(ptr, ANTON_FWD(args)...);
                     return iterator(_slots + index, _states + index);
                 }
                 index = (index + 1) % _capacity;

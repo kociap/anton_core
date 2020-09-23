@@ -20,7 +20,7 @@ namespace anton {
         public:
             Optional_Destruct_Base(): _null_state(), _holds_value(false) {}
             template<typename... Args>
-            Optional_Destruct_Base(Variadic_Construct_Tag, Args&&... args): _value(ANTON_FWD<Args>(args)...), _holds_value(true) {}
+            Optional_Destruct_Base(Variadic_Construct_Tag, Args&&... args): _value(ANTON_FWD(args)...), _holds_value(true) {}
             ~Optional_Destruct_Base() = default;
 
             void destruct() {
@@ -42,7 +42,7 @@ namespace anton {
             Optional_Destruct_Base(): _null_state(), _holds_value(false) {}
 
             template<typename... Args>
-            Optional_Destruct_Base(Variadic_Construct_Tag, Args&&... args): _value(ANTON_FWD<Args>(args)...), _holds_value(true) {}
+            Optional_Destruct_Base(Variadic_Construct_Tag, Args&&... args): _value(ANTON_FWD(args)...), _holds_value(true) {}
 
             ~Optional_Destruct_Base() {
                 if(_holds_value) {
@@ -92,7 +92,7 @@ namespace anton {
             template<typename... Args>
             void construct(Args&&... args) {
                 ANTON_ASSERT(!holds_value(), u8"construct called on empty Optional.");
-                ::new(addressof(this->_value)) T(ANTON_FWD<Args>(args)...);
+                ::new(addressof(this->_value)) T(ANTON_FWD(args)...);
                 this->_holds_value = true;
             }
 
@@ -244,14 +244,14 @@ namespace anton {
         Optional(Null_Optional_Tag) {}
 
         template<typename... Args, typename = enable_if<is_constructible<T, Args...>>>
-        explicit Optional(Variadic_Construct_Tag, Args&&... args): _base(variadic_construct, ANTON_FWD<Args>(args)...) {}
+        explicit Optional(Variadic_Construct_Tag, Args&&... args): _base(variadic_construct, ANTON_FWD(args)...) {}
 
         template<typename U>
-        Optional(U&& arg, enable_if<Is_Constructible_From_Type<U&&>::value && is_convertible<U&&, T>, int> = 0): _base(variadic_construct, ANTON_FWD<U>(arg)) {}
+        Optional(U&& arg, enable_if<Is_Constructible_From_Type<U&&>::value && is_convertible<U&&, T>, int> = 0): _base(variadic_construct, ANTON_FWD(arg)) {}
 
         template<typename U>
         explicit Optional(U&& arg, enable_if<Is_Constructible_From_Type<U&&>::value && !is_convertible<U&&, T>, int> = 0)
-            : _base(variadic_construct, ANTON_FWD<U>(arg)) {}
+            : _base(variadic_construct, ANTON_FWD(arg)) {}
 
         Optional(Optional const&) = default;
         // Leaves other in null_optional state

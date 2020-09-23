@@ -32,10 +32,10 @@ namespace anton {
 
     template<typename T, typename... Args>
     void construct(T* pointer, Args&&... args) {
-        if constexpr(is_constructible<T, decltype(ANTON_FWD<Args>(args))...>) {
-            ::new((void*)pointer) T(ANTON_FWD<Args>(args)...);
+        if constexpr(is_constructible<T, decltype(ANTON_FWD(args))...>) {
+            ::new((void*)pointer) T(ANTON_FWD(args)...);
         } else {
-            ::new((void*)pointer) T{ANTON_FWD<Args>(args)...};
+            ::new((void*)pointer) T{ANTON_FWD(args)...};
         }
     }
 
@@ -132,7 +132,7 @@ namespace anton {
 
     template<typename Forward_Iterator, typename... Ts>
     void uninitialized_variadic_construct(Forward_Iterator first, Ts&&... vals) {
-        (..., anton::construct(anton::addressof(*(first++)), ANTON_FWD<Ts>(vals)));
+        (..., anton::construct(anton::addressof(*(first++)), ANTON_FWD(vals)));
     }
 
     // copy

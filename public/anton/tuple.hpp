@@ -14,7 +14,7 @@ namespace anton {
             constexpr Tuple_Child() = default;
 
             template<typename T>
-            constexpr Tuple_Child(T&& arg): _element(ANTON_FWD<T>(arg)) {}
+            constexpr Tuple_Child(T&& arg): _element(ANTON_FWD(arg)) {}
 
             Type _element;
         };
@@ -28,7 +28,7 @@ namespace anton {
             constexpr Tuple_Expand() = default;
 
             template<typename... Args>
-            constexpr Tuple_Expand(Variadic_Construct_Tag, Args&&... args): Tuple_Child<Indices, Types>(ANTON_FWD<Args>(args))... {}
+            constexpr Tuple_Expand(Variadic_Construct_Tag, Args&&... args): Tuple_Child<Indices, Types>(ANTON_FWD(args))... {}
         };
     } // namespace detail
 
@@ -42,7 +42,7 @@ namespace anton {
 
         // TODO: Add conditional explicit
         template<typename... Args, enable_if<sizeof...(Args) == sizeof...(Ts) && (sizeof...(Args) > 0), int> = 0>
-        constexpr Tuple(Args&&... args): base_t(variadic_construct, ANTON_FWD<Args>(args)...) {}
+        constexpr Tuple(Args&&... args): base_t(variadic_construct, ANTON_FWD(args)...) {}
     };
 
     template<typename... Types>
@@ -144,19 +144,19 @@ namespace anton {
 
     template<typename... Types>
     constexpr Tuple<decay<Types>...> make_tuple(Types&&... args) {
-        return Tuple<decay<Types>...>(ANTON_FWD<Types>(args)...);
+        return Tuple<decay<Types>...>(ANTON_FWD(args)...);
     }
 
     namespace detail {
         template<typename Callable, typename Tuple, u64... Indices>
         constexpr decltype(auto) apply(Callable&& callable, Tuple&& tuple, integer_sequence<u64, Indices...>) {
-            return callable(get<Indices>(ANTON_FWD<Tuple>(tuple))...);
+            return callable(get<Indices>(ANTON_FWD(tuple))...);
         }
     } // namespace detail
 
     template<typename Callable, typename Tuple>
     constexpr decltype(auto) apply(Callable&& callable, Tuple&& tuple) {
-        return detail::apply(ANTON_FWD<Callable>(callable), ANTON_FWD<Tuple>(tuple), make_integer_sequence<u64, tuple_size<remove_reference<Tuple>>>());
+        return detail::apply(ANTON_FWD(callable), ANTON_FWD(tuple), make_integer_sequence<u64, tuple_size<remove_reference<Tuple>>>());
     }
 } // namespace anton
 

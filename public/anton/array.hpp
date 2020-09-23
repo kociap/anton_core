@@ -210,7 +210,7 @@ namespace anton {
     Array<T, Allocator>::Array(Variadic_Construct_Tag, Args&&... args) {
         _capacity = math::max(_capacity, static_cast<size_type>(sizeof...(Args)));
         _data = allocate(_capacity);
-        uninitialized_variadic_construct(_data, ANTON_FWD<Args>(args)...);
+        uninitialized_variadic_construct(_data, ANTON_FWD(args)...);
         _size = static_cast<size_type>(sizeof...(Args));
     }
 
@@ -403,7 +403,7 @@ namespace anton {
     template<typename T, typename Allocator>
     template<typename... Args>
     void Array<T, Allocator>::insert(Variadic_Construct_Tag, const_iterator position, Args&&... args) {
-        insert(variadic_construct, position - begin(), ANTON_FWD<Args>(args)...);
+        insert(variadic_construct, position - begin(), ANTON_FWD(args)...);
     }
 
     template<typename T, typename Allocator>
@@ -417,7 +417,7 @@ namespace anton {
             if(_size != _capacity) {
                 anton::uninitialized_move_n(get_ptr(_size - 1), 1, get_ptr(_size));
                 anton::move_backward(get_ptr(position), get_ptr(_size - 1), get_ptr(_size));
-                anton::construct(get_ptr(position), ANTON_FWD<Args>(args)...);
+                anton::construct(get_ptr(position), ANTON_FWD(args)...);
                 _size += 1;
             } else {
                 i64 const new_capacity = _capacity * 2;
@@ -425,7 +425,7 @@ namespace anton {
                 i64 moved = 0;
                 anton::uninitialized_move(get_ptr(0), get_ptr(position), new_data);
                 moved = position;
-                anton::construct(new_data + position, ANTON_FWD<Args>(args)...);
+                anton::construct(new_data + position, ANTON_FWD(args)...);
                 moved += 1;
                 anton::uninitialized_move(get_ptr(position), get_ptr(_size), new_data + moved);
 
@@ -437,7 +437,7 @@ namespace anton {
             }
         } else {
             // Quick path when position points to end and we have room for one more element.
-            anton::construct(get_ptr(_size), ANTON_FWD<Args>(args)...);
+            anton::construct(get_ptr(_size), ANTON_FWD(args)...);
             _size += 1;
         }
     }
@@ -537,7 +537,7 @@ namespace anton {
     auto Array<T, Allocator>::emplace_back(Args&&... args) -> reference {
         ensure_capacity(_size + 1);
         T* elem_ptr = get_ptr(_size);
-        construct(elem_ptr, ANTON_FWD<Args>(args)...);
+        construct(elem_ptr, ANTON_FWD(args)...);
         ++_size;
         return *elem_ptr;
     }

@@ -24,10 +24,10 @@ namespace anton {
         using error_type = E;
 
         template<typename... Args>
-        Expected(Expected_Value_Tag, Args&&... args): _holds_value(true), _value{ANTON_FWD<Args&&>(args)...} {}
+        Expected(Expected_Value_Tag, Args&&... args): _holds_value(true), _value{ANTON_FWD(args)...} {}
 
         template<typename... Args>
-        Expected(Expected_Error_Tag, Args&&... args): _holds_value(false), _error{ANTON_FWD<Args&&>(args)...} {}
+        Expected(Expected_Error_Tag, Args&&... args): _holds_value(false), _error{ANTON_FWD(args)...} {}
 
         Expected(Expected const& other): _holds_value(other._holds_value), _null_state() {
             if(other._holds_value) {
@@ -199,7 +199,7 @@ namespace anton {
         Expected(Expected_Value_Tag): _holds_value(true) {}
 
         template<typename... Args>
-        Expected(Expected_Error_Tag, Args&&... args): _holds_value(false), _error{ANTON_FWD<Args&&>(args)...} {}
+        Expected(Expected_Error_Tag, Args&&... args): _holds_value(false), _error{ANTON_FWD(args)...} {}
 
         Expected(Expected const& other): _holds_value(other._holds_value), _null_state() {
             if(!other._holds_value) {

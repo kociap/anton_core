@@ -16,7 +16,7 @@ namespace anton {
 
         constexpr Pair() = default;
         template<typename U1, typename U2>
-        constexpr Pair(U1&& u1, U2&& u2): first(ANTON_FWD<U1>(u1)), second(ANTON_FWD<U2>(u2)) {}
+        constexpr Pair(U1&& u1, U2&& u2): first(ANTON_FWD(u1)), second(ANTON_FWD(u2)) {}
         template<typename U1, typename U2>
         constexpr Pair(Pair<U1, U2> const& pair): first(pair.first), second(pair.second) {}
         template<typename U1, typename U2>

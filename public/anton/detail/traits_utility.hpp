@@ -2,6 +2,9 @@
 
 #include <anton/detail/traits_transformations.hpp>
 
+#define ANTON_MOV(x) (static_cast<anton::remove_reference<decltype(x)>&&>(x))
+#define ANTON_FWD(x) (static_cast<decltype(x)&&>(x))
+
 namespace anton {
     template<typename T>
     [[nodiscard]] constexpr T&& forward(remove_reference<T>& v) {
@@ -10,7 +13,7 @@ namespace anton {
 
     template<typename T>
     [[nodiscard]] constexpr T&& forward(remove_reference<T>&& v) {
-        // TODO is there any case where this assert would fail?
+        // We don't really care about safety, so we just throw it out the window
         // static_assert(!is_lvalue_reference<T>, "Can not forward an rvalue as an lvalue.");
         return static_cast<T&&>(v);
     }

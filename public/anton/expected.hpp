@@ -24,10 +24,10 @@ namespace anton {
         using error_type = E;
 
         template<typename... Args>
-        Expected(Expected_Value_Tag, Args&&... args): _holds_value(true), _value{anton::forward<Args&&>(args)...} {}
+        Expected(Expected_Value_Tag, Args&&... args): _holds_value(true), _value{ANTON_FWD<Args&&>(args)...} {}
 
         template<typename... Args>
-        Expected(Expected_Error_Tag, Args&&... args): _holds_value(false), _error{anton::forward<Args&&>(args)...} {}
+        Expected(Expected_Error_Tag, Args&&... args): _holds_value(false), _error{ANTON_FWD<Args&&>(args)...} {}
 
         Expected(Expected const& other): _holds_value(other._holds_value), _null_state() {
             if(other._holds_value) {
@@ -39,9 +39,9 @@ namespace anton {
 
         Expected(Expected&& other): _holds_value(other._holds_value), _null_state() {
             if(other._holds_value) {
-                anton::construct(anton::addressof(_value), anton::move(other._value));
+                anton::construct(anton::addressof(_value), ANTON_MOV(other._value));
             } else {
-                anton::construct(anton::addressof(_error), anton::move(other._error));
+                anton::construct(anton::addressof(_error), ANTON_MOV(other._error));
             }
         }
 
@@ -68,19 +68,19 @@ namespace anton {
         Expected& operator=(Expected&& other) {
             if(_holds_value) {
                 if(other._holds_value) {
-                    _value = anton::move(other._value);
+                    _value = ANTON_MOV(other._value);
                 } else {
                     anton::destruct(anton::addressof(_value));
-                    anton::construct(anton::addressof(_error), anton::move(other._error));
+                    anton::construct(anton::addressof(_error), ANTON_MOV(other._error));
                     _holds_value = false;
                 }
             } else {
                 if(other._holds_value) {
                     anton::destruct(anton::addressof(_error));
-                    anton::construct(anton::addressof(_value), anton::move(other._value));
+                    anton::construct(anton::addressof(_value), ANTON_MOV(other._value));
                     _holds_value = true;
                 } else {
-                    _error = anton::move(other._error);
+                    _error = ANTON_MOV(other._error);
                 }
             }
         }
@@ -162,17 +162,17 @@ namespace anton {
                 if(rhs._holds_value) {
                     swap(lhs._value, rhs._value);
                 } else {
-                    anton::construct(anton::addressof(rhs._value), anton::move(lhs._value));
+                    anton::construct(anton::addressof(rhs._value), ANTON_MOV(lhs._value));
                     anton::destruct(anton::addressof(lhs._value));
-                    anton::construct(anton::addressof(lhs._error), anton::move(rhs._error));
+                    anton::construct(anton::addressof(lhs._error), ANTON_MOV(rhs._error));
                     anton::destruct(anton::addressof(rhs._error));
                     anton::swap(lhs._holds_value, rhs._holds_value);
                 }
             } else {
                 if(rhs._holds_value) {
-                    anton::construct(anton::addressof(rhs._error), anton::move(lhs._error));
+                    anton::construct(anton::addressof(rhs._error), ANTON_MOV(lhs._error));
                     anton::destruct(anton::addressof(lhs._error));
-                    anton::construct(anton::addressof(lhs._value), anton::move(rhs._value));
+                    anton::construct(anton::addressof(lhs._value), ANTON_MOV(rhs._value));
                     anton::destruct(anton::addressof(rhs._value));
                     anton::swap(lhs._holds_value, rhs._holds_value);
                 } else {
@@ -199,7 +199,7 @@ namespace anton {
         Expected(Expected_Value_Tag): _holds_value(true) {}
 
         template<typename... Args>
-        Expected(Expected_Error_Tag, Args&&... args): _holds_value(false), _error{anton::forward<Args&&>(args)...} {}
+        Expected(Expected_Error_Tag, Args&&... args): _holds_value(false), _error{ANTON_FWD<Args&&>(args)...} {}
 
         Expected(Expected const& other): _holds_value(other._holds_value), _null_state() {
             if(!other._holds_value) {
@@ -209,7 +209,7 @@ namespace anton {
 
         Expected(Expected&& other): _holds_value(other._holds_value), _null_state() {
             if(!other._holds_value) {
-                anton::construct(anton::addressof(_error), anton::move(other._error));
+                anton::construct(anton::addressof(_error), ANTON_MOV(other._error));
             }
         }
 
@@ -233,7 +233,7 @@ namespace anton {
         Expected& operator=(Expected&& other) {
             if(_holds_value) {
                 if(!other._holds_value) {
-                    anton::construct(anton::addressof(_error), anton::move(other._error));
+                    anton::construct(anton::addressof(_error), ANTON_MOV(other._error));
                     anton::destruct(anton::addressof(other._error));
                     _holds_value = false;
                 }
@@ -242,7 +242,7 @@ namespace anton {
                     anton::destruct(anton::addressof(_error));
                     _holds_value = true;
                 } else {
-                    _error = anton::move(other._error);
+                    _error = ANTON_MOV(other._error);
                 }
             }
         }
@@ -280,13 +280,13 @@ namespace anton {
         friend void swap(Expected& lhs, Expected& rhs) {
             if(lhs._holds_value) {
                 if(!rhs._holds_value) {
-                    anton::construct(anton::addressof(lhs._error), anton::move(rhs._error));
+                    anton::construct(anton::addressof(lhs._error), ANTON_MOV(rhs._error));
                     anton::destruct(anton::addressof(rhs._error));
                     swap(lhs._holds_value, rhs._holds_value);
                 }
             } else {
                 if(rhs._holds_value) {
-                    anton::construct(anton::addressof(rhs._error), anton::move(lhs._error));
+                    anton::construct(anton::addressof(rhs._error), ANTON_MOV(lhs._error));
                     anton::destruct(anton::addressof(lhs._error));
                     swap(lhs._holds_value, rhs._holds_value);
                 }

@@ -16,11 +16,11 @@ namespace anton {
 
         constexpr Pair() = default;
         template<typename U1, typename U2>
-        constexpr Pair(U1&& u1, U2&& u2): first(forward<U1>(u1)), second(forward<U2>(u2)) {}
+        constexpr Pair(U1&& u1, U2&& u2): first(ANTON_FWD<U1>(u1)), second(ANTON_FWD<U2>(u2)) {}
         template<typename U1, typename U2>
         constexpr Pair(Pair<U1, U2> const& pair): first(pair.first), second(pair.second) {}
         template<typename U1, typename U2>
-        constexpr Pair(Pair<U1, U2>&& pair): first(move(pair.first)), second(move(pair.second)) {}
+        constexpr Pair(Pair<U1, U2>&& pair): first(ANTON_MOV(pair.first)), second(ANTON_MOV(pair.second)) {}
         constexpr Pair(Pair const& pair) = default;
         constexpr Pair(Pair&& pair) = default;
         constexpr Pair& operator=(Pair const& pair) = default;
@@ -119,9 +119,9 @@ namespace anton {
     [[nodiscard]] constexpr tuple_element<N, Pair<T1, T2>>&& get(Pair<T1, T2>&& p) {
         static_assert(N == 0 || N == 1, u8"Pair has only 2 elements");
         if constexpr(N == 0) {
-            return move(p.first);
+            return ANTON_MOV(p.first);
         } else {
-            return move(p.second);
+            return ANTON_MOV(p.second);
         }
     }
 
@@ -129,9 +129,9 @@ namespace anton {
     [[nodiscard]] constexpr tuple_element<N, Pair<T1, T2> const>&& get(Pair<T1, T2> const&& p) {
         static_assert(N == 0 || N == 1, u8"Pair has only 2 elements");
         if constexpr(N == 0) {
-            return move(p.first);
+            return ANTON_MOV(p.first);
         } else {
-            return move(p.second);
+            return ANTON_MOV(p.second);
         }
     }
 
@@ -162,25 +162,25 @@ namespace anton {
     template<typename T1, typename T2>
     [[nodiscard]] constexpr T1&& get(Pair<T1, T2>&& p) {
         static_assert(!is_same<T1, T2>, u8"Type based get may not be called with Pair with the same types.");
-        return move(p.first);
+        return ANTON_MOV(p.first);
     }
 
     template<typename T1, typename T2>
     [[nodiscard]] constexpr T1&& get(Pair<T2, T1>&& p) {
         static_assert(!is_same<T1, T2>, u8"Type based get may not be called with Pair with the same types.");
-        return move(p.second);
+        return ANTON_MOV(p.second);
     }
 
     template<typename T1, typename T2>
     [[nodiscard]] constexpr T1 const&& get(Pair<T1, T2> const&& p) {
         static_assert(!is_same<T1, T2>, u8"Type based get may not be called with Pair with the same types.");
-        return move(p.first);
+        return ANTON_MOV(p.first);
     }
 
     template<typename T1, typename T2>
     [[nodiscard]] constexpr T1 const&& get(Pair<T2, T1> const&& p) {
         static_assert(!is_same<T1, T2>, u8"Type based get may not be called with Pair with the same types.");
-        return move(p.second);
+        return ANTON_MOV(p.second);
     }
 } // namespace anton
 

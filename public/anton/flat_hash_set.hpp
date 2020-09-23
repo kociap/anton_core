@@ -385,7 +385,7 @@ namespace anton {
             State const state = _states[index];
             if(state != State::active) {
                 _states[index] = State::active;
-                construct(_slots + index, forward<Key_Type>(key));
+                construct(_slots + index, ANTON_FWD<Key_Type>(key));
                 _size += 1;
                 _empty_slots_left -= 1;
                 return iterator(_slots + index, _states + index);
@@ -461,7 +461,7 @@ namespace anton {
                 if(_states[i] == State::active) {
                     u64 const h = _hasher(_slots[i]);
                     i64 const index = find_non_active(h, new_capacity, new_states);
-                    construct(new_slots + index, move(_slots[i]));
+                    construct(new_slots + index, ANTON_MOV(_slots[i]));
                     destruct(_slots + i);
                     new_states[index] = State::active;
                 }
@@ -498,7 +498,7 @@ namespace anton {
                     State const state = _states[index];
                     if(state == State::empty) {
                         _states[index] = State::active;
-                        construct(_slots + index, move(_slots[i]));
+                        construct(_slots + index, ANTON_MOV(_slots[i]));
                         break;
                     } else if(state == State::deleted) {
                         _states[index] = State::active;

@@ -77,9 +77,9 @@ namespace anton {
         T const* get_ptr(size_type) const;
 
         friend void swap(Fixed_Array& a1, Fixed_Array& a2) {
-            Fixed_Array tmp = move(a1);
-            a1 = move(a2);
-            a2 = move(tmp);
+            Fixed_Array tmp = ANTON_MOV(a1);
+            a1 = ANTON_MOV(a2);
+            a2 = ANTON_MOV(tmp);
         }
     };
 } // namespace anton
@@ -122,7 +122,7 @@ namespace anton {
     template<typename... Args>
     Fixed_Array<T, Capacity>::Fixed_Array(Variadic_Construct_Tag, Args&&... args): _size(sizeof...(Args)) {
         static_assert(sizeof...(Args) <= Capacity, u8"Attempting to construct Fixed_Array with more elements than capacity.");
-        uninitialized_variadic_construct(get_ptr(0), forward<Args>(args)...);
+        uninitialized_variadic_construct(get_ptr(0), ANTON_FWD<Args>(args)...);
     }
 
     template<typename T, i64 Capacity>
@@ -256,7 +256,7 @@ namespace anton {
     auto Fixed_Array<T, Capacity>::emplace_back(Args&&... args) -> reference {
         ANTON_VERIFY(_size < Capacity, u8"Cannot emplace_back element in a full Fixed_Array.");
         T* const elem = get_ptr(_size);
-        construct(elem, forward<Args>(args)...);
+        construct(elem, ANTON_FWD<Args>(args)...);
         _size += 1;
         return *elem;
     }

@@ -32,10 +32,10 @@ namespace anton {
 
     template<typename T, typename... Args>
     void construct(T* pointer, Args&&... args) {
-        if constexpr(is_constructible<T, decltype(anton::forward<Args>(args))...>) {
-            ::new((void*)pointer) T(anton::forward<Args>(args)...);
+        if constexpr(is_constructible<T, decltype(ANTON_FWD<Args>(args))...>) {
+            ::new((void*)pointer) T(ANTON_FWD<Args>(args)...);
         } else {
-            ::new((void*)pointer) T{anton::forward<Args>(args)...};
+            ::new((void*)pointer) T{ANTON_FWD<Args>(args)...};
         }
     }
 
@@ -83,7 +83,7 @@ namespace anton {
     template<typename Input_Iterator, typename Forward_Iterator>
     Forward_Iterator uninitialized_move(Input_Iterator first, Input_Iterator last, Forward_Iterator dest) {
         for(; first != last; ++first, ++dest) {
-            anton::construct(addressof(*dest), anton::move(*first));
+            anton::construct(addressof(*dest), ANTON_MOV(*first));
         }
         return dest;
     }
@@ -91,7 +91,7 @@ namespace anton {
     template<typename Input_Iterator, typename Count, typename Forward_Iterator>
     Forward_Iterator uninitialized_move_n(Input_Iterator first, Count n, Forward_Iterator dest) {
         for(; n > 0; --n, ++first, ++dest) {
-            anton::construct(addressof(*dest), anton::move(*first));
+            anton::construct(addressof(*dest), ANTON_MOV(*first));
         }
         return dest;
     }
@@ -132,7 +132,7 @@ namespace anton {
 
     template<typename Forward_Iterator, typename... Ts>
     void uninitialized_variadic_construct(Forward_Iterator first, Ts&&... vals) {
-        (..., anton::construct(anton::addressof(*(first++)), anton::forward<Ts>(vals)));
+        (..., anton::construct(anton::addressof(*(first++)), ANTON_FWD<Ts>(vals)));
     }
 
     // copy
@@ -227,7 +227,7 @@ namespace anton {
             return dest + (last - first);
         } else {
             for(; first != last; ++first, ++dest) {
-                *dest = anton::move(*first);
+                *dest = ANTON_MOV(*first);
             }
             return dest;
         }
@@ -248,7 +248,7 @@ namespace anton {
     //   template<typename Bidirectional_Iterator>
     //   Bidirectional_Iterator move_backward(Bidirectional_Iterator first, Bidirectional_Iterator last, Bidirectional_Iterator dest) {
     //       while (last != first) {
-    //           *--dest = move(*--last);
+    //           *--dest = ANTON_MOV(*--last);
     //       }
     //       return dest;
     //   }
@@ -270,7 +270,7 @@ namespace anton {
             return dest_begin;
         } else {
             while(last != first) {
-                *--dest = move(*--last);
+                *--dest = ANTON_MOV(*--last);
             }
             return dest;
         }

@@ -6,9 +6,9 @@
 namespace anton {
     template<typename T>
     constexpr void swap(T& a, T& b) {
-        T tmp(move(a));
-        a = move(b);
-        b = move(tmp);
+        T tmp(ANTON_MOV(a));
+        a = ANTON_MOV(b);
+        b = ANTON_MOV(tmp);
     }
 
     template<typename T, typename U, typename = void>

@@ -86,7 +86,7 @@ namespace anton {
         using wrapped_iterator_type = Iterator;
 
         explicit Reverse_Iterator(wrapped_iterator_type const& iter): _iterator(iter) {}
-        explicit Reverse_Iterator(wrapped_iterator_type&& iter): _iterator(anton::move(iter)) {}
+        explicit Reverse_Iterator(wrapped_iterator_type&& iter): _iterator(ANTON_MOV(iter)) {}
 
         wrapped_iterator_type const& base() const {
             return _iterator;
@@ -195,13 +195,13 @@ namespace anton {
     class Move_Iterator {
     public:
         using value_type = typename Iterator_Traits<Iterator>::value_type;
-        using reference = decltype(anton::move(*anton::declval<Iterator>()));
+        using reference = decltype(ANTON_MOV(*anton::declval<Iterator>()));
         using difference_type = typename Iterator_Traits<Iterator>::difference_type;
         using iterator_category = typename Iterator_Traits<Iterator>::iterator_category;
         using wrapped_iterator_type = Iterator;
 
         explicit Move_Iterator(wrapped_iterator_type const& iterator): _iterator(iterator) {}
-        explicit Move_Iterator(wrapped_iterator_type&& iterator): _iterator(anton::move(iterator)) {}
+        explicit Move_Iterator(wrapped_iterator_type&& iterator): _iterator(ANTON_MOV(iterator)) {}
 
         wrapped_iterator_type const& base() const {
             return _iterator;
@@ -248,7 +248,7 @@ namespace anton {
         }
 
         [[nodiscard]] reference operator*() const {
-            return anton::move(*_iterator);
+            return ANTON_MOV(*_iterator);
         }
 
         [[nodiscard]] reference operator[](difference_type n) const {

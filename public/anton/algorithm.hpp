@@ -78,7 +78,7 @@ namespace anton {
             for(; next != last; ++next) {
                 if(!predicate(*first, *next)) {
                     ++first;
-                    *first = move(*next);
+                    *first = ANTON_MOV(*next);
                 }
             }
             return ++first;

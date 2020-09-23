@@ -328,7 +328,7 @@ namespace anton {
             Value value;
 
             template<typename K, typename... Args, enable_if<!is_same<remove_const_ref<K>, Slot>, int> = 0>
-            Slot(K&& k, Args&&... args): key(forward<K>(k)), value(forward<Args>(args)...) {}
+            Slot(K&& k, Args&&... args): key(ANTON_FWD<K>(k)), value(ANTON_FWD<Args>(args)...) {}
             Slot(Slot const&) = default;
             Slot(Slot&&) = default;
             Slot& operator=(Slot const&) = default;
@@ -383,8 +383,8 @@ namespace anton {
 
     template<typename Key, typename Value, typename Hash, typename Key_Compare>
     Flat_Hash_Map<Key, Value, Hash, Key_Compare>::Flat_Hash_Map(Flat_Hash_Map&& other) noexcept
-        : _allocator(move(other._allocator)), _hasher(move(other._hasher)), _key_equal(move(other._key_equal)), _states(other._states), _slots(other._slots),
-          _capacity(other._capacity), _size(other._size), _empty_slots_left(other._empty_slots_left) {
+        : _allocator(ANTON_MOV(other._allocator)), _hasher(ANTON_MOV(other._hasher)), _key_equal(ANTON_MOV(other._key_equal)), _states(other._states),
+          _slots(other._slots), _capacity(other._capacity), _size(other._size), _empty_slots_left(other._empty_slots_left) {
         other._slots = nullptr;
         other._states = nullptr;
         other._capacity = 0;
@@ -453,7 +453,7 @@ namespace anton {
         if(iter != end()) {
             return iter;
         } else {
-            return emplace(key, forward<Args>(args)...);
+            return emplace(key, ANTON_FWD<Args>(args)...);
         }
     }
 
@@ -467,7 +467,7 @@ namespace anton {
             State const state = _states[index];
             if(state != State::active) {
                 _states[index] = State::active;
-                construct(_slots + index, key, forward<Args>(args)...);
+                construct(_slots + index, key, ANTON_FWD<Args>(args)...);
                 _size += 1;
                 _empty_slots_left -= 1;
                 return iterator(_slots + index, _states + index);
@@ -475,7 +475,7 @@ namespace anton {
                 if(_key_equal(key, _slots[index].key)) {
                     Value* ptr = &_slots[index].value;
                     destruct(ptr);
-                    construct(ptr, forward<Args>(args)...);
+                    construct(ptr, ANTON_FWD<Args>(args)...);
                     return iterator(_slots + index, _states + index);
                 }
                 index = (index + 1) % _capacity;
@@ -541,7 +541,7 @@ namespace anton {
                 if(_states[i] == State::active) {
                     u64 const h = _hasher(_slots[i].key);
                     i64 const index = find_non_active(h, new_capacity, new_states);
-                    construct(new_slots + index, move(_slots[i]));
+                    construct(new_slots + index, ANTON_MOV(_slots[i]));
                     destruct(_slots + i);
                     new_states[index] = State::active;
                 }
@@ -578,7 +578,7 @@ namespace anton {
                     State const state = _states[index];
                     if(state == State::empty) {
                         _states[index] = State::active;
-                        construct(_slots + index, move(_slots[i]));
+                        construct(_slots + index, ANTON_MOV(_slots[i]));
                         break;
                     } else if(state == State::deleted) {
                         _states[index] = State::active;

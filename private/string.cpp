@@ -99,7 +99,7 @@ namespace anton {
         copy(other._data, other._data + other._size, _data);
     }
 
-    String::String(String&& other) noexcept: _allocator(move(other._allocator)), _data(other._data), _capacity(other._capacity), _size(other._size) {
+    String::String(String&& other) noexcept: _allocator(ANTON_MOV(other._allocator)), _data(other._data), _capacity(other._capacity), _size(other._size) {
         other._data = nullptr;
         other._size = 0;
         other._capacity = 0;

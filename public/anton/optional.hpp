@@ -20,7 +20,7 @@ namespace anton {
         public:
             Optional_Destruct_Base(): _null_state(), _holds_value(false) {}
             template<typename... Args>
-            Optional_Destruct_Base(Variadic_Construct_Tag, Args&&... args): _value(forward<Args>(args)...), _holds_value(true) {}
+            Optional_Destruct_Base(Variadic_Construct_Tag, Args&&... args): _value(ANTON_FWD<Args>(args)...), _holds_value(true) {}
             ~Optional_Destruct_Base() = default;
 
             void destruct() {
@@ -42,7 +42,7 @@ namespace anton {
             Optional_Destruct_Base(): _null_state(), _holds_value(false) {}
 
             template<typename... Args>
-            Optional_Destruct_Base(Variadic_Construct_Tag, Args&&... args): _value(forward<Args>(args)...), _holds_value(true) {}
+            Optional_Destruct_Base(Variadic_Construct_Tag, Args&&... args): _value(ANTON_FWD<Args>(args)...), _holds_value(true) {}
 
             ~Optional_Destruct_Base() {
                 if(_holds_value) {
@@ -82,17 +82,17 @@ namespace anton {
             }
 
             T&& get() && {
-                return move(this->_value);
+                return ANTON_MOV(this->_value);
             }
 
             T const&& get() const&& {
-                return move(this->_value);
+                return ANTON_MOV(this->_value);
             }
 
             template<typename... Args>
             void construct(Args&&... args) {
                 ANTON_ASSERT(!holds_value(), u8"construct called on empty Optional.");
-                ::new(addressof(this->_value)) T(forward<Args>(args)...);
+                ::new(addressof(this->_value)) T(ANTON_FWD<Args>(args)...);
                 this->_holds_value = true;
             }
 
@@ -113,14 +113,14 @@ namespace anton {
             void assign(Optional_Storage_Base&& opt) {
                 if(holds_value()) {
                     if(opt.holds_value()) {
-                        this->_value = move(opt).get();
+                        this->_value = ANTON_MOV(opt).get();
                         opt.destruct();
                     } else {
                         this->destruct();
                     }
                 } else {
                     if(opt.holds_value()) {
-                        construct(move(opt).get());
+                        construct(ANTON_MOV(opt).get());
                         opt.destruct();
                     }
                 }
@@ -167,7 +167,7 @@ namespace anton {
 
             Optional_Move_Base(Optional_Move_Base&& other) noexcept {
                 if(other.holds_value()) {
-                    construct(move(other).get());
+                    construct(ANTON_MOV(other).get());
                     other.destruct();
                 }
             }
@@ -216,7 +216,7 @@ namespace anton {
             Optional_Move_Assign_Base& operator=(Optional_Move_Assign_Base const&) = default;
 
             Optional_Move_Assign_Base& operator=(Optional_Move_Assign_Base&& other) noexcept {
-                assign(move(other));
+                assign(ANTON_MOV(other));
                 other.destruct();
                 return *this;
             }
@@ -244,14 +244,14 @@ namespace anton {
         Optional(Null_Optional_Tag) {}
 
         template<typename... Args, typename = enable_if<is_constructible<T, Args...>>>
-        explicit Optional(Variadic_Construct_Tag, Args&&... args): _base(variadic_construct, forward<Args>(args)...) {}
+        explicit Optional(Variadic_Construct_Tag, Args&&... args): _base(variadic_construct, ANTON_FWD<Args>(args)...) {}
 
         template<typename U>
-        Optional(U&& arg, enable_if<Is_Constructible_From_Type<U&&>::value && is_convertible<U&&, T>, int> = 0): _base(variadic_construct, forward<U>(arg)) {}
+        Optional(U&& arg, enable_if<Is_Constructible_From_Type<U&&>::value && is_convertible<U&&, T>, int> = 0): _base(variadic_construct, ANTON_FWD<U>(arg)) {}
 
         template<typename U>
         explicit Optional(U&& arg, enable_if<Is_Constructible_From_Type<U&&>::value && !is_convertible<U&&, T>, int> = 0)
-            : _base(variadic_construct, forward<U>(arg)) {}
+            : _base(variadic_construct, ANTON_FWD<U>(arg)) {}
 
         Optional(Optional const&) = default;
         // Leaves other in null_optional state
@@ -334,11 +334,11 @@ namespace anton {
             if(rhs.holds_value()) {
                 swap(*lhs, *rhs);
             } else {
-                rhs = move(lhs);
+                rhs = ANTON_MOV(lhs);
             }
         } else {
             if(rhs.holds_value()) {
-                lhs = move(rhs);
+                lhs = ANTON_MOV(rhs);
             }
         }
     }

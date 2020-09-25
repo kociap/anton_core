@@ -55,6 +55,7 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/pair.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/slice.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/stream.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/string_stream.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/string_utils.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/string_view.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/string.hpp"
@@ -71,6 +72,7 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/private/filesystem.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/format.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string_common.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/private/string_stream.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/unicode/common.cpp"
 )

@@ -1,4 +1,4 @@
-#include <string_stream.hpp>
+#include <anton/string_stream.hpp>
 
 namespace anton {
     Input_String_Stream::Input_String_Stream(anton::String string): _string(ANTON_MOV(string)), _current(_string.chars_begin()) {}

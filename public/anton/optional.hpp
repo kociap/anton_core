@@ -142,7 +142,7 @@ namespace anton {
 
             Optional_Copy_Base(Optional_Copy_Base const& other) {
                 if(other.holds_value()) {
-                    construct(other.get());
+                    this->construct(other.get());
                 }
             }
 
@@ -167,7 +167,7 @@ namespace anton {
 
             Optional_Move_Base(Optional_Move_Base&& other) noexcept {
                 if(other.holds_value()) {
-                    construct(ANTON_MOV(other).get());
+                    this->construct(ANTON_MOV(other).get());
                     other.destruct();
                 }
             }
@@ -192,7 +192,7 @@ namespace anton {
             Optional_Copy_Assign_Base(Optional_Copy_Assign_Base&&) noexcept = default;
 
             Optional_Copy_Assign_Base& operator=(Optional_Copy_Assign_Base const& other) {
-                assign(other);
+                this->assign(other);
                 return *this;
             }
 
@@ -216,7 +216,7 @@ namespace anton {
             Optional_Move_Assign_Base& operator=(Optional_Move_Assign_Base const&) = default;
 
             Optional_Move_Assign_Base& operator=(Optional_Move_Assign_Base&& other) noexcept {
-                assign(ANTON_MOV(other));
+                this->assign(ANTON_MOV(other));
                 other.destruct();
                 return *this;
             }

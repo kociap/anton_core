@@ -171,6 +171,11 @@ namespace anton {
         return first;
     }
 
+    // bubble_sort
+    // first, last - the range to sort.
+    // predicate - comparison function. Returns true when the first argument is less than (i.e. ordered before) the second argument.
+    //             The function must not modify the objects passed to it.
+    //
     template<typename Forward_Iterator, typename Predicate>
     void bubble_sort(Forward_Iterator first, Forward_Iterator last, Predicate predicate) {
         for(; first != last;) {
@@ -179,8 +184,8 @@ namespace anton {
             ++next;
             bool swapped = false;
             for(; next != last; ++next, ++i) {
-                if(predicate(*next, *i)) {
-                    swap(*next, *i);
+                if(!predicate(*i, *next)) {
+                    swap(*i, *next);
                     swapped = true;
                 }
             }
@@ -194,7 +199,7 @@ namespace anton {
     template<typename Forward_Iterator>
     void bubble_sort(Forward_Iterator first, Forward_Iterator last) {
         using value_type = typename Iterator_Traits<Forward_Iterator>::value_type;
-        bubble_sort(first, last, [](value_type const& lhs, value_type const& rhs) { return lhs == rhs; });
+        bubble_sort(first, last, [](value_type const& lhs, value_type const& rhs) { return lhs < rhs; });
     }
 
     template<typename Random_Access_Iterator, typename Predicate>
@@ -207,7 +212,7 @@ namespace anton {
             for(Random_Access_Iterator j = i; j != first;) {
                 Random_Access_Iterator prev = j;
                 --prev;
-                if(predicate(*j, *prev)) {
+                if(!predicate(*prev, *j)) {
                     swap(*j, *prev);
                     j = prev;
                 } else {

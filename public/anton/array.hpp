@@ -451,22 +451,32 @@ namespace anton {
 
         // TODO: Distance and actual support for input iterators.
         if(first != last) {
-            i64 const dist = last - first;
-            ANTON_ASSERT(dist >= 0, "the difference of first and last must not be negative");
-            if(_size + dist > _capacity || position != _size) {
-                if(_size + dist <= _capacity) {
+            i64 const new_elems = last - first;
+            ANTON_ASSERT(new_elems >= 0, "the difference of first and last must not be negative");
+            if(_size + new_elems <= _capacity && position == _size) {
+                // Quick path when position points to end and we have room for new_elems elements.
+                anton::uninitialized_copy(first, last, get_ptr(_size));
+                _size += new_elems;
+            } else {
+                if(_size + new_elems <= _capacity) {
+                    // total number of elements we want to move
                     i64 const total_elems = _size - position;
-                    i64 const elems_outside = math::min(_size - position, dist);
+                    // when new_elems < total_elems, we have to unititialized_move min(total_elems, new_elems)
+                    // and move_backward the rest because the target range will overlap the source range
+                    i64 const elems_outside = math::min(total_elems, new_elems);
                     i64 const elems_inside = total_elems - elems_outside;
-                    i64 const target_offset = math::max(position + dist, _size);
+                    // we move the 'outside' elements to _size unless position + new_elems is greater than _size
+                    i64 const target_offset = math::max(position + new_elems, _size);
                     anton::uninitialized_move_n(get_ptr(position + elems_inside), elems_outside, get_ptr(target_offset));
-                    anton::move_backward(get_ptr(position), get_ptr(position + elems_inside), get_ptr(position + dist + elems_inside));
-                    anton::destruct_n(get_ptr(position), dist);
+                    anton::move_backward(get_ptr(position), get_ptr(position + elems_inside), get_ptr(position + new_elems + elems_inside));
+                    // we always have to destruct at most total_elems and at least new_elems
+                    // if we attempt to destruct more than total_elems, we will call destruct on uninitialized memory
+                    anton::destruct_n(get_ptr(position), elems_outside);
                     anton::uninitialized_copy(first, last, get_ptr(position));
-                    _size += dist;
+                    _size += new_elems;
                 } else {
                     i64 new_capacity = _capacity * 2;
-                    while(new_capacity <= _size + dist) {
+                    while(new_capacity <= _size + new_elems) {
                         new_capacity *= 2;
                     }
 
@@ -475,19 +485,15 @@ namespace anton {
                     anton::uninitialized_move(get_ptr(0), get_ptr(position), new_data);
                     moved = position;
                     anton::uninitialized_copy(first, last, new_data + moved);
-                    moved += dist;
+                    moved += new_elems;
                     anton::uninitialized_move(get_ptr(position), get_ptr(_size), new_data + moved);
 
                     anton::destruct_n(_data, _size);
                     deallocate(_data, _capacity);
                     _capacity = new_capacity;
                     _data = new_data;
-                    _size += dist;
+                    _size += new_elems;
                 }
-            } else {
-                // Quick path when position points to end and we have room for dist elements.
-                anton::uninitialized_copy(first, last, get_ptr(_size));
-                _size += dist;
             }
         }
     }

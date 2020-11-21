@@ -114,6 +114,17 @@ namespace anton::fs {
         return fs_path_to_string(a.parent_path());
     }
 
+    void rename(String_View const from, String_View const to) {
+        std::filesystem::path a(std::string_view(from.data(), from.size_bytes()));
+        std::filesystem::path b(std::string_view(to.data(), to.size_bytes()));
+        std::filesystem::rename(a, b);
+    }
+
+    i64 file_size(String_View const p) {
+        std::filesystem::path a(std::string_view(p.data(), p.size_bytes()));
+        return static_cast<i64>(std::filesystem::file_size(a));
+    }
+
     Output_File_Stream::Output_File_Stream() {}
 
     Output_File_Stream::Output_File_Stream(String const& filename) {

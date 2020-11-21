@@ -37,6 +37,13 @@ namespace anton::fs {
     [[nodiscard]] bool has_filename(String_View path);
     [[nodiscard]] bool exists(String_View path);
 
+    void rename(String_View from, String_View to);
+
+    // file_size
+    // Obtain size of a file in bytes.
+    //
+    i64 file_size(String_View path);
+
     enum class Open_Mode : u32 {
         // Has effect only on Windows. Makes all reading operations translate the \n\r sequences into \n.
         // Opposite of std::ios_base::open_mode::binary.

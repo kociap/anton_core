@@ -129,13 +129,17 @@ namespace anton {
     }
 
     String& String::operator=(String const& other) {
-        value_type* new_data = reinterpret_cast<value_type*>(_allocator.allocate(other._capacity, alignof(value_type)));
-        _allocator.deallocate(_data, _capacity, alignof(value_type));
-        _data = new_data;
-        _size = other._size;
-        _capacity = other._capacity;
+        size_type const new_size = other._size;
+        size_type const new_capacity = other._capacity;
+        value_type* new_data = reinterpret_cast<value_type*>(_allocator.allocate(new_capacity, alignof(value_type)));
+        // We want to copy the data from the String before we deallocate the old memory to handle self-assignment
         memset(_data + _size, 0, _capacity - _size);
         copy(other._data, other._data + other._size, _data);
+        _allocator.deallocate(_data, _capacity, alignof(value_type));
+
+        _data = new_data;
+        _size = new_size;
+        _capacity = new_capacity;
         return *this;
     }
 
@@ -145,19 +149,22 @@ namespace anton {
     }
 
     String& String::operator=(String_View const sv) {
-        _size = sv.size_bytes();
-        size_type const old_capacity = _capacity;
-        _capacity = 64;
-        while(_capacity < _size + 1) {
-            _capacity *= 2;
+        size_type const new_size = sv.size_bytes();
+        size_type new_capacity = 64;
+        while(new_capacity < new_size + 1) {
+            new_capacity *= 2;
         }
 
-        value_type* new_data = reinterpret_cast<value_type*>(_allocator.allocate(_capacity, alignof(value_type)));
-        _allocator.deallocate(_data, old_capacity, alignof(value_type));
-        _data = new_data;
+        value_type* const new_data = reinterpret_cast<value_type*>(_allocator.allocate(new_capacity, alignof(value_type)));
+        // We want to copy the data from the String_View before we deallocate the old memory to handle the case
+        // when the String_View points to our own memory (sort of self-assignment)
+        memset(new_data + new_size, 0, new_capacity - new_size);
+        copy(sv.data(), sv.data() + sv.size_bytes(), new_data);
 
-        memset(_data + _size, 0, _capacity - _size);
-        copy(sv.data(), sv.data() + sv.size_bytes(), _data);
+        _allocator.deallocate(_data, _capacity, alignof(value_type));
+        _data = new_data;
+        _capacity = new_capacity;
+        _size = new_size;
         return *this;
     }
 

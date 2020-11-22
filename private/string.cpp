@@ -133,8 +133,8 @@ namespace anton {
         size_type const new_capacity = other._capacity;
         value_type* new_data = reinterpret_cast<value_type*>(_allocator.allocate(new_capacity, alignof(value_type)));
         // We want to copy the data from the String before we deallocate the old memory to handle self-assignment
-        memset(_data + _size, 0, _capacity - _size);
-        copy(other._data, other._data + other._size, _data);
+        memset(new_data + _size, 0, _capacity - _size);
+        copy(other._data, other._data + other._size, new_data);
         _allocator.deallocate(_data, _capacity, alignof(value_type));
 
         _data = new_data;

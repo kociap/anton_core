@@ -1,5 +1,6 @@
 #pragma once
 
+#include <anton/assert.hpp>
 #include <anton/detail/swap.hpp>
 #include <anton/memory.hpp>
 #include <anton/type_traits.hpp>
@@ -106,58 +107,72 @@ namespace anton {
         }
 
         [[nodiscard]] T* operator->() {
+            ANTON_ASSERT(_holds_value, u8"cannot call operator-> on Expected that does not hold a value");
             return &_value;
         }
 
         [[nodiscard]] T const* operator->() const {
+            ANTON_ASSERT(_holds_value, u8"cannot call operator-> on Expected that does not hold a value");
             return &_value;
         }
 
         [[nodiscard]] T& operator*() & {
+            ANTON_ASSERT(_holds_value, u8"cannot call operator* on Expected that does not hold a value");
             return _value;
         }
 
         [[nodiscard]] T const& operator*() const& {
+            ANTON_ASSERT(_holds_value, u8"cannot call operator* on Expected that does not hold a value");
             return _value;
         }
 
         [[nodiscard]] T&& operator*() && {
+            ANTON_ASSERT(_holds_value, u8"cannot call operator* on Expected that does not hold a value");
             return _value;
         }
 
         [[nodiscard]] T const&& operator*() const&& {
+            ANTON_ASSERT(_holds_value, u8"cannot call operator* on Expected that does not hold a value");
             return _value;
         }
 
         [[nodiscard]] T& value() & {
+            ANTON_ASSERT(_holds_value, u8"cannot call value() on Expected that does not hold a value");
             return _value;
         }
 
         [[nodiscard]] T const& value() const& {
+            ANTON_ASSERT(_holds_value, u8"cannot call value() on Expected that does not hold a value");
             return _value;
         }
 
         [[nodiscard]] T&& value() && {
+            ANTON_ASSERT(_holds_value, u8"cannot call value() on Expected that does not hold a value");
             return _value;
         }
 
         [[nodiscard]] T const&& value() const&& {
+            ANTON_ASSERT(_holds_value, u8"cannot call value() on Expected that does not hold a value");
             return _value;
         }
 
         [[nodiscard]] E& error() & {
+            ANTON_ASSERT(!_holds_value, u8"cannot call error() on Expected that does not hold a value");
             return _error;
         }
 
         [[nodiscard]] E const& error() const& {
+            ANTON_ASSERT(!_holds_value, u8"cannot call error() on Expected that does not hold a value");
             return _error;
         }
 
         [[nodiscard]] E&& error() && {
+            ANTON_ASSERT(!_holds_value, u8"cannot call error() on Expected that does not hold a value");
             return _error;
         }
 
         [[nodiscard]] E const&& error() const&& {
+            ANTON_ASSERT(!_holds_value, u8"cannot call error() on Expected that does not hold a value");
             return _error;
         }
 
@@ -270,18 +285,22 @@ namespace anton {
         }
 
         [[nodiscard]] E& error() & {
+            ANTON_ASSERT(!_holds_value, u8"cannot call error() on Expected that does not hold a value");
             return _error;
         }
 
         [[nodiscard]] E const& error() const& {
+            ANTON_ASSERT(!_holds_value, u8"cannot call error() on Expected that does not hold a value");
             return _error;
         }
 
         [[nodiscard]] E&& error() && {
+            ANTON_ASSERT(!_holds_value, u8"cannot call error() on Expected that does not hold a value");
             return _error;
         }
 
         [[nodiscard]] E const&& error() const&& {
+            ANTON_ASSERT(!_holds_value, u8"cannot call error() on Expected that does not hold a value");
             return _error;
         }
 

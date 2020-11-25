@@ -63,6 +63,8 @@ namespace anton {
                     _error = other._error;
                 }
             }
+
+            return *this;
         }
 
         Expected& operator=(Expected&& other) {
@@ -83,6 +85,8 @@ namespace anton {
                     _error = ANTON_MOV(other._error);
                 }
             }
+
+            return *this;
         }
 
         ~Expected() {
@@ -228,6 +232,8 @@ namespace anton {
                     _error = other._error;
                 }
             }
+
+            return *this;
         }
 
         Expected& operator=(Expected&& other) {
@@ -245,6 +251,8 @@ namespace anton {
                     _error = ANTON_MOV(other._error);
                 }
             }
+
+            return *this;
         }
 
         ~Expected() {

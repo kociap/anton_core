@@ -479,7 +479,7 @@ namespace anton {
 
     template<typename Key, typename Hash, typename Key_Compare>
     void Flat_Hash_Set<Key, Hash, Key_Compare>::rehash() {
-        // Convert deleted to empty and active to deleted.
+        // Convert deleted to empty and active to deleted
         for(i64 i = 0; i < _capacity; ++i) {
             if(_states[i] == State::deleted) {
                 _states[i] = State::empty;
@@ -488,21 +488,24 @@ namespace anton {
             }
         }
 
-        // Rehash all deleted.
-        for(i64 i = 0; i < _capacity; ++i) {
+        // Rehash all deleted
+        for(i64 i = 0; i < _capacity; i += 1) {
             if(_states[i] == State::deleted) {
                 Slot& slot = _slots[i];
-                u64 const h = _hasher(slot);
+                u64 const h = _hasher(slot.key);
                 i64 index = h % _capacity;
                 while(true) {
                     State const state = _states[index];
                     if(state == State::empty) {
+                        _states[i] = State::empty;
                         _states[index] = State::active;
-                        construct(_slots + index, ANTON_MOV(_slots[i]));
+                        construct(_slots + index, ANTON_MOV(slot));
+                        destruct(&slot);
                         break;
                     } else if(state == State::deleted) {
                         _states[index] = State::active;
                         swap(slot, _slots[index]);
+                        i -= 1;
                         break;
                     }
                     index = (index + 1) % _capacity;

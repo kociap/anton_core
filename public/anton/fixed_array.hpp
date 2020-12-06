@@ -238,7 +238,7 @@ namespace anton {
     void Fixed_Array<T, Capacity>::resize(size_type const s, T const& v) {
         ANTON_VERIFY(s <= Capacity && s >= 0, u8"Requested size was outside the range [0, capacity()].");
         if(s >= _size) {
-            uninitialized_fill_n(get_ptr(_size), s - _size);
+            uninitialized_fill_n(get_ptr(_size), s - _size, v);
         } else {
             destruct_n(get_ptr(s), _size - s);
         }

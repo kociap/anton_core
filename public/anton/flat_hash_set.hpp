@@ -492,7 +492,7 @@ namespace anton {
         for(i64 i = 0; i < _capacity; i += 1) {
             if(_states[i] == State::deleted) {
                 Slot& slot = _slots[i];
-                u64 const h = _hasher(slot.key);
+                u64 const h = _hasher(slot);
                 i64 index = h % _capacity;
                 while(true) {
                     State const state = _states[index];

@@ -103,6 +103,10 @@ namespace anton {
             for(; first != last; ++first) {
                 anton::construct(anton::addressof(*first));
             }
+        } else {
+            for(; first != last; ++first) {
+                *first = {};
+            }
         }
     }
 
@@ -112,6 +116,10 @@ namespace anton {
         if constexpr(!is_trivially_constructible<value_type>) {
             for(; n > 0; --n, ++first) {
                 anton::construct(anton::addressof(*first));
+            }
+        } else {
+            for(; n > 0; --n, ++first) {
+                *first = {};
             }
         }
     }

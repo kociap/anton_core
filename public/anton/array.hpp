@@ -130,6 +130,14 @@ namespace anton {
         void pop_back();
         void clear();
 
+        friend void swap(Array& v1, Array& v2) {
+            using anton::swap;
+            swap(v1._allocator, v2._allocator);
+            swap(v1._capacity, v2._capacity);
+            swap(v1._size, v2._size);
+            swap(v1._data, v2._data);
+        }
+
     private:
         Allocator _allocator;
         size_type _capacity = 64;
@@ -146,7 +154,6 @@ namespace anton {
         void deallocate(void*, size_type);
         void ensure_capacity(size_type requested_capacity);
     };
-
 } // namespace anton
 
 namespace anton {

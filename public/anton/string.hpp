@@ -182,7 +182,7 @@ namespace anton {
         using transparent = void;
 
         [[nodiscard]] constexpr u64 operator()(String_View const v) const {
-            return hash(v);
+            return anton::hash(v);
         }
     };
 

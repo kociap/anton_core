@@ -23,7 +23,7 @@ namespace anton {
     // Complexity: At most 'last - first' comparisons.
     //
     template<typename Input_Iterator, typename T>
-    [[nodiscard]] inline Input_Iterator find(Input_Iterator first, Input_Iterator last, T const& value) {
+    [[nodiscard]] Input_Iterator find(Input_Iterator first, Input_Iterator last, T const& value) {
         while(first != last && *first != value) {
             ++first;
         }
@@ -39,7 +39,7 @@ namespace anton {
     // Complexity: At most 'last - first' applications of the predicate.
     //
     template<typename Input_Iterator, typename Predicate>
-    [[nodiscard]] inline Input_Iterator find_if(Input_Iterator first, Input_Iterator last, Predicate predicate) {
+    [[nodiscard]] Input_Iterator find_if(Input_Iterator first, Input_Iterator last, Predicate predicate) {
         while(first != last && !predicate(*first)) {
             ++first;
         }
@@ -47,13 +47,62 @@ namespace anton {
     }
 
     template<typename Input_Iterator, typename Predicate>
-    [[nodiscard]] inline bool any_of(Input_Iterator first, Input_Iterator last, Predicate predicate) {
+    [[nodiscard]] bool any_of(Input_Iterator first, Input_Iterator last, Predicate predicate) {
         for(; first != last; ++first) {
             if(predicate(*first)) {
                 return true;
             }
         }
         return false;
+    }
+
+    // rotate_left
+    // Performs left rotation on the range by swapping elements so that middle becomes the first element.
+    // [first, last[ must be a valid range, middle must be within [first, last[.
+    //
+    // This function works on forward iterators meaning it supports lists, however you can get much better
+    // performance by using splice operations instead (O(1) instead of O(n)).
+    //
+    // Returns: Position of the first element after rotate.
+    //
+    // Complexity: At most last - first swaps.
+    //
+    template<typename Forward_Iterator>
+    Forward_Iterator rotate_left(Forward_Iterator first, Forward_Iterator middle, Forward_Iterator last) {
+        using anton::swap;
+        Forward_Iterator i = middle;
+        while(true) {
+            swap(*first, *i);
+            ++first;
+            ++i;
+
+            if(i == last) {
+                break;
+            }
+
+            if(first == middle) {
+                middle = i;
+            }
+        }
+
+        Forward_Iterator r = first;
+        if(first != middle) {
+            i = middle;
+            while(true) {
+                swap(*first, *i);
+                ++first;
+                ++i;
+                if(i == last) {
+                    if(first == middle) {
+                        break;
+                    }
+                    i = middle;
+                } else if(first == middle) {
+                    middle = i;
+                }
+            }
+        }
+        return r;
     }
 
     // unique

@@ -423,6 +423,8 @@ namespace anton {
             }
             *i = State::empty;
         }
+        _size = 0;
+        _empty_slots_left = _capacity;
     }
 
     template<typename Key, typename Hash, typename Key_Compare>
@@ -474,6 +476,7 @@ namespace anton {
             _states = new_states;
             _slots = new_slots;
             _capacity = new_capacity;
+            _empty_slots_left = _capacity - _size;
         }
     }
 

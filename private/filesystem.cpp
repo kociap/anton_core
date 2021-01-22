@@ -174,6 +174,7 @@ namespace anton::fs {
     void Output_File_Stream::close() {
         if(_buffer) {
             fclose((FILE*)_buffer);
+            _buffer = nullptr;
         }
     }
 

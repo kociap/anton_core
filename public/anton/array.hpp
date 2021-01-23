@@ -10,8 +10,6 @@
 #include <anton/utility.hpp>
 
 namespace anton {
-    // Move constructor of T must not throw any exceptions.
-    //
     template<typename T, typename Allocator = Allocator>
     class Array {
     public:
@@ -108,13 +106,59 @@ namespace anton {
         template<typename Input_Iterator>
         void assign(Input_Iterator first, Input_Iterator last);
 
+        // insert
+        // Constructs an object directly into array at position avoiding copies or moves.
+        // position must be a valid iterator.
+        //
+        // Returns: iterator to the inserted element.
+        //
         template<typename... Args>
-        void insert(Variadic_Construct_Tag, const_iterator position, Args&&... args);
+        iterator insert(Variadic_Construct_Tag, const_iterator position, Args&&... args);
+
+        // insert
+        // Constructs an object directly into array at position avoiding copies or moves.
+        // position must be an index greater than or equal 0 and less than or equal size.
+        //
+        // Returns: iterator to the inserted element.
+        //
         template<typename... Args>
-        void insert(Variadic_Construct_Tag, size_type position, Args&&... args);
+        iterator insert(Variadic_Construct_Tag, size_type position, Args&&... args);
+
+        // insert
+        // Insert a range of elements into array at position.
+        // position must be a valid iterator.
+        //
+        // Returns: iterator to the first of the inserted elements.
+        //
         template<typename Input_Iterator>
-        void insert(size_type position, Input_Iterator first, Input_Iterator last);
-        void insert_unsorted(const_iterator position, value_type const& value);
+        iterator insert(const_iterator position, Input_Iterator first, Input_Iterator last);
+
+        // insert
+        // Insert a range of elements into array at position.
+        // position must be an index greater than or equal 0 and less than or equal size.
+        //
+        // Returns: iterator to the first of the inserted elements.
+        //
+        template<typename Input_Iterator>
+        iterator insert(size_type position, Input_Iterator first, Input_Iterator last);
+
+        // insert_unsorted
+        // Inserts an element into array by moving the object at position to the end of the array
+        // and then copying value into position.
+        // position must be a valid iterator.
+        //
+        // Returns: iterator to the inserted element.
+        //
+        iterator insert_unsorted(const_iterator position, value_type const& value);
+
+        // insert_unsorted
+        // Inserts an element into array by moving the object at position to the end of the array
+        // and then copying value into position.
+        // position must be an index greater than or equal 0 and less than or equal size.
+        //
+        // Returns: iterator to the inserted element.
+        //
+        iterator insert_unsorted(size_type position, value_type const& value);
 
         void push_back(value_type const&);
         void push_back(value_type&&);
@@ -122,7 +166,7 @@ namespace anton {
         reference emplace_back(Args&&... args);
 
         iterator erase(const_iterator first, const_iterator last);
-        void erase_unsorted(size_type index); // TODO: remove
+        void erase_unsorted(size_type index);
         void erase_unsorted_unchecked(size_type index);
         iterator erase_unsorted(const_iterator first);
         // iterator erase_unsorted(const_iterator first, const_iterator last);
@@ -143,9 +187,6 @@ namespace anton {
         size_type _capacity = 64;
         size_type _size = 0;
         T* _data = nullptr;
-
-        void attempt_copy(T* from, T* to);
-        void attempt_move(T* from, T* to);
 
         T* get_ptr(size_type index = 0);
         T const* get_ptr(size_type index = 0) const;
@@ -377,7 +418,6 @@ namespace anton {
     void Array<T, Allocator>::set_capacity(size_type new_capacity) {
         if(new_capacity != _capacity) {
             T* new_data = allocate(new_capacity);
-            // TODO: More reallocation options
             if constexpr(is_move_constructible<T>) {
                 uninitialized_move_n(_data, math::min(new_capacity, _size), new_data);
             } else {
@@ -409,15 +449,16 @@ namespace anton {
 
     template<typename T, typename Allocator>
     template<typename... Args>
-    void Array<T, Allocator>::insert(Variadic_Construct_Tag, const_iterator position, Args&&... args) {
-        insert(variadic_construct, position - begin(), ANTON_FWD(args)...);
+    auto Array<T, Allocator>::insert(Variadic_Construct_Tag, const_iterator position, Args&&... args) -> iterator {
+        size_type const offset = static_cast<size_type>(position - begin());
+        return insert(variadic_construct, offset, ANTON_FWD(args)...);
     }
 
     template<typename T, typename Allocator>
     template<typename... Args>
-    void Array<T, Allocator>::insert(Variadic_Construct_Tag, size_type const position, Args&&... args) {
+    auto Array<T, Allocator>::insert(Variadic_Construct_Tag, size_type const position, Args&&... args) -> iterator {
         if constexpr(ANTON_ITERATOR_DEBUG) {
-            ANTON_FAIL(position <= _size && position >= 0, u8"Index out of bounds.");
+            ANTON_FAIL(position >= 0 && position <= _size, u8"index out of bounds");
         }
 
         if(_size == _capacity || position != _size) {
@@ -447,13 +488,21 @@ namespace anton {
             anton::construct(get_ptr(_size), ANTON_FWD(args)...);
             _size += 1;
         }
+        return get_ptr(position);
     }
 
     template<typename T, typename Allocator>
     template<typename Input_Iterator>
-    void Array<T, Allocator>::insert(size_type position, Input_Iterator first, Input_Iterator last) {
+    auto Array<T, Allocator>::insert(const_iterator position, Input_Iterator first, Input_Iterator last) -> iterator {
+        size_type const offset = static_cast<size_type>(position - begin());
+        return insert(offset, first, last);
+    }
+
+    template<typename T, typename Allocator>
+    template<typename Input_Iterator>
+    auto Array<T, Allocator>::insert(size_type position, Input_Iterator first, Input_Iterator last) -> iterator {
         if constexpr(ANTON_ITERATOR_DEBUG) {
-            ANTON_FAIL(position <= _size && position >= 0, u8"Index out of bounds.");
+            ANTON_FAIL(position >= 0 && position <= _size, u8"index out of bounds");
         }
 
         // TODO: Distance and actual support for input iterators.
@@ -503,30 +552,37 @@ namespace anton {
                 }
             }
         }
+        return get_ptr(position);
     }
 
     template<typename T, typename Allocator>
-    void Array<T, Allocator>::insert_unsorted(const_iterator position, value_type const& value) {
+    auto Array<T, Allocator>::insert_unsorted(const_iterator position, value_type const& value) -> iterator {
+        size_type const offset = static_cast<size_type>(position - begin());
+        return insert_unsorted(offset, value);
+    }
+
+    template<typename T, typename Allocator>
+    auto Array<T, Allocator>::insert_unsorted(size_type position, value_type const& value) -> iterator {
         if constexpr(ANTON_ITERATOR_DEBUG) {
-            ANTON_FAIL(position <= _size && position >= 0, u8"Index out of bounds.");
+            ANTON_FAIL(position >= 0 && position <= _size, u8"index out of bounds");
         }
 
         ensure_capacity(_size + 1);
-        size_type offset = static_cast<size_type>(position - _data);
-        if(offset == _size) {
-            construct(get_ptr(offset), value);
-            ++_size;
+        T* elem_ptr = get_ptr(position);
+        if(position == _size) {
+            construct(elem_ptr, value);
         } else {
-            T* elem_ptr = get_ptr(offset);
             if constexpr(is_move_constructible<T>) {
-                attempt_move(elem_ptr, get_ptr(_size));
+                construct(get_ptr(_size), ANTON_MOV(*elem_ptr));
             } else {
-                attempt_copy(elem_ptr, get_ptr(_size));
+                construct(get_ptr(_size), *elem_ptr);
             }
             destruct(elem_ptr);
             construct(elem_ptr, value);
-            ++_size;
         }
+
+        ++_size;
+        return elem_ptr;
     }
 
     template<typename T, typename Allocator>
@@ -558,7 +614,7 @@ namespace anton {
     template<typename T, typename Allocator>
     void Array<T, Allocator>::erase_unsorted(size_type index) {
         if constexpr(ANTON_ITERATOR_DEBUG) {
-            ANTON_FAIL(index <= size && index >= 0, u8"Index out of range.");
+            ANTON_FAIL(index <= size && index >= 0, u8"index out of range");
         }
 
         erase_unsorted_unchecked(index);
@@ -638,16 +694,6 @@ namespace anton {
     }
 
     template<typename T, typename Allocator>
-    void Array<T, Allocator>::attempt_copy(T* from, T* to) {
-        ::new(to) T(*from);
-    }
-
-    template<typename T, typename Allocator>
-    void Array<T, Allocator>::attempt_move(T* from, T* to) {
-        ::new(to) T(ANTON_MOV(*from));
-    }
-
-    template<typename T, typename Allocator>
     T* Array<T, Allocator>::get_ptr(size_type index) {
         return launder(_data + index);
     }
@@ -677,7 +723,6 @@ namespace anton {
             }
 
             T* new_data = allocate(new_capacity);
-            // TODO: More reallocation options
             if constexpr(is_move_constructible<T>) {
                 uninitialized_move(_data, _data + _size, new_data);
             } else {

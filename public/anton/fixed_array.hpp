@@ -69,18 +69,18 @@ namespace anton {
         reference emplace_back(Args&&... args);
         void pop_back();
 
+        friend void swap(Fixed_Array& a1, Fixed_Array& a2) {
+            Fixed_Array tmp = ANTON_MOV(a1);
+            a1 = ANTON_MOV(a2);
+            a2 = ANTON_MOV(tmp);
+        }
+
     private:
         Aligned_Buffer<sizeof(T), alignof(T)> _data[Capacity];
         size_type _size;
 
         T* get_ptr(size_type);
         T const* get_ptr(size_type) const;
-
-        friend void swap(Fixed_Array& a1, Fixed_Array& a2) {
-            Fixed_Array tmp = ANTON_MOV(a1);
-            a1 = ANTON_MOV(a2);
-            a2 = ANTON_MOV(tmp);
-        }
     };
 } // namespace anton
 

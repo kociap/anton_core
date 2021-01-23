@@ -2,6 +2,7 @@
 
 #include <anton/assert.hpp>
 #include <anton/math/math.hpp>
+#include <anton/unicode/common.hpp>
 
 namespace anton {
     bool is_whitespace(char32 const c) {
@@ -81,21 +82,10 @@ namespace anton {
     }
 
     UTF8_Char_Iterator::value_type UTF8_Char_Iterator::operator*() const {
-        // TODO: Use unicode library instead.
-        u8 const leading_zeros = math::clz((u8)~_data[0]);
-        u32 const byte_count = math::max((u8)1, leading_zeros);
-        switch(byte_count) {
-            case 1:
-                return _data[0];
-            case 2:
-                return (_data[0] & 0x1F << 6) | (_data[1] & 0x3F);
-            case 3:
-                return (_data[0] & 0x1F << 12) | (_data[1] & 0x3F << 6);
-            case 4:
-                return (_data[0] & 0x1F << 18) | (_data[1] & 0x3F << 12) | (_data[2] & 0x3F << 6) | (_data[3] & 0x3F);
-            default:
-                ANTON_FAIL(false, u8"Unsupported UTF-8 codepoint size.");
-        }
+        char32 c;
+        i64 const byte_count = unicode::get_byte_count_from_utf8_leading_byte(_data[0]);
+        unicode::convert_utf8_to_utf32(_data, byte_count, &c);
+        return c;
     }
 
     char8 const* UTF8_Char_Iterator::get_underlying_pointer() const {

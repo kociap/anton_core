@@ -23,7 +23,7 @@ namespace anton {
     //
     class UTF8_Char_Iterator {
     public:
-        using value_type = u32;
+        using value_type = char32;
         using difference_type = isize;
         using iterator_category = Random_Access_Iterator_Tag;
 

@@ -3,6 +3,12 @@
 #include <anton/math/math.hpp>
 
 namespace anton::unicode {
+    i64 get_byte_count_from_utf8_leading_byte(char8 leading_byte) {
+        u8 const leading_zeros = math::clz((u8)~leading_byte);
+        i64 const byte_count = math::max((u8)1, leading_zeros);
+        return byte_count;
+    }
+
     static i64 get_utf8_bytes_count_in_utf32_codepoint(char32 const codepoint) {
         u32 const leading_zeros = math::clz(codepoint);
         u32 const highest_bit = 32 - leading_zeros;

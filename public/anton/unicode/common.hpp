@@ -3,6 +3,15 @@
 #include <anton/types.hpp>
 
 namespace anton::unicode {
+    // get_byte_count_from_utf8_leading_byte
+    // Calculates the number of bytes in a UTF-8 encoded codepoint from the leading
+    // byte of the sequence.
+    //
+    // Returns:
+    // The number of bytes in the UTF-8 encoded codepoint.
+    //
+    i64 get_byte_count_from_utf8_leading_byte(char8 leading_byte);
+
     // convert_utf32_to_utf8
     // Converts a UTF-32 encoded string contained in buffer_utf32 to a UTF-8 encoded
     // string and writes it to buffer_utf8.

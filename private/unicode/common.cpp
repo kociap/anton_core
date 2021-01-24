@@ -31,6 +31,24 @@ namespace anton::unicode {
         return codepoint;
     }
 
+    struct Codepoint_Conversion_Result {
+        char32 codepoint;
+        i32 bytes_read;
+    };
+
+    static Codepoint_Conversion_Result utf8_bytes_to_codepoint(char8* bytes) {
+        char8 const leading_byte = *bytes;
+        // Copied from get_byte_count_from_utf8_leading_byte because we need the leading zeroes.
+        u8 const leading_zeros = math::clz((u8)~leading_byte);
+        i64 const byte_count = math::max((u8)1, leading_zeros);
+        char32 codepoint = leading_byte & (0xFF >> (leading_zeros + 1));
+        for(u32 i = 1; i < byte_count; ++i) {
+            codepoint <<= 6;
+            codepoint |= bytes[i] & 0x3F;
+        }
+        return {codepoint, byte_count};
+    }
+
     i64 convert_utf32_to_utf8(char32 const* buffer_utf32, i64 const count, char8* buffer_utf8) {
         if constexpr(ANTON_UNICODE_VALIDATE_ENCODING) {
             // TODO: Implement
@@ -77,7 +95,8 @@ namespace anton::unicode {
         }
 
         // U+0000 to U+D7FF and U+E000 to U+FFFF are encoded as single 16bit chars, which we expect to be the more common case.
-        if(char16 const high_surrogate = *buffer_utf16; high_surrogate <= 0xD7FF || high_surrogate >= 0xE000) {
+        char16 const high_surrogate = *buffer_utf16;
+        if(high_surrogate <= 0xD7FF || high_surrogate >= 0xE000) {
             char32 const codepoint = high_surrogate;
             if(codepoint <= 0x7F) {
                 *buffer_utf8 = static_cast<char8>(codepoint);
@@ -113,7 +132,8 @@ namespace anton::unicode {
             i64 bytes_read = 0;
             while(true) {
                 // U+0000 to U+D7FF and U+E000 to U+FFFF are encoded as single 16bit chars, which we expect to be the more common case.
-                if(char16 const high_surrogate = *buffer_utf16; high_surrogate <= 0xD7FF || high_surrogate >= 0xE000) {
+                char16 const high_surrogate = *buffer_utf16;
+                if(high_surrogate <= 0xD7FF || high_surrogate >= 0xE000) {
                     char16 const codepoint = high_surrogate;
                     // If codepoint is less than 0x7FF, it's 2 bytes in UTF-8. If it's less than 0x7F, it's 1 byte in UTF-8.
                     // Otherwise it's 3 bytes.
@@ -137,7 +157,8 @@ namespace anton::unicode {
             i64 bytes_read = 0;
             while(true) {
                 // U+0000 to U+D7FF and U+E000 to U+FFFF are encoded as single 16bit chars, which we expect to be the more common case.
-                if(char16 const high_surrogate = *buffer_utf16; high_surrogate <= 0xD7FF || high_surrogate >= 0xE000) {
+                char16 const high_surrogate = *buffer_utf16;
+                if(high_surrogate <= 0xD7FF || high_surrogate >= 0xE000) {
                     char32 const codepoint = high_surrogate;
                     if(codepoint <= 0x7F) {
                         *buffer_utf8 = static_cast<char8>(codepoint);
@@ -179,45 +200,80 @@ namespace anton::unicode {
         }
     }
 
+    i64 convert_utf8_to_utf16(char8 const* buffer_utf8, i64 count, char16* buffer_utf16) {
+        if constexpr(ANTON_UNICODE_VALIDATE_ENCODING) {
+            // TODO: Implement
+        }
+
+        i64 bytes = 0;
+        i64 bytes_read = 0;
+        if(buffer_utf16 == nullptr) {
+            while(true) {
+                auto const [codepoint, byte_count] = utf8_bytes_to_codepoint(buffer_utf8);
+                buffer_utf8 += byte_count;
+                bytes_read += byte_count;
+                // U+0000 to U+D7FF and U+E000 to U+FFFF are encoded as single 16bit chars.
+                bool const is_surrogate_pair = !(codepoint <= 0xD7FF || (codepoint >= 0xE000 && codepoint <= 0xFFFF));
+                bytes += 2 * (is_surrogate_pair + 1);
+                if((count == -1 && codepoint == U'\0') || (count != -1 && bytes_read >= count)) {
+                    return bytes;
+                }
+            }
+        } else {
+            while(true) {
+                auto const [codepoint, byte_count] = utf8_bytes_to_codepoint(buffer_utf8);
+                buffer_utf8 += byte_count;
+                bytes_read += byte_count;
+                // U+0000 to U+D7FF and U+E000 to U+FFFF are encoded as single 16bit chars, which we expect to be the more common case.
+                if(codepoint <= 0xD7FF || (codepoint >= 0xE000 && codepoint <= 0xFFFF)) {
+                    *buffer_utf16 = codepoint;
+                    buffer_utf16 += 1;
+                    bytes += 2;
+                } else {
+                    char16 const high_surrogate = 0xD800 + ((codepoint - 0x10000) >> 10 & 0x3FF);
+                    char16 const low_surrogate = 0xDC00 + ((codepoint - 0x10000) & 0x3FF);
+                    buffer_utf16[0] = high_surrogate;
+                    buffer_utf16[1] = low_surrogate;
+                    buffer_utf16 += 2;
+                    bytes += 4;
+                }
+
+                if((count == -1 && codepoint == U'\0') || (count != -1 && bytes_read >= count)) {
+                    return bytes;
+                }
+            }
+        }
+    }
+
     i64 convert_utf8_to_utf32(char8 const* buffer_utf8, i64 const count, char32* buffer_utf32) {
         if constexpr(ANTON_UNICODE_VALIDATE_ENCODING) {
             // TODO: Implement
         }
 
+        i64 bytes = 0;
+        i64 bytes_read = 0;
         if(buffer_utf32 == nullptr) {
-            i64 codepoint_count = 0;
-            i64 bytes_read = 0;
             while(true) {
-                u8 const first_byte = *buffer_utf8;
-                u8 const leading_zeros = math::clz((u8)~first_byte);
-                u32 const byte_count = math::max((u8)1, leading_zeros);
-                codepoint_count += 1;
+                u8 const leading_byte = *buffer_utf8;
+                u32 const byte_count = get_byte_count_from_utf8_leading_byte(leading_byte);
+                bytes += 4;
                 bytes_read += byte_count;
-                if((count == -1 && first_byte == u8'\0') || (count != -1 && bytes_read >= count)) {
-                    return codepoint_count * sizeof(char32);
-                }
                 buffer_utf8 += byte_count;
+                if((count == -1 && leading_byte == u8'\0') || (count != -1 && bytes_read >= count)) {
+                    return bytes;
+                }
             }
         } else {
-            i64 codepoint_count = 0;
-            i64 bytes_read = 0;
             while(true) {
-                u8 const first_byte = *buffer_utf8;
-                u32 const leading_zeros = math::clz((u8)~first_byte);
-                u32 const byte_count = math::max((u32)1, leading_zeros);
-                char32 codepoint = first_byte & (0xFF >> (leading_zeros + 1));
-                for(u32 i = 1; i < byte_count; ++i) {
-                    codepoint <<= 6;
-                    codepoint |= buffer_utf8[i] & 0x3F;
-                }
+                u8 const leading_byte = *buffer_utf8;
+                auto const [codepoint, byte_count] = utf8_bytes_to_codepoint(buffer_utf8);
                 *buffer_utf32 = codepoint;
-                codepoint_count += 1;
+                bytes += 4;
                 bytes_read += byte_count;
                 buffer_utf8 += byte_count;
                 buffer_utf32 += 1;
-
-                if((count == -1 && first_byte == u8'\0') || (count != -1 && bytes_read >= count)) {
-                    return codepoint_count * sizeof(char32);
+                if((count == -1 && leading_byte == u8'\0') || (count != -1 && bytes_read >= count)) {
+                    return bytes;
                 }
             }
         }

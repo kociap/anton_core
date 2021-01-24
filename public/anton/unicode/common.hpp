@@ -26,7 +26,7 @@ namespace anton::unicode {
     //
     // Exceptions:
     // If buffer_utf32 does not contain valid UTF-32, then the function raises
-    // Exception if ANTON_UNICODE_VALIDATE_ENCODING is defined.
+    // assertion if ANTON_UNICODE_VALIDATE_ENCODING is defined.
     // Otherwise the behaviour is undefined.
     //
     i64 convert_utf32_to_utf8(char32 const* buffer_utf32, i64 count, char8* buffer_utf8);
@@ -42,7 +42,7 @@ namespace anton::unicode {
     //
     // Exceptions:
     // If buffer_utf16 does not contain valid UTF-16, then the function raises
-    // Exception if ANTON_UNICODE_VALIDATE_ENCODING is defined.
+    // assertion if ANTON_UNICODE_VALIDATE_ENCODING is defined.
     // Otherwise the behaviour is undefined.
     //
     i64 convert_codepoint_utf16_to_utf8(char16 const* buffer_utf16, char8* buffer_utf8);
@@ -61,10 +61,29 @@ namespace anton::unicode {
     //
     // Exceptions:
     // If buffer_utf16 does not contain valid UTF-16, then the function raises
-    // Exception if ANTON_UNICODE_VALIDATE_ENCODING is defined.
+    // assertion if ANTON_UNICODE_VALIDATE_ENCODING is defined.
     // Otherwise the behaviour is undefined.
     //
     i64 convert_utf16_to_utf8(char16 const* buffer_utf16, i64 count, char8* buffer_utf8);
+
+    // convert_utf8_to_utf16
+    // Converts a UTF-8 encoded string contained in buffer_utf8 to a UTF-16 encoded
+    // string and writes it to buffer_utf16.
+    // If buffer_utf16 is nullptr, this function calculates the size in bytes required
+    // to fit the converted string in buffer_utf16.
+    // count is the number of bytes in buffer_utf8 to be converted. If count is -1,
+    // the function will convert all charcaters up until and including null-terminator.
+    //
+    // Returns:
+    // The number of UTF-16 bytes written or if buffer_utf16 is nullptr,
+    // the size of buffer_utf16 in bytes required to store the converted string.
+    //
+    // Exceptions:
+    // If buffer_utf8 does not contain valid UTF-8, then the function raises
+    // assertion if ANTON_UNICODE_VALIDATE_ENCODING is defined.
+    // Otherwise the behaviour is undefined.
+    //
+    i64 convert_utf8_to_utf16(char8 const* buffer_utf8, i64 count, char16* buffer_utf16);
 
     // convert_utf8_to_utf32
     // Converts a UTF-8 encoded string contained in buffer_utf8 to a UTF-32 encoded
@@ -80,7 +99,7 @@ namespace anton::unicode {
     //
     // Exceptions:
     // If buffer_utf8 does not contain valid UTF-8, then the function raises
-    // Exception if ANTON_UNICODE_VALIDATE_ENCODING is defined.
+    // assertion if ANTON_UNICODE_VALIDATE_ENCODING is defined.
     // Otherwise the behaviour is undefined.
     //
     i64 convert_utf8_to_utf32(char8 const* buffer_utf8, i64 count, char32* buffer_utf32);

@@ -2,7 +2,9 @@
 
 #include <anton/assert.hpp>
 #include <anton/detail/crt.hpp>
+#include <anton/unicode/common.hpp>
 
+#include <Windows.h>
 #include <filesystem>
 #include <string_view>
 
@@ -89,9 +91,20 @@ namespace anton::fs {
     }
 
     i64 get_last_write_time(String_View path) {
-        std::filesystem::path p(std::string_view(path.data(), path.size_bytes()));
-        auto t = std::filesystem::last_write_time(p);
-        return t.time_since_epoch().count();
+        i64 const wpath_length = unicode::convert_utf8_to_utf16(path.data(), path.size_bytes(), nullptr);
+        unicode::Array<char16> wpath(wpath_length / sizeof(char16), 0);
+        unicode::convert_utf8_to_utf16(path.data(), path.size_bytes(), wpath.data());
+        // Open file for reading, allow other processes to open for reading, must exist
+        HANDLE const file_handle = CreateFileW((wchar_t*)wpath.data(), GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        FILETIME last_write_time = {};
+        GetFileTime(file_handle, nullptr, nullptr, &last_write_time);
+        i64 last_write_time_64 = last_write_time.dwLowDateTime << 32 | last_write_time.dwHighDateTime;
+        // Time is reported since 00:00:00 1601-01-01. We want to adjust it so that it starts at 00:00:00 1970-01-01.
+        last_write_time -= 0x19DB1DED53E8000LL;
+        // Time is reported in 100-nanoseconds. Convert to milliseconds.
+        last_write_time /= 10000;
+        // A little bit of error recovery. If the file could not be opened or GetFileTime failed, we return 0.
+        return math::max(last_write_time, 0LL);
     }
 
     bool has_filename(String_View const path) {

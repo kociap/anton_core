@@ -28,8 +28,12 @@ namespace anton::fs {
     [[nodiscard]] String_View get_directory_name(String_View path);
 
     // get_last_write_time
-    // Returns time in ms since 1970 (TODO: document exact time) of the last modification of a file.
-    // TODO: Currently returns gods know what time.
+    // Gets the last write time of a file identified by path.
+    // The file must exist and it must be possible to open it for reading.
+    //
+    // Returns:
+    // Time of the last modification of the file in milliseconds since 00:00:00 1970-01-01
+    // or -1 if the function failed to retrieve the information.
     //
     [[nodiscard]] i64 get_last_write_time(String_View path);
 

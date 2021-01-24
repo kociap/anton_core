@@ -3,7 +3,7 @@
 #include <anton/math/math.hpp>
 
 namespace anton::unicode {
-    i64 get_byte_count_from_utf8_leading_byte(char8 leading_byte) {
+    i64 get_byte_count_from_utf8_leading_byte(char8 const leading_byte) {
         u8 const leading_zeros = math::clz((u8)~leading_byte);
         i64 const byte_count = math::max((u8)1, leading_zeros);
         return byte_count;
@@ -36,13 +36,13 @@ namespace anton::unicode {
         i32 bytes_read;
     };
 
-    static Codepoint_Conversion_Result utf8_bytes_to_codepoint(char8* bytes) {
+    static Codepoint_Conversion_Result utf8_bytes_to_codepoint(char8 const* bytes) {
         char8 const leading_byte = *bytes;
         // Copied from get_byte_count_from_utf8_leading_byte because we need the leading zeroes.
         u8 const leading_zeros = math::clz((u8)~leading_byte);
-        i64 const byte_count = math::max((u8)1, leading_zeros);
+        i32 const byte_count = math::max((u8)1, leading_zeros);
         char32 codepoint = leading_byte & (0xFF >> (leading_zeros + 1));
-        for(u32 i = 1; i < byte_count; ++i) {
+        for(i32 i = 1; i < byte_count; ++i) {
             codepoint <<= 6;
             codepoint |= bytes[i] & 0x3F;
         }
@@ -200,7 +200,7 @@ namespace anton::unicode {
         }
     }
 
-    i64 convert_utf8_to_utf16(char8 const* buffer_utf8, i64 count, char16* buffer_utf16) {
+    i64 convert_utf8_to_utf16(char8 const* buffer_utf8, i64 const count, char16* buffer_utf16) {
         if constexpr(ANTON_UNICODE_VALIDATE_ENCODING) {
             // TODO: Implement
         }

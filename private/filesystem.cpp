@@ -98,9 +98,10 @@ namespace anton::fs {
 
     i64 get_last_write_time(String_View path) {
         i64 const wpath_length = unicode::convert_utf8_to_utf16(path.data(), path.size_bytes(), nullptr);
-        Array<char16> wpath(wpath_length / sizeof(char16), 0);
+        // Add 1 to the length for null-terminator.
+        Array<char16> wpath(1 + wpath_length / sizeof(char16), 0);
         unicode::convert_utf8_to_utf16(path.data(), path.size_bytes(), wpath.data());
-        // Open file for reading, allow other processes to open for reading, must exist
+        // Open file for reading, allow other processes to open for reading, must exist.
         HANDLE const file_handle = CreateFileW((wchar_t*)wpath.data(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
         FILETIME last_write_time = {};
         GetFileTime(file_handle, nullptr, nullptr, &last_write_time);

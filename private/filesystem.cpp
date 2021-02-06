@@ -66,7 +66,6 @@ namespace anton::fs {
     }
 
     String_View get_filename_no_extension(String_View const path) {
-        // TODO: Improve.
         String_View const filename = get_filename(path);
         return remove_extension(filename);
     }
@@ -103,15 +102,23 @@ namespace anton::fs {
         unicode::convert_utf8_to_utf16(path.data(), path.size_bytes(), wpath.data());
         // Open file for reading, allow other processes to open for reading, must exist.
         HANDLE const file_handle = CreateFileW((wchar_t*)wpath.data(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        if(file_handle == INVALID_HANDLE_VALUE) {
+            return -1;
+        }
+
         FILETIME last_write_time = {};
-        GetFileTime(file_handle, nullptr, nullptr, &last_write_time);
+        BOOL const got_time = GetFileTime(file_handle, nullptr, nullptr, &last_write_time);
+        if(!got_time) {
+            return -1;
+        }
+
         i64 last_write_time_64 = (i64)last_write_time.dwLowDateTime << 32 | (i64)last_write_time.dwHighDateTime;
         // Time is reported since 00:00:00 1601-01-01. We want to adjust it so that it starts at 00:00:00 1970-01-01.
         last_write_time_64 -= 0x19DB1DED53E8000LL;
         // Time is reported in 100-nanoseconds. Convert to milliseconds.
         last_write_time_64 /= 10000;
-        // A little bit of error recovery. If the file could not be opened or GetFileTime failed, we return 0.
-        return math::max(last_write_time_64, 0LL);
+        // Clamp time to be in range 00:00:00 1970-01-01 to present because we don't care about files older than that.
+        return math::max(last_write_time_64, 0);
     }
 
     bool has_filename(String_View const path) {

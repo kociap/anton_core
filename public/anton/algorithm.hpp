@@ -1,6 +1,7 @@
 #pragma once
 
 #include <anton/iterators.hpp>
+#include <anton/pair.hpp>
 #include <anton/utility.hpp>
 
 namespace anton {
@@ -323,5 +324,101 @@ namespace anton {
     void quick_sort(Random_Access_Iterator first, Random_Access_Iterator last) {
         using value_type = typename Iterator_Traits<Random_Access_Iterator>::value_type;
         quick_sort(first, last, [](value_type const& lhs, value_type const& rhs) { return lhs < rhs; });
+    }
+
+    // mismatch
+    // Finds the first mismatching pair of elements in the two ranges
+    // defined by [first1, last1[ and [first2, first2 + (last1 - first1)[.
+    // The elements are compared using operator==.
+    //
+    // Parameters:
+    // first1, last1 - first range of elements.
+    // first2, last2 - seconds range of elements.
+    //             p - predicate that returns true when the elements should be treated as equal.
+    //                 The signature should be equivalent to bool(Type1 const&, Type2 const&)
+    //
+    // Returns:
+    // Pair of iterators to the first elements that are not equal.
+    // If no mismatches are found, one or both iterators are the end iterators.
+    //
+    template<typename Input_Iterator1, typename Input_Iterator2>
+    Pair<Input_Iterator1, Input_Iterator2> mismatch(Input_Iterator1 first1, Input_Iterator1 last1, Input_Iterator2 first2) {
+        while(first1 != last1 && *first1 == *first2) {
+            ++first1;
+            ++first2;
+        }
+
+        return {first1, first2};
+    }
+
+    // mismatch
+    // Finds the first mismatching pair of elements in the two ranges
+    // defined by [first1, last1[ and [first2, first2 + (last1 - first1)[.
+    // The elements are compared using the predicate p.
+    //
+    // Parameters:
+    // first1, last1 - first range of elements.
+    // first2, last2 - seconds range of elements.
+    //             p - predicate that returns true when the elements should be treated as equal.
+    //                 The signature should be equivalent to bool(Type1 const&, Type2 const&)
+    //
+    // Returns:
+    // Pair of iterators to the first elements that are not equal.
+    // If no mismatches are found, one or both iterators are the end iterators.
+    //
+    template<typename Input_Iterator1, typename Input_Iterator2, typename Predicate>
+    Pair<Input_Iterator1, Input_Iterator2> mismatch(Input_Iterator1 first1, Input_Iterator1 last1, Input_Iterator2 first2, Predicate p) {
+        while(first1 != last1 && p(*first1, *first2)) {
+            ++first1;
+            ++first2;
+        }
+
+        return {first1, first2};
+    }
+
+    // mismatch
+    // Finds the first mismatching pair of elements in the two ranges defined by [first1, last1[ and [first2, last2[.
+    // The elements are compared using operator==.
+    //
+    // Parameters:
+    // first1, last1 - first range of elements.
+    // first2, last2 - seconds range of elements.
+    //
+    // Returns:
+    // Pair of iterators to the first elements that are not equal.
+    // If no mismatches are found, one or both iterators are the end iterators.
+    //
+    template<typename Input_Iterator1, typename Input_Iterator2>
+    Pair<Input_Iterator1, Input_Iterator2> mismatch(Input_Iterator1 first1, Input_Iterator1 last1, Input_Iterator2 first2, Input_Iterator2 last2) {
+        while(first1 != last1 && first2 != last2 && *first1 == *first2) {
+            ++first1;
+            ++first2;
+        }
+
+        return {first1, first2};
+    }
+
+    // mismatch
+    // Finds the first mismatching pair of elements in the two ranges defined by [first1, last1[ and [first2, last2[.
+    // The elements are compared using the predicate p.
+    //
+    // Parameters:
+    // first1, last1 - first range of elements.
+    // first2, last2 - seconds range of elements.
+    //             p - predicate that returns true when the elements should be treated as equal.
+    //                 The signature should be equivalent to bool(Type1 const&, Type2 const&)
+    //
+    // Returns:
+    // Pair of iterators to the first elements that are not equal.
+    // If no mismatches are found, one or both iterators are the end iterators.
+    //
+    template<typename Input_Iterator1, typename Input_Iterator2, typename Predicate>
+    Pair<Input_Iterator1, Input_Iterator2> mismatch(Input_Iterator1 first1, Input_Iterator1 last1, Input_Iterator2 first2, Input_Iterator2 last2, Predicate p) {
+        while(first1 != last1 && first2 != last2 && p(*first1, *first2)) {
+            ++first1;
+            ++first2;
+        }
+
+        return {first1, first2};
     }
 } // namespace anton

@@ -118,7 +118,7 @@ namespace anton::fs {
         // Time is reported in 100-nanoseconds. Convert to milliseconds.
         last_write_time_64 /= 10000;
         // Clamp time to be in range 00:00:00 1970-01-01 to present because we don't care about files older than that.
-        return math::max(last_write_time_64, 0);
+        return math::max(last_write_time_64, (i64)0);
     }
 
     bool has_filename(String_View const path) {

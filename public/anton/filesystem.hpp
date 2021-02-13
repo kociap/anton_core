@@ -27,6 +27,10 @@ namespace anton::fs {
     //
     [[nodiscard]] String_View get_directory_name(String_View path);
 
+    // make_relative
+    //
+    [[nodiscard]] String make_relative(String_View path, String_View base_path);
+
     // get_last_write_time
     // Gets the last write time of a file identified by path.
     // The file must exist and it must be possible to open it for reading.

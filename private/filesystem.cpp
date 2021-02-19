@@ -96,8 +96,8 @@ namespace anton::fs {
     }
 
     String make_relative(String_View path, String_View base_path) {
-        std::filesystem::path p(std::string_view(path.data(), path.size()));
-        std::filesystem::path b(std::string_view(base_path.data(), base_path.size()));
+        std::filesystem::path p(std::string_view(path.data(), path.size_bytes()));
+        std::filesystem::path b(std::string_view(base_path.data(), base_path.size_bytes()));
         std::filesystem::path r = std::filesystem::relative(p, b);
         return fs_path_to_string(r);
     }

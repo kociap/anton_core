@@ -74,6 +74,7 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string_common.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string_stream.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/private/string_view.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/unicode/common.cpp"
 )
 

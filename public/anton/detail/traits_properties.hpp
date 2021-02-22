@@ -322,27 +322,26 @@ namespace anton {
     constexpr bool is_trivially_move_constructible = __is_trivially_constructible(T, add_rvalue_reference<T>);
 
     namespace detail {
-        // Is_Implicitly_Default_Constructible
-        //
-        template<typename T, typename = void>
-        struct Is_Implicitly_Default_Constructible: False_Type {};
-
         template<typename T>
         void check_implicit_default_construct(T const&);
-
-        template<typename T>
-        struct Is_Implicitly_Default_Constructible<T, void_sink<decltype(check_implicit_default_construct<T>({}))>>: True_Type {};
-
-        template<typename T>
-        constexpr bool is_implicitly_default_constructible = Is_Implicitly_Default_Constructible<T>::value;
     } // namespace detail
 
-    // Is_Convertible
+    // Is_Implicitly_Default_Constructible
     //
+    template<typename T, typename = void>
+    struct Is_Implicitly_Default_Constructible: False_Type {};
+
+    template<typename T>
+    struct Is_Implicitly_Default_Constructible<T, void_sink<decltype(detail::check_implicit_default_construct<T>({}))>>: True_Type {};
+
+    template<typename T>
+    constexpr bool is_implicitly_default_constructible = Is_Implicitly_Default_Constructible<T>::value;
 
 #if ANTON_COMPILER_CLANG || ANTON_COMPILER_MSVC
     // Both Clang and MSVC support __is_convertible_to
 
+    // Is_Convertible
+    //
     template<typename From, typename To>
     struct Is_Convertible: Bool_Constant<__is_convertible_to(From, To)> {};
 
@@ -380,6 +379,8 @@ namespace anton {
         };
     } // namespace detail
 
+    // Is_Convertible
+    //
     template<typename From, typename To>
     struct Is_Convertible: detail::Is_Convertible_Helper<From, To>::type {};
 

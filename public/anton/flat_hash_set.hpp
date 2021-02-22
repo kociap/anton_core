@@ -447,17 +447,12 @@ namespace anton {
 
             State* new_states = nullptr;
             Slot* new_slots = nullptr;
-            try {
-                new_states = (State*)_allocator.allocate((new_capacity + 16 + 1) * sizeof(State), 16);
-                new_states += 16;
-                new_states[-1] = State::sentinel;
-                memset(new_states, (u8)State::empty, new_capacity);
-                new_states[new_capacity] = State::sentinel;
-                new_slots = (Slot*)_allocator.allocate(new_capacity * sizeof(Slot), alignof(Slot));
-            } catch(...) {
-                // TODO: Cleanup or whatever.
-                throw;
-            }
+            new_states = (State*)_allocator.allocate((new_capacity + 16 + 1) * sizeof(State), 16);
+            new_states += 16;
+            new_states[-1] = State::sentinel;
+            memset(new_states, (u8)State::empty, new_capacity);
+            new_states[new_capacity] = State::sentinel;
+            new_slots = (Slot*)_allocator.allocate(new_capacity * sizeof(Slot), alignof(Slot));
 
             for(i64 i = 0; i < _capacity; ++i) {
                 if(_states[i] == State::active) {

@@ -344,13 +344,10 @@ namespace anton {
     void merge_sort(Random_Access_Iterator first, Random_Access_Iterator last, Predicate p) {
         i64 const length = last - first;
         // Sort 4-long runs using bubble sort
-        for(i64 i = 0; true; i += 4) {
+        for(i64 i = 0; i < length; i += 4) {
             Random_Access_Iterator b = first + i;
             Random_Access_Iterator e = first + math::min(i + 4, length);
             bubble_sort(b, e, p);
-            if(i + 4 >= length) {
-                break;
-            }
         }
 
         if(length <= 4) {

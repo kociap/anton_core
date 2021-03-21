@@ -134,11 +134,21 @@ namespace anton {
         return murmurhash2_64(view.bytes_begin(), view.size_bytes());
     }
 
+    // find_substring
+    // Finds the first occurence of substr within string.
+    //
+    // Parameters:
+    // string - the source string.
+    // substr - the substring to look for in string.
+    //
+    // Returns:
+    // The start position of the substring within string or npos if the substring is not present.
+    //
     [[nodiscard]] constexpr i64 find_substring(String_View const string, String_View const substr) {
         // Bruteforce
         char8 const* const string_data = string.data();
         char8 const* const substr_data = substr.data();
-        for(i64 i = 0, end = string.size_bytes() - substr.size_bytes(); i < end; ++i) {
+        for(i64 i = 0, end = string.size_bytes() - substr.size_bytes(); i <= end; ++i) {
             bool equal = true;
             for(i64 j = i, k = 0; k < substr.size_bytes(); ++j, ++k) {
                 equal &= string_data[j] == substr_data[k];
@@ -150,6 +160,18 @@ namespace anton {
         }
         return npos;
     }
+
+    // find_last_substring
+    // Finds the last occurence of substr within string.
+    //
+    // Parameters:
+    // string - the source string.
+    // substr - the substring to look for in string.
+    //
+    // Returns:
+    // The start position of the substring within string or npos if the substring is not present.
+    //
+    [[nodiscard]] i64 find_last_substring(String_View const string, String_View const substr);
 
     // str_to_i64
     // Expects a string containing a number in base [2, 36].

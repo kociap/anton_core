@@ -2,6 +2,7 @@
 
 #include <anton/allocator.hpp>
 #include <anton/assert.hpp>
+#include <anton/detail/swap.hpp>
 #include <anton/functors.hpp>
 #include <anton/math/math.hpp>
 #include <anton/memory.hpp>
@@ -421,6 +422,7 @@ namespace anton {
 
     template<typename Key, typename Value, typename Hash, typename Key_Compare>
     auto Flat_Hash_Map<Key, Value, Hash, Key_Compare>::operator=(Flat_Hash_Map&& other) noexcept -> Flat_Hash_Map& {
+        using anton::swap;
         swap(_slots, other._slots);
         swap(_states, other._states);
         swap(_capacity, other._capacity);
@@ -587,6 +589,7 @@ namespace anton {
                         break;
                     } else if(state == State::deleted) {
                         _states[index] = State::active;
+                        using anton::swap;
                         swap(slot, _slots[index]);
                         i -= 1;
                         break;

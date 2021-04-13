@@ -59,6 +59,7 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/owning_ptr.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/pair.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/slice.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/stacktrace.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/stream.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/string_stream.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/string_utils.hpp"
@@ -78,6 +79,7 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/private/filesystem.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/format.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/memory.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/private/stacktrace.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string_common.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string_stream.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string.cpp"
@@ -135,4 +137,4 @@ else()
     target_compile_definitions(anton_core PUBLIC ANTON_UNREACHABLE_ASSERTS=0)
 endif()
 
-target_link_libraries(anton_core PUBLIC anton_math)
+target_link_libraries(anton_core PUBLIC anton_math PRIVATE DbgHelp)

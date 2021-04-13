@@ -56,6 +56,7 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/iterators.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/memory.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/optional.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/owning_ptr.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/pair.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/slice.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/stream.hpp"

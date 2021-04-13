@@ -320,6 +320,10 @@ namespace anton {
         }
     }
 
+    String operator"" _s(char8 const* const literal, u64 const size) {
+        return String{literal, (i64)size};
+    }
+
     String& operator+=(String& str, char8 c) {
         str.append(c);
         return str;

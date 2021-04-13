@@ -10,7 +10,7 @@
 namespace anton {
     // addressof
     template<typename T>
-    [[nodiscard]] inline constexpr T* addressof(T& value) {
+    [[nodiscard]] constexpr T* addressof(T& value) {
 #ifndef ANTON_HAS_NO_BUILTIN_ADDRESSOF
         return __builtin_addressof(value);
 #else
@@ -29,6 +29,28 @@ namespace anton {
         static_assert(!is_function<T> && !is_void<T>, u8"N4727 21.6.4 [ptr.launder]/3: The program is ill-formed if T is a function type or void const.");
         return __builtin_launder(ptr);
     }
+
+    // allocate
+    // Allocates a block of memory aligned to alignment.
+    //
+    // Parameters:
+    // size      - the number of bytes to allocate.
+    // alignment - alignment of the memory block. Must be a power of 2.
+    //
+    // Returns:
+    // A newly allocated block of memory aligned to alignment
+    // or nullptr if allocation failed.
+    //
+    void* allocate(i64 size, i64 alignment);
+
+    // deallocate
+    // Deallocates a block of memory allocated by allocate.
+    //
+    // Parameters:
+    // memory - pointer to the memory block. Might be nullptr
+    //          in which case the function does nothing.
+    //
+    void deallocate(void* memory);
 
     template<typename T, typename... Args>
     void construct(T* pointer, Args&&... args) {

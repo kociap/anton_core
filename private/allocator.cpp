@@ -2,7 +2,7 @@
 
 #include <anton/detail/swap.hpp>
 #include <anton/math/math.hpp>
-#include <new>
+#include <anton/memory.hpp>
 
 namespace anton {
     static Allocator default_allocator;
@@ -13,34 +13,12 @@ namespace anton {
 
     // Allocator
 
-    constexpr bool is_overaligned_for_new(isize alignment) {
-        return alignment > static_cast<isize>(__STDCPP_DEFAULT_NEW_ALIGNMENT__);
-    }
-
     void* Allocator::allocate(isize const bytes, isize const alignment) {
-        if(bytes <= 0 || alignment <= 0) {
-            return nullptr;
-        }
-
-        // TODO: new aligns to at least __STDCPP_DEFAULT_NEW_ALIGNMENT__ which might not be suitable for all use cases
-        // TODO: MSVC boosts the alignment to 32 bytes for allocations that are > 4096 bytes. Why?
-        if(is_overaligned_for_new(alignment)) {
-            return ::operator new(static_cast<std::size_t>(bytes), static_cast<std::align_val_t>(alignment));
-        } else {
-            return ::operator new(static_cast<std::size_t>(bytes));
-        }
+        return anton::allocate(bytes, alignment);
     }
 
-    void Allocator::deallocate(void* ptr, isize const bytes, isize const alignment) {
-        if(bytes <= 0 || alignment <= 0) {
-            return; // TODO add some sort of diagnostic maybe?
-        }
-
-        if(is_overaligned_for_new(alignment)) {
-            ::operator delete(ptr, static_cast<std::size_t>(bytes), static_cast<std::align_val_t>(alignment));
-        } else {
-            ::operator delete(ptr, static_cast<std::size_t>(bytes));
-        }
+    void Allocator::deallocate(void* ptr, [[maybe_unused]] isize const bytes, [[maybe_unused]] isize const alignment) {
+        anton::deallocate(ptr);
     }
 
     bool Allocator::is_equal(Memory_Allocator const& other) const {

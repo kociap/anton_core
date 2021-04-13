@@ -33,8 +33,14 @@ extern "C" {
 
     size_t strlen(char const* string);
 
-    // stdlib.h
+    // malloc.h
+    #if defined(_WIN64)
+        void* _aligned_malloc(size_t size, size_t alignment);
+        void _aligned_free(void* memory);
+    #endif
 
+    // stdlib.h
+    
     ANTON_CRT_IMPORT float strtof(char const*, char**);
     ANTON_CRT_IMPORT double strtod(char const*, char**);
     ANTON_CRT_IMPORT long long strtoll(char const*, char**, int base);

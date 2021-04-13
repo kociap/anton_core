@@ -9,12 +9,16 @@ option(ANTON_DISABLE_VERIFY "Disable ANTON_VERIFY" OFF)
 option(ANTON_CHECK_OPTIONAL_VALUE "Enable checking whether optional holds a value" OFF)
 option(ANTON_UNREACHABLE_ASSERTS "ANTON_UNREACHABLE will use assert instead of an intrinsic" OFF)
 
+include(FetchContent)
+
 # Add anton_math
 FetchContent_Declare(
     anton_math
     GIT_REPOSITORY https://github.com/kociap/anton_math.git
 )
 FetchContent_MakeAvailable(anton_math)
+
+project(anton_core)
 
 add_library(anton_core)
 set_target_properties(anton_core PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
@@ -72,6 +76,7 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/private/console.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/filesystem.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/format.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/private/memory.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string_common.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string_stream.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string.cpp"

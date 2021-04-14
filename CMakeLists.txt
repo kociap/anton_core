@@ -25,6 +25,7 @@ set_target_properties(anton_core PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
 target_include_directories(anton_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/public")
 target_sources(anton_core 
     PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/algorithm/sort.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/detail/crt.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/detail/string_common.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/detail/swap.hpp"

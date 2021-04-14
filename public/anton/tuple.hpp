@@ -1,9 +1,9 @@
 #pragma once
 
-#include <anton/detail/traits_base.hpp>
 #include <anton/detail/tuple.hpp>
 #include <anton/detail/utility.hpp>
 #include <anton/tags.hpp>
+#include <anton/type_traits/base.hpp>
 #include <anton/types.hpp>
 
 namespace anton {

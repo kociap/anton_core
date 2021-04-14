@@ -2,10 +2,10 @@
 
 #include <anton/array.hpp>
 #include <anton/detail/swap.hpp>
-#include <anton/detail/traits_utility.hpp>
 #include <anton/iterators.hpp>
 #include <anton/math/math.hpp>
 #include <anton/memory.hpp>
+#include <anton/type_traits/utility.hpp>
 
 namespace anton {
     template<typename Forward_Iterator, typename Predicate>

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <anton/detail/traits_base.hpp>
-#include <anton/detail/traits_common.hpp>
-#include <anton/detail/traits_function.hpp>
+#include <anton/type_traits/base.hpp>
+#include <anton/type_traits/common.hpp>
+#include <anton/type_traits/function.hpp>
 #include <anton/types.hpp>
 
 namespace anton {

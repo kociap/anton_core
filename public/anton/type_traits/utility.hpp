@@ -1,6 +1,6 @@
 #pragma once
 
-#include <anton/detail/traits_transformations.hpp>
+#include <anton/type_traits/transformations.hpp>
 
 #define ANTON_MOV(x) (static_cast<anton::remove_reference<decltype(x)>&&>(x))
 #define ANTON_FWD(x) (static_cast<decltype(x)&&>(x))

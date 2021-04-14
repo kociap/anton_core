@@ -1,7 +1,7 @@
 #pragma once
 
-#include <anton/detail/traits_base.hpp>
 #include <anton/detail/tuple.hpp>
+#include <anton/type_traits/base.hpp>
 
 namespace anton {
     template<typename... Ts>

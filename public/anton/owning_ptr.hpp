@@ -1,10 +1,10 @@
 #pragma once
 
-#include <anton/detail/traits_properties.hpp>
-#include <anton/detail/traits_transformations.hpp>
 #include <anton/functors.hpp>
 #include <anton/memory.hpp>
 #include <anton/tags.hpp>
+#include <anton/type_traits/properties.hpp>
+#include <anton/type_traits/transformations.hpp>
 #include <anton/types.hpp>
 #include <anton/utility.hpp>
 

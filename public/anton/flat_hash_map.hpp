@@ -2,10 +2,10 @@
 
 #include <anton/allocator.hpp>
 #include <anton/assert.hpp>
-#include <anton/detail/swap.hpp>
 #include <anton/functors.hpp>
 #include <anton/math/math.hpp>
 #include <anton/memory.hpp>
+#include <anton/swap.hpp>
 #include <anton/tags.hpp>
 #include <anton/type_traits.hpp>
 #include <anton/types.hpp>

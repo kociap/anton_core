@@ -14,7 +14,7 @@ namespace anton {
     template<typename T, typename U, typename = void>
     struct Is_Swappable_With: False_Type {};
 
-    // Note: swap left unprefixed to allow ADL of user-defined swap specializations
+    // Note: swap is left unprefixed to allow ADL of user-defined swap specializations
     template<typename T, typename U>
     struct Is_Swappable_With<T, U, void_sink<decltype(swap(declval<U&>(), declval<T&>())), decltype(swap(declval<T&>(), declval<U&>()))>>: True_Type {};
 

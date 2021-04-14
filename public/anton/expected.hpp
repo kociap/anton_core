@@ -1,8 +1,8 @@
 #pragma once
 
 #include <anton/assert.hpp>
-#include <anton/detail/swap.hpp>
 #include <anton/memory.hpp>
+#include <anton/swap.hpp>
 #include <anton/type_traits.hpp>
 
 namespace anton {

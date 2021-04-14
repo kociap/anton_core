@@ -1,8 +1,8 @@
 #include <anton/allocator.hpp>
 
-#include <anton/detail/swap.hpp>
 #include <anton/math/math.hpp>
 #include <anton/memory.hpp>
+#include <anton/swap.hpp>
 
 namespace anton {
     static Allocator default_allocator;

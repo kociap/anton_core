@@ -28,7 +28,7 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/algorithm/sort.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/detail/crt.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/detail/string_common.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/detail/swap.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/swap.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/type_traits/base.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/type_traits/common.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/type_traits/function.hpp"

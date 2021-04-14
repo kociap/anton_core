@@ -1,10 +1,10 @@
 #pragma once
 
 #include <anton/array.hpp>
-#include <anton/detail/swap.hpp>
 #include <anton/iterators.hpp>
 #include <anton/math/math.hpp>
 #include <anton/memory.hpp>
+#include <anton/swap.hpp>
 #include <anton/type_traits/utility.hpp>
 
 namespace anton {

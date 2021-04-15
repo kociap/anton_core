@@ -35,8 +35,8 @@ extern "C" {
 
     // malloc.h
     #if defined(_WIN64)
-        void* _aligned_malloc(size_t size, size_t alignment);
-        void _aligned_free(void* memory);
+        ANTON_CRT_IMPORT void* _aligned_malloc(size_t size, size_t alignment);
+        ANTON_CRT_IMPORT void _aligned_free(void* memory);
     #endif
 
     // stdlib.h

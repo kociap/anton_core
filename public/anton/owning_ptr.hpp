@@ -105,6 +105,9 @@ namespace anton {
     };
 
     template<typename T>
+    Owning_Ptr(T*) -> Owning_Ptr<T>;
+
+    template<typename T>
     [[nodiscard]] bool operator==(Owning_Ptr<T> const& lhs, Owning_Ptr<T> const& rhs) {
         return lhs.get_ptr() == rhs.get_ptr();
     }

@@ -110,9 +110,11 @@ namespace anton {
         value_type const* _end;
     };
 
-    [[nodiscard]] constexpr String_View operator"" _sv(char8 const* literal, u64 size) {
-        return String_View{literal, (i64)size};
-    }
+    inline namespace literals {
+        [[nodiscard]] constexpr String_View operator"" _sv(char8 const* literal, u64 size) {
+            return String_View{literal, (i64)size};
+        }
+    } // namespace literals
 
     // Compares bytes
     [[nodiscard]] constexpr bool operator==(String_View const& lhs, String_View const& rhs) {

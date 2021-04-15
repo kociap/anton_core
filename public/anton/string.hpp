@@ -156,7 +156,9 @@ namespace anton {
         void ensure_capacity_exact(size_type requested_capacity);
     };
 
-    [[nodiscard]] String operator"" _s(char8 const* literal, u64 size);
+    inline namespace literals {
+        [[nodiscard]] String operator"" _s(char8 const* literal, u64 size);
+    }
 
     String& operator+=(String&, char8);
     String& operator+=(String&, char32);

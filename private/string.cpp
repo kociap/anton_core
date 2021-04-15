@@ -320,9 +320,11 @@ namespace anton {
         }
     }
 
-    String operator"" _s(char8 const* const literal, u64 const size) {
-        return String{literal, (i64)size};
-    }
+    inline namespace literals {
+        String operator"" _s(char8 const* const literal, u64 const size) {
+            return String{literal, (i64)size};
+        }
+    } // namespace literals
 
     String& operator+=(String& str, char8 c) {
         str.append(c);

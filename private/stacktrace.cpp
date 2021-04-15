@@ -191,7 +191,7 @@ namespace anton::stacktrace {
 
         u64 const alloc_size = sizeof(TI_FINDCHILDREN_PARAMS) + sizeof(ULONG) * parameters_count;
         Owning_Ptr<void> children_params_memory = allocate(alloc_size, alignof(TI_FINDCHILDREN_PARAMS));
-        TI_FINDCHILDREN_PARAMS& children_params = *reinterpret_cast<TI_FINDCHILDREN_PARAMS*>(children_params_memory.get_ptr());
+        TI_FINDCHILDREN_PARAMS& children_params = *reinterpret_cast<TI_FINDCHILDREN_PARAMS*>(children_params_memory.get());
         memset(&children_params, 0, alloc_size);
         children_params.Count = parameters_count;
         if(!SymGetTypeInfo(process, module_base, index, TI_FINDCHILDREN, &children_params)) {

@@ -78,7 +78,7 @@ namespace anton {
             return _pointer;
         }
 
-        [[nodiscard]] T* get_ptr() const {
+        [[nodiscard]] T* get() const {
             return _pointer;
         }
 
@@ -109,31 +109,31 @@ namespace anton {
 
     template<typename T>
     [[nodiscard]] bool operator==(Owning_Ptr<T> const& lhs, Owning_Ptr<T> const& rhs) {
-        return lhs.get_ptr() == rhs.get_ptr();
+        return lhs.get() == rhs.get();
     }
 
     template<typename T>
     [[nodiscard]] bool operator!=(Owning_Ptr<T> const& lhs, Owning_Ptr<T> const& rhs) {
-        return lhs.get_ptr() != rhs.get_ptr();
+        return lhs.get() != rhs.get();
     }
 
     template<typename T>
     [[nodiscard]] bool operator<(Owning_Ptr<T> const& lhs, Owning_Ptr<T> const& rhs) {
-        return lhs.get_ptr() < rhs.get_ptr();
+        return lhs.get() < rhs.get();
     }
 
     template<typename T>
     [[nodiscard]] bool operator>(Owning_Ptr<T> const& lhs, Owning_Ptr<T> const& rhs) {
-        return lhs.get_ptr() > rhs.get_ptr();
+        return lhs.get() > rhs.get();
     }
 
     template<typename T>
     [[nodiscard]] bool operator<=(Owning_Ptr<T> const& lhs, Owning_Ptr<T> const& rhs) {
-        return lhs.get_ptr() <= rhs.get_ptr();
+        return lhs.get() <= rhs.get();
     }
 
     template<typename T>
     [[nodiscard]] bool operator>=(Owning_Ptr<T> const& lhs, Owning_Ptr<T> const& rhs) {
-        return lhs.get_ptr() >= rhs.get_ptr();
+        return lhs.get() >= rhs.get();
     }
 } // namespace anton

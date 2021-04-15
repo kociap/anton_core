@@ -1,5 +1,6 @@
 #pragma once
 
+#include <anton/assert.hpp>
 #include <anton/functors.hpp>
 #include <anton/memory.hpp>
 #include <anton/tags.hpp>
@@ -71,10 +72,12 @@ namespace anton {
         }
 
         [[nodiscard]] add_lvalue_reference<T> operator*() const {
+            ANTON_ASSERT(_pointer, u8"dereferencing nullptr");
             return *_pointer;
         }
 
         [[nodiscard]] T* operator->() const {
+            ANTON_ASSERT(_pointer, u8"dereferencing nullptr");
             return _pointer;
         }
 

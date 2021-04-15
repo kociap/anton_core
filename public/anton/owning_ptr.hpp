@@ -60,7 +60,9 @@ namespace anton {
                 _deleter(_pointer);
             } else {
                 if constexpr(is_complete_type<T>) {
-                    destruct(_pointer);
+                    if(_pointer) {
+                        destruct(_pointer);
+                    }
                 }
 
                 deallocate(_pointer);

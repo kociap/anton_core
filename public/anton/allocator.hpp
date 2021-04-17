@@ -18,13 +18,8 @@ namespace anton {
         [[nodiscard]] virtual bool is_equal(Memory_Allocator const&) const = 0;
     };
 
-    [[nodiscard]] inline bool operator==(Memory_Allocator const& lhs, Memory_Allocator const& rhs) {
-        return lhs.is_equal(rhs);
-    }
-
-    [[nodiscard]] inline bool operator!=(Memory_Allocator const& lhs, Memory_Allocator const& rhs) {
-        return !(lhs == rhs);
-    }
+    [[nodiscard]] bool operator==(Memory_Allocator const& lhs, Memory_Allocator const& rhs);
+    [[nodiscard]] bool operator!=(Memory_Allocator const& lhs, Memory_Allocator const& rhs);
 
     // get_default_allocator
     //
@@ -42,17 +37,10 @@ namespace anton {
         [[nodiscard]] bool is_equal(Memory_Allocator const& other) const override;
     };
 
-    inline void swap(Allocator&, Allocator&) {
-        // Stateless allocator. No need to do anything.
-    }
+    void swap(Allocator& v1, Allocator& v2);
 
-    [[nodiscard]] inline bool operator==(Allocator const&, Allocator const&) {
-        return true; // All Allocators are stateless and may always be considered equal.
-    }
-
-    [[nodiscard]] inline bool operator!=(Allocator const&, Allocator const&) {
-        return false; // All Allocators are stateless and may always be considered equal.
-    }
+    [[nodiscard]] bool operator==(Allocator const& lhs, Allocator const& rhs);
+    [[nodiscard]] bool operator!=(Allocator const& lhs, Allocator const& rhs);
 
     // // Buffer_Allocator
     // class Buffer_Allocator: public Memory_Allocator {

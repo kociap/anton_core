@@ -11,6 +11,14 @@ namespace anton {
         return &default_allocator;
     }
 
+    bool operator==(Memory_Allocator const& lhs, Memory_Allocator const& rhs) {
+        return lhs.is_equal(rhs);
+    }
+
+    bool operator!=(Memory_Allocator const& lhs, Memory_Allocator const& rhs) {
+        return !(lhs == rhs);
+    }
+
     // Allocator
 
     void* Allocator::allocate(isize const bytes, isize const alignment) {
@@ -23,6 +31,18 @@ namespace anton {
 
     bool Allocator::is_equal(Memory_Allocator const& other) const {
         return this == &other;
+    }
+
+    void swap(Allocator&, Allocator&) {
+        // Stateless allocator. No need to do anything.
+    }
+
+    bool operator==(Allocator const&, Allocator const&) {
+        return true; // All Allocators are stateless and may always be considered equal.
+    }
+
+    bool operator!=(Allocator const&, Allocator const&) {
+        return false; // All Allocators are stateless and may always be considered equal.
     }
 
     // Buffer Allocator

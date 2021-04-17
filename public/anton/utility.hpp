@@ -1,6 +1,5 @@
 #pragma once
 
-#include <anton/swap.hpp>
 #include <anton/types.hpp>
 
 // TODO: Is this header necessary?

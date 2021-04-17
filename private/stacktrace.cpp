@@ -6,12 +6,12 @@
 
 // We need SymTagEnum and this define allows us to access it without including cvconst.h (???)
 #define _NO_CVCONST_H
-#define NOMINMAX
-#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 // Windows.h must be included before DbgHelp.h. Otherwise we get undefined identifiers in DbgHelp.h
 #include <DbgHelp.h>
 #include <debugapi.h>
+
+// TODO: add locking to ensure thread safety because all the functions are singlethreaded
 
 namespace anton::stacktrace {
     static HANDLE process_handle = nullptr;

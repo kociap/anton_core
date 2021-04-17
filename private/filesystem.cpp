@@ -6,9 +6,6 @@
 #include <anton/math/math.hpp>
 #include <anton/unicode/common.hpp>
 
-#define VC_EXTRALEAN
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
 #include <Windows.h>
 
 #include <filesystem>

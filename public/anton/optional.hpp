@@ -4,6 +4,7 @@
 #include <anton/assert.hpp>
 #include <anton/intrinsics.hpp>
 #include <anton/memory.hpp>
+#include <anton/swap.hpp>
 #include <anton/tags.hpp>
 #include <anton/type_traits.hpp>
 

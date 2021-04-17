@@ -6,7 +6,7 @@
 #include <anton/math/math.hpp>
 #include <anton/memory.hpp>
 #include <anton/pair.hpp>
-#include <anton/utility.hpp>
+#include <anton/swap.hpp>
 
 namespace anton {
     // fill_with_consecutive

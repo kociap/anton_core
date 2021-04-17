@@ -3,11 +3,11 @@
 #include <anton/assert.hpp>
 #include <anton/functors.hpp>
 #include <anton/memory.hpp>
+#include <anton/swap.hpp>
 #include <anton/tags.hpp>
 #include <anton/type_traits/properties.hpp>
 #include <anton/type_traits/transformations.hpp>
 #include <anton/types.hpp>
-#include <anton/utility.hpp>
 
 namespace anton {
     // Owning_Ptr

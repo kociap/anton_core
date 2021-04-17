@@ -1,6 +1,7 @@
 #pragma once
 
 #include <anton/iterators.hpp>
+#include <anton/swap.hpp>
 #include <anton/type_traits.hpp>
 #include <anton/types.hpp>
 #include <anton/utility.hpp>

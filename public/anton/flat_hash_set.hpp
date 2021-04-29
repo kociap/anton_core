@@ -53,7 +53,7 @@ namespace anton {
         public:
             using value_type = Key const;
             using difference_type = isize;
-            using iterator_category = Bidirectional_Input_Tag;
+            using iterator_category = Bidirectional_Iterator_Tag;
 
             const_iterator() = delete;
             const_iterator(const_iterator const&) = default;

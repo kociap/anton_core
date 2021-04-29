@@ -19,11 +19,11 @@ namespace anton {
         explicit Forward_Iterator_Tag() = default;
     };
 
-    struct Bidirectional_Input_Tag: public Forward_Iterator_Tag {
-        explicit Bidirectional_Input_Tag() = default;
+    struct Bidirectional_Iterator_Tag: public Forward_Iterator_Tag {
+        explicit Bidirectional_Iterator_Tag() = default;
     };
 
-    struct Random_Access_Iterator_Tag: public Bidirectional_Input_Tag {
+    struct Random_Access_Iterator_Tag: public Bidirectional_Iterator_Tag {
         explicit Random_Access_Iterator_Tag() = default;
     };
 

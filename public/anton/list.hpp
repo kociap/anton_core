@@ -33,10 +33,8 @@ namespace anton {
         using node_type = List_Node<Data_Type>;
         using iterator_category = Bidirectional_Iterator_Tag;
 
-    private:
         node_type* node = nullptr;
 
-    public:
         List_Iterator() = default;
         List_Iterator(node_type* node): node(node) {}
         List_Iterator(List_Iterator const&) = default;
@@ -44,6 +42,11 @@ namespace anton {
         ~List_Iterator() = default;
         List_Iterator& operator=(List_Iterator const&) = default;
         List_Iterator& operator=(List_Iterator&&) = default;
+
+        // Conversion operator to the const version of the iterator
+        [[nodiscard]] operator List_Iterator<Value_Type const, Data_Type>() const {
+            return node;
+        }
 
         [[nodiscard]] value_type* operator->() const {
             return &node->data;

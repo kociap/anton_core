@@ -185,8 +185,8 @@ namespace anton {
         // Returns:
         // Reference to the allocator.
         //
-        allocator_type& get_allocator();
-        allocator_type const& get_allocator() const;
+        [[nodiscard]] allocator_type& get_allocator();
+        [[nodiscard]] allocator_type const& get_allocator() const;
 
         // set_allocator
         // Change the currently used allocator.

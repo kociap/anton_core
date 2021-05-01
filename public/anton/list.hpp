@@ -19,6 +19,71 @@ namespace anton {
         List_Node(Args&&... args): data(ANTON_FWD(args)...) {}
     };
 
+    // List_Iterator
+    // Default constructed iterator is invalid.
+    //
+    // Parameters:
+    // Value_Type - qualified type returned by operator* and operator->.
+    //  Data_Type - unqualified type stored by List_Node.
+    //
+    template<typename Value_Type, typename Data_Type>
+    struct List_Iterator {
+    public:
+        using value_type = Value_Type;
+        using node_type = List_Node<Data_Type>;
+        using iterator_category = Bidirectional_Iterator_Tag;
+
+    private:
+        node_type* node = nullptr;
+
+    public:
+        List_Iterator() = default;
+        List_Iterator(node_type* node): node(node) {}
+        List_Iterator(List_Iterator const&) = default;
+        List_Iterator(List_Iterator&&) = default;
+        ~List_Iterator() = default;
+        List_Iterator& operator=(List_Iterator const&) = default;
+        List_Iterator& operator=(List_Iterator&&) = default;
+
+        [[nodiscard]] value_type* operator->() const {
+            return &node->data;
+        }
+
+        [[nodiscard]] value_type& operator*() const {
+            return node->data;
+        }
+
+        List_Iterator& operator++() {
+            node = node->next;
+            return *this;
+        }
+
+        [[nodiscard]] List_Iterator operator++(int) {
+            List_Iterator v{node};
+            node = node->next;
+            return v;
+        }
+
+        List_Iterator& operator--() {
+            node = node->prev;
+            return *this;
+        }
+
+        [[nodiscard]] List_Iterator operator--(int) {
+            List_Iterator v{node};
+            node = node->prev;
+            return v;
+        }
+
+        [[nodiscard]] bool operator==(List_Iterator const& other) const {
+            return node == other.node;
+        }
+
+        [[nodiscard]] bool operator!=(List_Iterator const& other) const {
+            return node != other.node;
+        }
+    };
+
     // List
     // List is a node-based container that guarantees address stability of the elements it owns.
     // It supports constant time insertion and removal from anywhere inside the container,
@@ -38,6 +103,8 @@ namespace anton {
         using allocator_type = Allocator;
         using size_type = i64;
         using node_type = List_Node<T>;
+        using iterator = List_Iterator<T, T>;
+        using const_iterator = List_Iterator<T const, T>;
 
     private:
         struct alignas(alignof(node_type)) Internal_Node {
@@ -49,117 +116,6 @@ namespace anton {
 
         Internal_Node _internal_node;
         Allocator _allocator;
-
-    public:
-        struct const_iterator {
-        public:
-            using value_type = T const;
-            using node_type = List_Node<T>;
-            using iterator_category = Bidirectional_Iterator_Tag;
-
-        private:
-            node_type* node;
-
-            const_iterator(node_type* node): node(node) {}
-
-            friend struct List;
-
-        public:
-            [[nodiscard]] T const* operator->() const {
-                return &node->data;
-            }
-
-            [[nodiscard]] T const& operator*() const {
-                return node->data;
-            }
-
-            const_iterator& operator++() {
-                node = node->next;
-                return *this;
-            }
-
-            [[nodiscard]] const_iterator operator++(int) {
-                const_iterator v{node};
-                node = node->next;
-                return v;
-            }
-
-            const_iterator& operator--() {
-                node = node->prev;
-                return *this;
-            }
-
-            [[nodiscard]] const_iterator operator--(int) {
-                const_iterator v{node};
-                node = node->prev;
-                return v;
-            }
-
-            [[nodiscard]] bool operator==(const_iterator const& other) const {
-                return node == other.node;
-            }
-
-            [[nodiscard]] bool operator!=(const_iterator const& other) const {
-                return node != other.node;
-            }
-        };
-
-        struct iterator {
-        public:
-            using value_type = T;
-            using node_type = List_Node<T>;
-            using iterator_category = Bidirectional_Iterator_Tag;
-
-        private:
-            node_type* node;
-
-            iterator(node_type* node): node(node) {}
-
-            friend struct List;
-
-        public:
-            [[nodiscard]] operator const_iterator() const {
-                return reinterpret_cast<const_iterator const&>(*this);
-            }
-
-            [[nodiscard]] T* operator->() const {
-                return &node->data;
-            }
-
-            [[nodiscard]] T& operator*() const {
-                return node->data;
-            }
-
-            iterator& operator++() {
-                node = node->next;
-                return *this;
-            }
-
-            [[nodiscard]] iterator operator++(int) {
-                iterator v{node};
-                node = node->next;
-                return v;
-            }
-
-            iterator& operator--() {
-                node = node->prev;
-                return *this;
-            }
-
-            [[nodiscard]] iterator operator--(int) {
-                iterator v{node};
-                node = node->prev;
-                return v;
-            }
-
-            [[nodiscard]] bool operator==(iterator const& other) const {
-                return node == other.node;
-            }
-
-            [[nodiscard]] bool operator!=(iterator const& other) const {
-                return node != other.node;
-            }
-        };
 
     public:
         List();

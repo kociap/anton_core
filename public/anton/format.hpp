@@ -32,10 +32,8 @@ namespace anton {
 
     template<typename T>
     struct Formatter final: Formatter_Base {
-    public:
-        using value_type = remove_reference<T>;
-
     private:
+        using value_type = remove_reference<T>;
         value_type const& value;
 
     public:
@@ -49,9 +47,6 @@ namespace anton {
 
     template<>
     struct Formatter<char8 const*> final: Formatter_Base {
-    public:
-        using value_type = String_View;
-
     private:
         String_View _string;
 

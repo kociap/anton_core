@@ -47,20 +47,20 @@ namespace anton {
         }
     };
 
-    template<usize N>
-    struct Formatter<char8 const (&)[N]> final: Formatter_Base {
+    template<>
+    struct Formatter<char8 const*> final: Formatter_Base {
     public:
         using value_type = String_View;
 
     private:
-        String_View string;
+        String_View _string;
 
     public:
-        Formatter(char8 const (&array)[N]): string(array, array + N - 1) {} // -1 because of null-terminator
+        Formatter(char8 const* string): _string(string) {}
         virtual ~Formatter() override = default;
 
         virtual void format(Format_Buffer& buffer) const override {
-            format_type(buffer, string);
+            format_type(buffer, _string);
         }
     };
 
@@ -83,11 +83,11 @@ namespace anton {
 
     template<typename... Args>
     String format(Format_Buffer& buffer, String_View const format_string, Args&&... args) {
-        return detail::format(buffer, format_string, Formatter<Args>(ANTON_FWD(args))...);
+        return detail::format(buffer, format_string, Formatter<decay<Args>>(ANTON_FWD(args))...);
     }
 
     template<typename... Args>
     String format(String_View const format_string, Args&&... args) {
-        return detail::format(format_string, Formatter<Args>(ANTON_FWD(args))...);
+        return detail::format(format_string, Formatter<decay<Args>>(ANTON_FWD(args))...);
     }
 } // namespace anton

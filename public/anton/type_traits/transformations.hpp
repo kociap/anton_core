@@ -181,7 +181,7 @@ namespace anton {
         using U = remove_reference<T>;
 
     public:
-        using type = conditional<detail::Is_Array<U>::value, remove_extent<U>*, conditional<is_function<T>, add_pointer<T>, remove_const<U>>>;
+        using type = conditional<detail::Is_Array<U>::value, remove_extent<U>*, conditional<is_function<U>, add_pointer<U>, remove_const<U>>>;
     };
 
     template<typename T>

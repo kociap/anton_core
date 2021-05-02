@@ -54,99 +54,108 @@ namespace anton {
         }
     }
 
-    struct Default_Formatter final: public Formatter {
-        String* str;
+    struct Default_Format_Buffer final: public Format_Buffer {
+    private:
+        String _string;
 
-        Default_Formatter(String* str): str(str) {}
-        virtual ~Default_Formatter() override = default;
+    public:
+        virtual ~Default_Format_Buffer() override = default;
 
         virtual void write(String_View string) override {
-            *str += string;
+            _string += string;
+        }
+
+        virtual String to_string() override {
+            return ANTON_MOV(_string);
         }
     };
 
-    void format_type(Formatter& formatter, i8 value) {
+    void format_type(Format_Buffer& format_buffer, i8 value) {
         String str = to_string(value);
-        formatter.write(str);
+        format_buffer.write(str);
     }
 
-    void format_type(Formatter& formatter, u8 value) {
+    void format_type(Format_Buffer& format_buffer, u8 value) {
         String str = to_string(value);
-        formatter.write(str);
+        format_buffer.write(str);
     }
 
-    void format_type(Formatter& formatter, i16 value) {
+    void format_type(Format_Buffer& format_buffer, i16 value) {
         String str = to_string(value);
-        formatter.write(str);
+        format_buffer.write(str);
     }
 
-    void format_type(Formatter& formatter, u16 value) {
+    void format_type(Format_Buffer& format_buffer, u16 value) {
         String str = to_string(value);
-        formatter.write(str);
+        format_buffer.write(str);
     }
 
-    void format_type(Formatter& formatter, i32 value) {
+    void format_type(Format_Buffer& format_buffer, i32 value) {
         String str = to_string(value);
-        formatter.write(str);
+        format_buffer.write(str);
     }
 
-    void format_type(Formatter& formatter, u32 value) {
+    void format_type(Format_Buffer& format_buffer, u32 value) {
         String str = to_string(value);
-        formatter.write(str);
+        format_buffer.write(str);
     }
 
-    void format_type(Formatter& formatter, i64 value) {
+    void format_type(Format_Buffer& format_buffer, i64 value) {
         String str = to_string(value);
-        formatter.write(str);
+        format_buffer.write(str);
     }
 
-    void format_type(Formatter& formatter, u64 value) {
+    void format_type(Format_Buffer& format_buffer, u64 value) {
         String str = to_string(value);
-        formatter.write(str);
+        format_buffer.write(str);
     }
 
-    void format_type(Formatter& formatter, f32 value) {
+    void format_type(Format_Buffer& format_buffer, f32 value) {
         String str = to_string(value);
-        formatter.write(str);
+        format_buffer.write(str);
     }
 
-    void format_type(Formatter& formatter, f64 value) {
+    void format_type(Format_Buffer& format_buffer, f64 value) {
         String str = to_string(value);
-        formatter.write(str);
+        format_buffer.write(str);
     }
 
-    void format_type(Formatter& formatter, void const* value) {
+    void format_type(Format_Buffer& format_buffer, void const* value) {
         String str = to_string(value);
-        formatter.write(str);
+        format_buffer.write(str);
     }
 
-    void format_type(Formatter& formatter, String_View value) {
-        formatter.write(value);
+    void format_type(Format_Buffer& format_buffer, String_View value) {
+        format_buffer.write(value);
     }
 
-    String detail::format_internal(String_View const format_string, detail::Format_Argument_Base const* const* args, i64 const args_size) {
+    String detail::format_internal(Format_Buffer& buffer, String_View const format_string, Slice<Formatter_Base const* const> const arguments) {
         Array<String_View> string_slices;
         Array<Format_Field> format_fields;
         if(!parse_format_string(format_string, string_slices, format_fields)) {
             return String{""};
         }
 
-        String out;
-        Default_Formatter formatter{&out};
         auto field = format_fields.begin();
         auto field_end = format_fields.end();
-        auto args_end = args + args_size;
+        auto args = arguments.begin();
+        auto args_end = arguments.end();
         for(auto i = string_slices.begin(), end = string_slices.end(); i != end; ++i) {
-            formatter.write(*i);
+            buffer.write(*i);
             if(field != field_end && args != args_end) {
                 if(!field->dont_print) {
                     auto arg = *args;
-                    arg->format(formatter);
+                    arg->format(buffer);
                     ++args;
                 }
                 ++field;
             }
         }
-        return out;
+        return buffer.to_string();
+    }
+
+    String detail::format_internal(String_View const format_string, Slice<Formatter_Base const* const> arguments) {
+        Default_Format_Buffer buffer;
+        return format_internal(buffer, format_string, arguments);
     }
 } // namespace anton

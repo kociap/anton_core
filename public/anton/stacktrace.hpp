@@ -21,7 +21,7 @@ namespace anton::stacktrace {
     //
     // Returns:
     // Array containing call stack frame records.
-    // The first element is the bottom frame, the last element is the top frame.
+    // The first element is the top frame, the last element is the bottom frame.
     //
     ANTON_NOINLINE Array<Frame_Record*> capture_call_stack();
 

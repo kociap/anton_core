@@ -33,10 +33,6 @@ namespace anton::stacktrace {
         Array<Frame_Record*> records{reserve, 1024};
         i64 const captured_frames = RtlCaptureStackBackTrace(1, 1024, (void**)records.data(), nullptr);
         records.force_size(captured_frames);
-        // Reverse the records
-        for(i64 i = 0, j = records.size() - 1; i < j; ++i, --j) {
-            swap(records[i], records[j]);
-        }
         return records;
     }
 

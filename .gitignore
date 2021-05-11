@@ -1,1 +1,4 @@
 .vscode
+build/
+build.bat
+buildf.bat

@@ -52,6 +52,25 @@ namespace anton {
     //
     void deallocate(void* memory);
 
+    // fill_memory
+    // Fill the memory range [first, last[ with value.
+    //
+    // Parameters:
+    // first - The beginning of the memory range to fill. May be nullptr;
+    // last  - The end of the memory range to fill. If first is nullptr, must also be nullptr.
+    // value - The value to fill the memory range with.
+    //
+    void fill_memory(void* first, void* last, char8 value);
+
+    // zero_memory
+    // Fill the memory range [first, last[ with zeros.
+    //
+    // Parameters:
+    // first - The beginning of the memory range to fill. May be nullptr;
+    // last  - The end of the memory range to fill. If first is nullptr, must also be nullptr.
+    //
+    void zero_memory(void* first, void* last);
+
     template<typename T, typename... Args>
     void construct(T* pointer, Args&&... args) {
         if constexpr(is_constructible<T, decltype(ANTON_FWD(args))...>) {

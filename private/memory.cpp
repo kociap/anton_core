@@ -11,4 +11,20 @@ namespace anton {
     void deallocate(void* memory) {
         _aligned_free(memory);
     }
+
+    void fill_memory(void* first, void* last, char8 value) {
+        char8* f = (char8*)first;
+        char8* l = (char8*)last;
+        for(; f != l; ++f) {
+            *f = value;
+        }
+    }
+
+    void zero_memory(void* first, void* last) {
+        char8* f = (char8*)first;
+        char8* l = (char8*)last;
+        for(; f != l; ++f) {
+            *f = 0;
+        }
+    }
 } // namespace anton

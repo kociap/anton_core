@@ -64,7 +64,7 @@ namespace anton {
     String::String(value_type const* cstr, size_type n): String(cstr, n, allocator_type()) {}
 
     String::String(value_type const* cstr, size_type n, allocator_type const& allocator): _allocator(allocator) {
-        if(_size > 0) {
+        if(n > 0) {
             _size = n;
             _capacity = math::max(min_allocation_size - 1, _size) + 1;
             _data = (value_type*)_allocator.allocate(_capacity, alignof(value_type));

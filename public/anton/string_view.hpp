@@ -121,10 +121,10 @@ namespace anton {
             return false;
         }
 
-        char8* lhs_f = lhs.bytes_begin();
-        char8* lhs_e = lhs.bytes_end();
-        char8* rhs_f = rhs.bytes_begin();
-        char8* rhs_e = rhs.bytes_end();
+        char8 const* lhs_f = lhs.bytes_begin();
+        char8 const* lhs_e = lhs.bytes_end();
+        char8 const* rhs_f = rhs.bytes_begin();
+        char8 const* rhs_e = rhs.bytes_end();
         for(; lhs_f != lhs_e && rhs_f != rhs_e; ++lhs_f, ++rhs_f) {
             if(*lhs_f != *rhs_f) {
                 return false;

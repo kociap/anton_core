@@ -47,7 +47,7 @@ namespace anton {
         zero_memory(_data, _data + _capacity);
     }
 
-    String::String(value_type const* cstr): String(str, allocator_type()) {}
+    String::String(value_type const* cstr): String(cstr, allocator_type()) {}
 
     String::String(value_type const* cstr, allocator_type const& allocator): _allocator(allocator) {
         _size = strlen(cstr);
@@ -166,7 +166,7 @@ namespace anton {
             copy(other._data, other._data + other._size, new_data);
             _allocator.deallocate(_data, _capacity, alignof(value_type));
             _data = new_data;
-            _capacity = new_capacity;
+            _capacity = other._capacity;
             _size = other._size;
         } else {
             zero_memory(_data + other._size, _data + _capacity);
@@ -388,10 +388,10 @@ namespace anton {
             return false;
         }
 
-        char8* lhs_f = lhs.bytes_begin();
-        char8* lhs_e = lhs.bytes_end();
-        char8* rhs_f = rhs.bytes_begin();
-        char8* rhs_e = rhs.bytes_end();
+        char8 const* lhs_f = lhs.bytes_begin();
+        char8 const* lhs_e = lhs.bytes_end();
+        char8 const* rhs_f = rhs.bytes_begin();
+        char8 const* rhs_e = rhs.bytes_end();
         for(; lhs_f != lhs_e && rhs_f != rhs_e; ++lhs_f, ++rhs_f) {
             if(*lhs_f != *rhs_f) {
                 return false;

@@ -76,14 +76,14 @@ namespace anton {
     Polymorphic_Allocator::Polymorphic_Allocator(Polymorphic_Allocator const& other): allocator(other.allocator) {}
 
     Polymorphic_Allocator::Polymorphic_Allocator(Polymorphic_Allocator&& other): allocator(other.allocator) {
-        other.allocator = nullptr;
+        other.allocator = get_default_allocator();
     }
 
     Polymorphic_Allocator::Polymorphic_Allocator(Memory_Allocator* new_allocator): allocator(new_allocator) {}
 
     Polymorphic_Allocator& Polymorphic_Allocator::operator=(Polymorphic_Allocator&& other) {
         allocator = other.allocator;
-        other.allocator = nullptr;
+        other.allocator = get_default_allocator();
         return *this;
     }
 

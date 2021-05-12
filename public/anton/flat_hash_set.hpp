@@ -131,9 +131,9 @@ namespace anton {
         Flat_Hash_Set(allocator_type const& = allocator_type(), hasher const& = hasher(), key_equal const& = key_equal());
         Flat_Hash_Set(Reserve_Tag, i64 size, allocator_type const& = allocator_type(), hasher const& = hasher(), key_equal const& = key_equal());
         Flat_Hash_Set(Flat_Hash_Set const&, allocator_type const& = allocator_type());
-        Flat_Hash_Set(Flat_Hash_Set&&) noexcept;
+        Flat_Hash_Set(Flat_Hash_Set&&);
         Flat_Hash_Set& operator=(Flat_Hash_Set const&);
-        Flat_Hash_Set& operator=(Flat_Hash_Set&&) noexcept;
+        Flat_Hash_Set& operator=(Flat_Hash_Set&&);
         ~Flat_Hash_Set();
 
         [[nodiscard]] iterator begin() {
@@ -301,7 +301,7 @@ namespace anton {
     }
 
     template<typename Key, typename Hash, typename Key_Compare>
-    Flat_Hash_Set<Key, Hash, Key_Compare>::Flat_Hash_Set(Flat_Hash_Set&& other) noexcept
+    Flat_Hash_Set<Key, Hash, Key_Compare>::Flat_Hash_Set(Flat_Hash_Set&& other)
         : _allocator(), _hasher(), _key_equal(), _states(other._states), _slots(other._slots), _capacity(other._capacity), _size(other._size),
           _empty_slots_left(other._empty_slots_left) {
         other._slots = nullptr;
@@ -341,7 +341,7 @@ namespace anton {
     }
 
     template<typename Key, typename Hash, typename Key_Compare>
-    auto Flat_Hash_Set<Key, Hash, Key_Compare>::operator=(Flat_Hash_Set&& other) noexcept -> Flat_Hash_Set& {
+    auto Flat_Hash_Set<Key, Hash, Key_Compare>::operator=(Flat_Hash_Set&& other) -> Flat_Hash_Set& {
         swap(_slots, other._slots);
         swap(_states, other._states);
         swap(_capacity, other._capacity);

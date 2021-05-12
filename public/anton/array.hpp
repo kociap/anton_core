@@ -31,14 +31,14 @@ namespace anton {
         Array(Reserve_Tag, size_type size);
         Array(size_type, value_type const&);
         Array(Array const& original);
-        Array(Array&& from) noexcept;
+        Array(Array&& from);
         template<typename Input_Iterator>
         Array(Range_Construct_Tag, Input_Iterator first, Input_Iterator last);
         template<typename... Args>
         Array(Variadic_Construct_Tag, Args&&...);
         ~Array();
         Array& operator=(Array const& original);
-        Array& operator=(Array&& from) noexcept;
+        Array& operator=(Array&& from);
 
         [[nodiscard]] reference operator[](size_type);
         [[nodiscard]] const_reference operator[](size_type) const;
@@ -238,7 +238,7 @@ namespace anton {
     }
 
     template<typename T, typename Allocator>
-    Array<T, Allocator>::Array(Array&& v) noexcept: _allocator(ANTON_MOV(v._allocator)), _capacity(v._capacity), _size(v._size), _data(v._data) {
+    Array<T, Allocator>::Array(Array&& v): _allocator(ANTON_MOV(v._allocator)), _capacity(v._capacity), _size(v._size), _data(v._data) {
         v._data = nullptr;
         v._capacity = 0;
         v._size = 0;
@@ -288,7 +288,7 @@ namespace anton {
     }
 
     template<typename T, typename Allocator>
-    Array<T, Allocator>& Array<T, Allocator>::operator=(Array&& v) noexcept {
+    Array<T, Allocator>& Array<T, Allocator>::operator=(Array&& v) {
         // Note: We ignore the fact that the allocator_traits<Allocator>::propagate_on_container_swap might be false
         // or the allocators do not compare equal.
         swap(_data, v._data);

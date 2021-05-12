@@ -192,9 +192,9 @@ namespace anton {
         Flat_Hash_Map(allocator_type const& = allocator_type(), hasher const& = hasher(), key_equal const& = key_equal());
         Flat_Hash_Map(Reserve_Tag, i64 size, allocator_type const& = allocator_type(), hasher const& = hasher(), key_equal const& = key_equal());
         Flat_Hash_Map(Flat_Hash_Map const&, allocator_type const& = allocator_type());
-        Flat_Hash_Map(Flat_Hash_Map&&) noexcept;
+        Flat_Hash_Map(Flat_Hash_Map&&);
         Flat_Hash_Map& operator=(Flat_Hash_Map const&);
-        Flat_Hash_Map& operator=(Flat_Hash_Map&&) noexcept;
+        Flat_Hash_Map& operator=(Flat_Hash_Map&&);
         ~Flat_Hash_Map();
 
         [[nodiscard]] iterator begin() {
@@ -383,7 +383,7 @@ namespace anton {
     }
 
     template<typename Key, typename Value, typename Hash, typename Key_Compare>
-    Flat_Hash_Map<Key, Value, Hash, Key_Compare>::Flat_Hash_Map(Flat_Hash_Map&& other) noexcept
+    Flat_Hash_Map<Key, Value, Hash, Key_Compare>::Flat_Hash_Map(Flat_Hash_Map&& other)
         : _allocator(ANTON_MOV(other._allocator)), _hasher(ANTON_MOV(other._hasher)), _key_equal(ANTON_MOV(other._key_equal)), _states(other._states),
           _slots(other._slots), _capacity(other._capacity), _size(other._size), _empty_slots_left(other._empty_slots_left) {
         other._slots = nullptr;
@@ -421,7 +421,7 @@ namespace anton {
     }
 
     template<typename Key, typename Value, typename Hash, typename Key_Compare>
-    auto Flat_Hash_Map<Key, Value, Hash, Key_Compare>::operator=(Flat_Hash_Map&& other) noexcept -> Flat_Hash_Map& {
+    auto Flat_Hash_Map<Key, Value, Hash, Key_Compare>::operator=(Flat_Hash_Map&& other) -> Flat_Hash_Map& {
         using anton::swap;
         swap(_slots, other._slots);
         swap(_states, other._states);

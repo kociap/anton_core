@@ -28,14 +28,14 @@ namespace anton {
         Fixed_Array(Reserve_Tag, size_type size);
         Fixed_Array(size_type, value_type const&);
         Fixed_Array(Fixed_Array const& original);
-        Fixed_Array(Fixed_Array&& from) noexcept;
+        Fixed_Array(Fixed_Array&& from);
         template<typename Input_Iterator>
         Fixed_Array(Range_Construct_Tag, Input_Iterator first, Input_Iterator last);
         template<typename... Args>
         Fixed_Array(Variadic_Construct_Tag, Args&&...);
         ~Fixed_Array();
         Fixed_Array& operator=(Fixed_Array const& original);
-        Fixed_Array& operator=(Fixed_Array&& from) noexcept;
+        Fixed_Array& operator=(Fixed_Array&& from);
 
         [[nodiscard]] reference operator[](size_type index);
         [[nodiscard]] const_reference operator[](size_type index) const;
@@ -106,7 +106,7 @@ namespace anton {
     }
 
     template<typename T, i64 Capacity>
-    Fixed_Array<T, Capacity>::Fixed_Array(Fixed_Array&& other) noexcept: _size(other._size) {
+    Fixed_Array<T, Capacity>::Fixed_Array(Fixed_Array&& other): _size(other._size) {
         uninitialized_move_n(other.get_ptr(0), _size, get_ptr(0));
     }
 
@@ -145,7 +145,7 @@ namespace anton {
     }
 
     template<typename T, i64 Capacity>
-    Fixed_Array<T, Capacity>& Fixed_Array<T, Capacity>::operator=(Fixed_Array&& from) noexcept {
+    Fixed_Array<T, Capacity>& Fixed_Array<T, Capacity>::operator=(Fixed_Array&& from) {
         if(_size >= from._size) {
             move(from.get_ptr(0), from.get_ptr(from._size), get_ptr(0));
             destruct_n(get_ptr(from._size), _size - from._size);

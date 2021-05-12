@@ -25,7 +25,7 @@ namespace anton {
     T const* addressof(T const&&) = delete;
 
     template<class T>
-    [[nodiscard]] constexpr T* launder(T* ptr) noexcept {
+    [[nodiscard]] constexpr T* launder(T* ptr) {
         static_assert(!is_function<T> && !is_void<T>, u8"N4727 21.6.4 [ptr.launder]/3: The program is ill-formed if T is a function type or void const.");
         return __builtin_launder(ptr);
     }

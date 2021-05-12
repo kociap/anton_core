@@ -108,12 +108,12 @@ namespace anton {
     public:
         Polymorphic_Allocator();
         Polymorphic_Allocator(Polymorphic_Allocator const&);
-        Polymorphic_Allocator(Polymorphic_Allocator&&) noexcept;
+        Polymorphic_Allocator(Polymorphic_Allocator&&);
         Polymorphic_Allocator(Memory_Allocator*);
         ~Polymorphic_Allocator() = default;
 
         Polymorphic_Allocator& operator=(Polymorphic_Allocator const&) = delete;
-        Polymorphic_Allocator& operator=(Polymorphic_Allocator&&) noexcept;
+        Polymorphic_Allocator& operator=(Polymorphic_Allocator&&);
 
         [[nodiscard]] ANTON_DECLSPEC_ALLOCATOR void* allocate(isize size, isize alignment);
         void deallocate(void*, isize size, isize alignment);

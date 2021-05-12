@@ -147,9 +147,9 @@ namespace anton {
                 }
             }
 
-            Optional_Copy_Base(Optional_Copy_Base&&) noexcept = default;
+            Optional_Copy_Base(Optional_Copy_Base&&) = default;
             Optional_Copy_Base& operator=(Optional_Copy_Base const&) = default;
-            Optional_Copy_Base& operator=(Optional_Copy_Base&&) noexcept = default;
+            Optional_Copy_Base& operator=(Optional_Copy_Base&&) = default;
         };
 
         template<typename T, bool = is_trivially_move_constructible<T>>
@@ -166,7 +166,7 @@ namespace anton {
             Optional_Move_Base() = default;
             Optional_Move_Base(Optional_Move_Base const&) = default;
 
-            Optional_Move_Base(Optional_Move_Base&& other) noexcept {
+            Optional_Move_Base(Optional_Move_Base&& other) {
                 if(other.holds_value()) {
                     this->construct(ANTON_MOV(other).get());
                     other.destruct();
@@ -174,7 +174,7 @@ namespace anton {
             }
 
             Optional_Move_Base& operator=(Optional_Move_Base const&) = default;
-            Optional_Move_Base& operator=(Optional_Move_Base&&) noexcept = default;
+            Optional_Move_Base& operator=(Optional_Move_Base&&) = default;
         };
 
         template<typename T, bool = is_trivially_copy_assignable<T>>
@@ -190,14 +190,14 @@ namespace anton {
 
             Optional_Copy_Assign_Base() = default;
             Optional_Copy_Assign_Base(Optional_Copy_Assign_Base const&) = default;
-            Optional_Copy_Assign_Base(Optional_Copy_Assign_Base&&) noexcept = default;
+            Optional_Copy_Assign_Base(Optional_Copy_Assign_Base&&) = default;
 
             Optional_Copy_Assign_Base& operator=(Optional_Copy_Assign_Base const& other) {
                 this->assign(other);
                 return *this;
             }
 
-            Optional_Copy_Assign_Base& operator=(Optional_Copy_Assign_Base&&) noexcept = default;
+            Optional_Copy_Assign_Base& operator=(Optional_Copy_Assign_Base&&) = default;
         };
 
         template<typename T, bool = is_trivially_move_assignable<T>>
@@ -213,10 +213,10 @@ namespace anton {
 
             Optional_Move_Assign_Base() = default;
             Optional_Move_Assign_Base(Optional_Move_Assign_Base const&) = default;
-            Optional_Move_Assign_Base(Optional_Move_Assign_Base&&) noexcept = default;
+            Optional_Move_Assign_Base(Optional_Move_Assign_Base&&) = default;
             Optional_Move_Assign_Base& operator=(Optional_Move_Assign_Base const&) = default;
 
-            Optional_Move_Assign_Base& operator=(Optional_Move_Assign_Base&& other) noexcept {
+            Optional_Move_Assign_Base& operator=(Optional_Move_Assign_Base&& other) {
                 this->assign(ANTON_MOV(other));
                 other.destruct();
                 return *this;
@@ -256,10 +256,10 @@ namespace anton {
 
         Optional(Optional const&) = default;
         // Leaves other in null_optional state
-        Optional(Optional&& other) noexcept = default;
+        Optional(Optional&& other) = default;
         Optional& operator=(Optional const&) = default;
         // Leaves other in null_optional state
-        Optional& operator=(Optional&& other) noexcept = default;
+        Optional& operator=(Optional&& other) = default;
         ~Optional() = default;
 
         [[nodiscard]] operator bool() const {

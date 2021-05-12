@@ -6,7 +6,6 @@
 #include <anton/iterators.hpp>
 #include <anton/string_utils.hpp>
 #include <anton/swap.hpp>
-#include <anton/type_traits.hpp>
 #include <anton/types.hpp>
 
 namespace anton {
@@ -122,7 +121,17 @@ namespace anton {
             return false;
         }
 
-        return compare_equal(lhs.data(), rhs.data(), lhs.size_bytes());
+        char8* lhs_f = lhs.bytes_begin();
+        char8* lhs_e = lhs.bytes_end();
+        char8* rhs_f = rhs.bytes_begin();
+        char8* rhs_e = rhs.bytes_end();
+        for(; lhs_f != lhs_e && rhs_f != rhs_e; ++lhs_f, ++rhs_f) {
+            if(*lhs_f != *rhs_f) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // Compares bytes

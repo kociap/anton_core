@@ -1,10 +1,6 @@
 #include <anton/string_view.hpp>
 
 namespace anton {
-    // compare
-    // Orders two strings lexicographically by comparing codepoints.
-    // Returns: -1 if lhs < rhs, 0 if lhs == rhs and 1 if lhs > rhs.
-    //
     i32 compare(String_View const lhs, String_View const rhs) {
         auto lhs_i = lhs.chars_begin(), rhs_i = rhs.chars_begin(), lhs_end = lhs.chars_end(), rhs_end = rhs.chars_end();
         for(; lhs_i != lhs_end && rhs_i != rhs_end; ++lhs_i, ++rhs_i) {

@@ -199,7 +199,7 @@ namespace anton {
             }
 
             // The String_View can not possibly point to our own memory (self-assignment)
-            // because its size is greater than our capacity
+            // because its size is greater than our capacity.
             value_type* const new_data = (value_type*)_allocator.allocate(new_capacity, alignof(value_type));
             zero_memory(new_data + new_size, new_data + new_capacity);
             copy(sv.data(), sv.data() + sv.size_bytes(), new_data);
@@ -312,7 +312,7 @@ namespace anton {
 
     void String::ensure_capacity(size_type const requested_capacity) {
         if(requested_capacity >= _capacity) {
-            size_type new_capacity = _capacity;
+            size_type new_capacity = (_capacity > 0 ? _capacity : min_allocation_size);
             while(new_capacity <= requested_capacity) {
                 new_capacity *= 2;
             }

@@ -67,26 +67,35 @@ namespace anton {
         explicit String(value_type const* first, value_type const* last);
         // Constructs String from the range [first, last[
         explicit String(value_type const* first, value_type const* last, allocator_type const& allocator);
-        explicit String(String_View);
-        explicit String(String_View, allocator_type const&);
-        // Does not copy the allocator
-        String(String const&);
-        String(String const&, allocator_type const&);
-        String(String&&) noexcept;
-        String(String&&, allocator_type const&);
+        explicit String(String_View string);
+        explicit String(String_View string, allocator_type const& allocator);
+        // Copies the allocator
+        String(String const& other);
+        String(String const& other, allocator_type const& allocator);
+        // Moves the allocator
+        String(String&& other);
+        String(String&& other, allocator_type const& allocator);
         ~String();
 
         // Does not copy the allocator
-        String& operator=(String const&);
-        String& operator=(String&&) noexcept;
-        String& operator=(String_View);
-        String& operator=(value_type const*);
+        String& operator=(String const& other);
+        // Does not move the allocator
+        String& operator=(String&& other);
+        String& operator=(String_View string);
+        String& operator=(value_type const* cstr);
 
     public:
         // Implicit conversion operator
         [[nodiscard]] operator String_View() const;
 
     public:
+        [[nodiscard]] allocator_type& get_allocator();
+        [[nodiscard]] allocator_type const& get_allocator() const;
+
+        [[nodiscard]] value_type* data();
+        [[nodiscard]] value_type const* data() const;
+        [[nodiscard]] value_type const* c_str() const;
+
         [[nodiscard]] UTF8_Bytes bytes();
         [[nodiscard]] UTF8_Const_Bytes bytes() const;
         [[nodiscard]] UTF8_Const_Bytes const_bytes() const;
@@ -113,17 +122,17 @@ namespace anton {
         // This is a linear-time operation.
         [[nodiscard]] size_type size_utf8() const;
 
-        // reserve
+        // ensure_capacity
         // Allocates at least requested_capacity + 1 (for null-terminator) bytes of storage.
         // Does nothing if requested_capacity is less than capacity().
         //
-        void reserve(size_type requested_capacity);
+        void ensure_capacity(size_type requested_capacity);
 
-        // reserve_exact
-        // Allocates exactly requested_capacity (no null-terminator) bytes of storage.
+        // ensure_capacity_exact
+        // Allocates exactly requested_capacity (null-terminator is not accounted for) bytes of storage.
         // Does nothing if requested_capacity is less than capacity().
         //
-        void reserve_exact(size_type requested_capacity);
+        void ensure_capacity_exact(size_type requested_capacity);
 
         // force_size
         // Changes the size of the string to n. Useful in situations when the user
@@ -132,37 +141,31 @@ namespace anton {
         void force_size(size_type n);
 
         void clear();
-        void append(char8);
-        void append(char32);
-        void append(String_View);
+        void append(char8 c);
+        void append(char32 c);
+        void append(String_View string);
         // template <typename Input_Iterator>
         // iterator insert(const_iterator pos, Input_Iterator first, Input_Iterator last);
 
-        [[nodiscard]] value_type* data();
-        [[nodiscard]] value_type const* data() const;
-        [[nodiscard]] value_type const* c_str() const;
-        [[nodiscard]] allocator_type& get_allocator();
-        [[nodiscard]] allocator_type const& get_allocator() const;
-
-        friend void swap(String&, String&);
+        friend void swap(String& lhs, String& rhs);
 
     private:
         allocator_type _allocator;
         value_type* _data = nullptr;
-        size_type _capacity = 64;
+        size_type _capacity = 0;
         size_type _size = 0;
-
-        void ensure_capacity(size_type requested_capacity);
-        void ensure_capacity_exact(size_type requested_capacity);
     };
 
     inline namespace literals {
         [[nodiscard]] String operator"" _s(char8 const* literal, u64 size);
     }
 
-    String& operator+=(String&, char8);
-    String& operator+=(String&, char32);
-    String& operator+=(String&, String_View);
+    [[nodiscard]] bool operator==(String const& lhs, String const& rhs);
+    [[nodiscard]] bool operator!=(String const& lhs, String const& rhs);
+
+    String& operator+=(String& lhs, char8 rhs);
+    String& operator+=(String& lhs, char32 rhs);
+    String& operator+=(String& lhs, String_View rhs);
 
     [[nodiscard]] String operator+(String const& lhs, String const& rhs);
     [[nodiscard]] String operator+(String_View lhs, String const& rhs);

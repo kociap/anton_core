@@ -9,10 +9,12 @@
 #include <anton/type_traits.hpp>
 #include <anton/unicode/common.hpp>
 
-// TODO: Replace with format.
+// TODO: Write custom to_string functions
 #include <stdio.h> // sprintf
 
 namespace anton {
+    constexpr i64 min_allocation_size = 64;
+
     String String::from_utf32(char32 const* string, i64 const length) {
         i64 const buffer_size = unicode::convert_utf32_to_utf8(string, length, nullptr);
         // null-terminator is present when length == -1 in which case we have to subtract it from the size since
@@ -33,76 +35,101 @@ namespace anton {
         return str;
     }
 
-    String::String(): String(allocator_type()) {}
+    String::String(): _allocator() {}
 
-    String::String(allocator_type const& allocator): _allocator(allocator) {
-        _data = reinterpret_cast<value_type*>(_allocator.allocate(_capacity, alignof(value_type)));
-        memset(_data, 0, _capacity);
-    }
+    String::String(allocator_type const& allocator): _allocator(allocator) {}
 
     String::String(Reserve_Tag, size_type n): String(anton::reserve, n, allocator_type()) {}
 
     String::String(Reserve_Tag, size_type n, allocator_type const& allocator): _allocator(allocator) {
-        _capacity = math::max(_capacity - 1, n) + 1;
-        _data = reinterpret_cast<value_type*>(_allocator.allocate(_capacity, alignof(value_type)));
-        memset(_data, 0, _capacity);
+        _capacity = math::max(min_allocation_size - 1, n) + 1;
+        _data = (value_type*)_allocator.allocate(_capacity, alignof(value_type));
+        zero_memory(_data, _data + _capacity);
     }
 
-    String::String(value_type const* str): String(str, allocator_type()) {}
+    String::String(value_type const* cstr): String(str, allocator_type()) {}
 
     String::String(value_type const* cstr, allocator_type const& allocator): _allocator(allocator) {
         _size = strlen(cstr);
+        _capacity = math::max(min_allocation_size - 1, _size) + 1;
+        _data = (value_type*)_allocator.allocate(_capacity, alignof(value_type));
+        zero_memory(_data + _size, _data + _capacity);
+        copy(cstr, cstr + _size, _data);
+
         if constexpr(ANTON_STRING_VERIFY_ENCODING) {
             // TODO: Implement
         }
-        _capacity = math::max(_capacity - 1, _size) + 1;
-        _data = reinterpret_cast<value_type*>(_allocator.allocate(_capacity, alignof(value_type)));
-        memset(_data + _size, 0, _capacity - _size);
-        copy(cstr, cstr + _size, _data);
     }
 
     String::String(value_type const* cstr, size_type n): String(cstr, n, allocator_type()) {}
 
     String::String(value_type const* cstr, size_type n, allocator_type const& allocator): _allocator(allocator) {
-        _size = n;
-        _capacity = math::max(_capacity - 1, n) + 1;
-        _data = reinterpret_cast<value_type*>(_allocator.allocate(_capacity, alignof(value_type)));
-        memset(_data + _size, 0, _capacity - _size);
-        copy(cstr, cstr + n, _data);
+        if(_size > 0) {
+            _size = n;
+            _capacity = math::max(min_allocation_size - 1, _size) + 1;
+            _data = (value_type*)_allocator.allocate(_capacity, alignof(value_type));
+            zero_memory(_data + _size, _data + _capacity);
+            copy(cstr, cstr + n, _data);
+        }
+
+        if constexpr(ANTON_STRING_VERIFY_ENCODING) {
+            // TODO: Implement
+        }
     }
 
     String::String(value_type const* first, value_type const* last): String(first, last, allocator_type()) {}
 
     String::String(value_type const* first, value_type const* last, allocator_type const& allocator) {
         _size = last - first;
-        _capacity = math::max(_capacity - 1, _size) + 1;
-        _data = reinterpret_cast<value_type*>(_allocator.allocate(_capacity, alignof(value_type)));
-        memset(_data + _size, 0, _capacity - _size);
-        copy(first, last, _data);
+        if(_size > 0) {
+            _capacity = math::max(min_allocation_size - 1, _size) + 1;
+            _data = (value_type*)_allocator.allocate(_capacity, alignof(value_type));
+            zero_memory(_data + _size, _data + _capacity);
+            copy(first, last, _data);
+        }
+
+        if constexpr(ANTON_STRING_VERIFY_ENCODING) {
+            // TODO: Implement
+        }
     }
 
     String::String(String_View const sv): String(sv, allocator_type()) {}
 
     String::String(String_View const sv, allocator_type const& allocator): _allocator(allocator) {
         _size = sv.size_bytes();
-        _capacity = math::max(_capacity - 1, _size) + 1;
-        _data = reinterpret_cast<value_type*>(_allocator.allocate(_capacity, alignof(value_type)));
-        memset(_data + _size, 0, _capacity - _size);
-        copy(sv.bytes_begin(), sv.bytes_end(), _data);
+        if(_size > 0) {
+            _capacity = math::max(min_allocation_size - 1, _size) + 1;
+            _data = (value_type*)_allocator.allocate(_capacity, alignof(value_type));
+            zero_memory(_data + _size, _data + _capacity);
+            copy(sv.bytes_begin(), sv.bytes_end(), _data);
+        }
+
+        if constexpr(ANTON_STRING_VERIFY_ENCODING) {
+            // TODO: Implement
+        }
     }
 
     String::String(String const& other): String(other, allocator_type()) {}
 
     String::String(String const& other, allocator_type const& allocator): _allocator(allocator), _capacity(other._capacity), _size(other._size) {
-        _data = reinterpret_cast<value_type*>(_allocator.allocate(_capacity, alignof(value_type)));
-        memset(_data + _size, 0, _capacity - _size);
-        copy(other._data, other._data + other._size, _data);
+        if(_capacity > 0) {
+            _data = (value_type*)_allocator.allocate(_capacity, alignof(value_type));
+            zero_memory(_data + _size, _data + _capacity);
+            copy(other._data, other._data + other._size, _data);
+        }
+
+        if constexpr(ANTON_STRING_VERIFY_ENCODING) {
+            // TODO: Implement
+        }
     }
 
-    String::String(String&& other) noexcept: _allocator(ANTON_MOV(other._allocator)), _data(other._data), _capacity(other._capacity), _size(other._size) {
+    String::String(String&& other): _allocator(ANTON_MOV(other._allocator)), _data(other._data), _capacity(other._capacity), _size(other._size) {
         other._data = nullptr;
         other._size = 0;
         other._capacity = 0;
+        if constexpr(ANTON_STRING_VERIFY_ENCODING) {
+            // TODO: Implement
+        }
     }
 
     String::String(String&& other, allocator_type const& allocator): _allocator(allocator) {
@@ -114,68 +141,113 @@ namespace anton {
             _size = other._size;
             other._size = 0;
         } else {
-            _size = other._size;
-            _capacity = other._capacity;
-            _data = reinterpret_cast<value_type*>(_allocator.allocate(_capacity, alignof(value_type)));
-            memset(_data + _size, 0, _capacity - _size);
-            move(other._data, other._data + other._size, _data);
+            if(other._capacity > 0) {
+                _size = other._size;
+                _capacity = other._capacity;
+                _data = (value_type*)_allocator.allocate(_capacity, alignof(value_type));
+                zero_memory(_data + _size, _data + _capacity);
+                move(other._data, other._data + other._size, _data);
+            }
+        }
+
+        if constexpr(ANTON_STRING_VERIFY_ENCODING) {
+            // TODO: Implement
         }
     }
 
     String::~String() {
-        if(_data != nullptr) {
-            _allocator.deallocate(_data, _capacity, alignof(value_type));
-        }
+        _allocator.deallocate(_data, _capacity, alignof(value_type));
     }
 
     String& String::operator=(String const& other) {
-        size_type const new_size = other._size;
-        size_type const new_capacity = other._capacity;
-        value_type* new_data = reinterpret_cast<value_type*>(_allocator.allocate(new_capacity, alignof(value_type)));
-        // We want to copy the data from the String before we deallocate the old memory to handle self-assignment
-        memset(new_data + _size, 0, _capacity - _size);
-        copy(other._data, other._data + other._size, new_data);
-        _allocator.deallocate(_data, _capacity, alignof(value_type));
+        if(other._size + 1 > _capacity) {
+            value_type* const new_data = (value_type*)_allocator.allocate(other._capacity, alignof(value_type));
+            zero_memory(new_data + other._size, new_data + other._capacity);
+            copy(other._data, other._data + other._size, new_data);
+            _allocator.deallocate(_data, _capacity, alignof(value_type));
+            _data = new_data;
+            _capacity = new_capacity;
+            _size = other._size;
+        } else {
+            zero_memory(_data + other._size, _data + _capacity);
+            copy(other._data, other._data + other._size, _data);
+            _size = other._size;
+        }
 
-        _data = new_data;
-        _size = new_size;
-        _capacity = new_capacity;
+        if constexpr(ANTON_STRING_VERIFY_ENCODING) {
+            // TODO: Implement
+        }
+
         return *this;
     }
 
-    String& String::operator=(String&& other) noexcept {
+    String& String::operator=(String&& other) {
         swap(*this, other);
+        if constexpr(ANTON_STRING_VERIFY_ENCODING) {
+            // TODO: Implement
+        }
+
         return *this;
     }
 
     String& String::operator=(String_View const sv) {
         size_type const new_size = sv.size_bytes();
-        size_type new_capacity = 64;
-        while(new_capacity < new_size + 1) {
-            new_capacity *= 2;
+        if(new_size + 1 > _capacity) {
+            size_type new_capacity = min_allocation_size;
+            while(new_capacity < new_size + 1) {
+                new_capacity *= 2;
+            }
+
+            // The String_View can not possibly point to our own memory (self-assignment)
+            // because its size is greater than our capacity
+            value_type* const new_data = (value_type*)_allocator.allocate(new_capacity, alignof(value_type));
+            zero_memory(new_data + new_size, new_data + new_capacity);
+            copy(sv.data(), sv.data() + sv.size_bytes(), new_data);
+            _allocator.deallocate(_data, _capacity, alignof(value_type));
+            _data = new_data;
+            _capacity = new_capacity;
+            _size = new_size;
+        } else {
+            // The String_View may point to our own memory!
+            zero_memory(_data + new_size, _data + _capacity);
+            copy(sv.data(), sv.data() + sv.size_bytes(), _data);
+            _size = new_size;
         }
 
-        value_type* const new_data = reinterpret_cast<value_type*>(_allocator.allocate(new_capacity, alignof(value_type)));
-        // We want to copy the data from the String_View before we deallocate the old memory to handle the case
-        // when the String_View points to our own memory (sort of self-assignment)
-        memset(new_data + new_size, 0, new_capacity - new_size);
-        copy(sv.data(), sv.data() + sv.size_bytes(), new_data);
+        if constexpr(ANTON_STRING_VERIFY_ENCODING) {
+            // TODO: Implement
+        }
 
-        _allocator.deallocate(_data, _capacity, alignof(value_type));
-        _data = new_data;
-        _capacity = new_capacity;
-        _size = new_size;
         return *this;
     }
 
-    String& String::operator=(value_type const* const str) {
-        *this = String_View(str);
+    String& String::operator=(value_type const* const cstr) {
+        *this = String_View(cstr);
         return *this;
     }
 
-    // Implicit conversion operator
     String::operator String_View() const {
         return {_data, _size};
+    }
+
+    String::allocator_type& String::get_allocator() {
+        return _allocator;
+    }
+
+    String::allocator_type const& String::get_allocator() const {
+        return _allocator;
+    }
+
+    auto String::data() -> value_type* {
+        return _data;
+    }
+
+    auto String::data() const -> value_type const* {
+        return _data;
+    }
+
+    auto String::c_str() const -> value_type const* {
+        return _data;
     }
 
     auto String::bytes() -> UTF8_Bytes {
@@ -238,12 +310,31 @@ namespace anton {
         return chars_end() - chars_begin();
     }
 
-    void String::reserve(size_type n) {
-        ensure_capacity(n);
+    void String::ensure_capacity(size_type const requested_capacity) {
+        if(requested_capacity >= _capacity) {
+            size_type new_capacity = _capacity;
+            while(new_capacity <= requested_capacity) {
+                new_capacity *= 2;
+            }
+
+            value_type* new_data = static_cast<value_type*>(_allocator.allocate(new_capacity, alignof(value_type)));
+            zero_memory(new_data + _size, new_data + new_capacity);
+            move(_data, _data + _size, new_data);
+            _allocator.deallocate(_data, _capacity, alignof(value_type));
+            _data = new_data;
+            _capacity = new_capacity;
+        }
     }
 
-    void String::reserve_exact(size_type n) {
-        ensure_capacity_exact(n);
+    void String::ensure_capacity_exact(size_type const requested_capacity) {
+        if(requested_capacity > _capacity) {
+            value_type* new_data = static_cast<value_type*>(_allocator.allocate(requested_capacity, alignof(value_type)));
+            zero_memory(new_data + _size, new_data + requested_capacity);
+            move(_data, _data + _size, new_data);
+            _allocator.deallocate(_data, _capacity, alignof(value_type));
+            _data = new_data;
+            _capacity = requested_capacity;
+        }
     }
 
     void String::force_size(size_type n) {
@@ -251,7 +342,7 @@ namespace anton {
     }
 
     void String::clear() {
-        memset(_data, 0, _size);
+        zero_memory(_data, _data + _size);
         _size = 0;
     }
 
@@ -268,56 +359,9 @@ namespace anton {
     }
 
     void String::append(String_View str) {
-        ensure_capacity(_size + str.size_bytes() + 1);
+        ensure_capacity(_size + str.size_bytes());
         copy(str.bytes_begin(), str.bytes_end(), _data + _size);
         _size += str.size_bytes();
-    }
-
-    auto String::data() -> value_type* {
-        return _data;
-    }
-
-    auto String::data() const -> value_type const* {
-        return _data;
-    }
-
-    auto String::c_str() const -> value_type const* {
-        return _data;
-    }
-
-    String::allocator_type& String::get_allocator() {
-        return _allocator;
-    }
-
-    String::allocator_type const& String::get_allocator() const {
-        return _allocator;
-    }
-
-    void String::ensure_capacity(size_type requested_capacity) {
-        if(requested_capacity >= _capacity) {
-            size_type new_capacity = _capacity;
-            while(new_capacity <= requested_capacity) {
-                new_capacity *= 2;
-            }
-
-            value_type* new_data = static_cast<value_type*>(_allocator.allocate(new_capacity, alignof(value_type)));
-            memset(new_data + _size, 0, new_capacity - _size);
-            move(_data, _data + _size, new_data);
-            _allocator.deallocate(_data, _capacity, alignof(value_type));
-            _data = new_data;
-            _capacity = new_capacity;
-        }
-    }
-
-    void String::ensure_capacity_exact(size_type requested_capacity) {
-        if(requested_capacity > _capacity) {
-            value_type* new_data = static_cast<value_type*>(_allocator.allocate(requested_capacity, alignof(value_type)));
-            memset(new_data + _size, 0, requested_capacity - _size);
-            move(_data, _data + _size, new_data);
-            _allocator.deallocate(_data, _capacity, alignof(value_type));
-            _data = new_data;
-            _capacity = requested_capacity;
-        }
     }
 
     inline namespace literals {
@@ -326,26 +370,17 @@ namespace anton {
         }
     } // namespace literals
 
-    String& operator+=(String& str, char8 c) {
-        str.append(c);
-        return str;
-    }
-
-    String& operator+=(String& str, char32 c) {
-        str.append(c);
-        return str;
-    }
-
-    String& operator+=(String& str, String_View sv) {
-        str.append(sv);
-        return str;
-    }
-
     void swap(String& str1, String& str2) {
-        swap(str1._allocator, str2._allocator);
-        swap(str1._data, str2._data);
-        swap(str1._capacity, str2._capacity);
-        swap(str1._size, str2._size);
+        if(str1._allocator == str2._allocator) {
+            swap(str1._data, str2._data);
+            swap(str1._capacity, str2._capacity);
+            swap(str1._size, str2._size);
+        } else {
+            // Move operations call swap, which could lead to an endless loop
+            String temp{str1};
+            str1 = str2;
+            str2 = temp;
+        }
     }
 
     bool operator==(String const& lhs, String const& rhs) {
@@ -353,7 +388,36 @@ namespace anton {
             return false;
         }
 
-        return compare_equal(lhs.data(), rhs.data());
+        char8* lhs_f = lhs.bytes_begin();
+        char8* lhs_e = lhs.bytes_end();
+        char8* rhs_f = rhs.bytes_begin();
+        char8* rhs_e = rhs.bytes_end();
+        for(; lhs_f != lhs_e && rhs_f != rhs_e; ++lhs_f, ++rhs_f) {
+            if(*lhs_f != *rhs_f) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool operator!=(String const& lhs, String const& rhs) {
+        return !(lhs == rhs);
+    }
+
+    String& operator+=(String& lhs, char8 rhs) {
+        lhs.append(rhs);
+        return lhs;
+    }
+
+    String& operator+=(String& lhs, char32 rhs) {
+        lhs.append(rhs);
+        return lhs;
+    }
+
+    String& operator+=(String& lhs, String_View string) {
+        lhs.append(string);
+        return lhs;
     }
 
     String operator+(String const& lhs, String const& rhs) {
@@ -377,11 +441,11 @@ namespace anton {
         return str;
     }
 
-    String operator+(char const* lhs, String const& rhs) {
+    String operator+(char8 const* lhs, String const& rhs) {
         return String_View(lhs) + rhs;
     }
 
-    String operator+(String const& lhs, char const* rhs) {
+    String operator+(String const& lhs, char8 const* rhs) {
         return lhs + String_View(rhs);
     }
 

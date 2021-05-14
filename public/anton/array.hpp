@@ -587,7 +587,7 @@ namespace anton {
         T* const element = _data + _size;
         construct(element, value);
         ++_size;
-        return element;
+        return *element;
     }
 
     template<typename T, typename Allocator>
@@ -596,7 +596,7 @@ namespace anton {
         T* const element = _data + _size;
         construct(element, ANTON_MOV(value));
         ++_size;
-        return element;
+        return *element;
     }
 
     template<typename T, typename Allocator>

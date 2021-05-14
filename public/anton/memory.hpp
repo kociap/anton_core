@@ -257,7 +257,9 @@ namespace anton {
             memmove(dest_begin, first, (usize)(last - first) * sizeof(input_value_type));
             return dest_begin;
         } else {
-            for(; last != first; --dest, --last) {
+            while(last != first) {
+                --dest;
+                --last;
                 *dest = *last;
             }
             return dest;
@@ -328,7 +330,9 @@ namespace anton {
             memmove(dest_begin, first, (usize)(last - first) * sizeof(input_value_type));
             return dest_begin;
         } else {
-            for(; last != first; --dest, --last) {
+            while(last != first) {
+                --dest;
+                --last;
                 *dest = ANTON_MOV(*last);
             }
             return dest;

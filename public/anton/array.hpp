@@ -305,12 +305,12 @@ namespace anton {
     Array<T, Allocator>& Array<T, Allocator>::operator=(Array const& other) {
         destruct_n(_data, _size);
         deallocate(_data, _capacity);
-        _capacity = v._capacity;
-        _size = v._size;
+        _capacity = other._capacity;
+        _size = other._size;
         _allocator = other._allocator;
         if(_capacity > 0) {
-            _data = allocate(v._capacity);
-            anton::uninitialized_copy_n(v._data, v._size, new_storage);
+            _data = allocate(other._capacity);
+            anton::uninitialized_copy_n(other._data, other._size, new_storage);
         }
         return *this;
     }

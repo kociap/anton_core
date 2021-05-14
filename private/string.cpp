@@ -372,6 +372,7 @@ namespace anton {
 
     void swap(String& str1, String& str2) {
         if(str1._allocator == str2._allocator) {
+            swap(str1._allocator, str2._allocator);
             swap(str1._data, str2._data);
             swap(str1._capacity, str2._capacity);
             swap(str1._size, str2._size);

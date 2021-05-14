@@ -82,11 +82,11 @@ namespace anton {
         //
         void resize(size_type n, value_type const& v);
 
-        // reserve
-        // Allocates enough memory to fit n elements of type T.
+        // ensure_capacity
+        // Allocates enough memory to fit requested_capacity elements of type T.
         // Does nothing if requested_capacity is less than capacity().
         //
-        void reserve(size_type n);
+        void ensure_capacity(size_type requested_capacity);
 
         // set_capacity
         // Sets the capacity to exactly match n.
@@ -187,7 +187,6 @@ namespace anton {
 
         T* allocate(size_type);
         void deallocate(void*, size_type);
-        void ensure_capacity(size_type requested_capacity);
     };
 } // namespace anton
 
@@ -401,11 +400,6 @@ namespace anton {
             destruct(_data + n, _data + _size);
         }
         _size = n;
-    }
-
-    template<typename T, typename Allocator>
-    void Array<T, Allocator>::reserve(size_type n) {
-        ensure_capacity(n);
     }
 
     template<typename T, typename Allocator>

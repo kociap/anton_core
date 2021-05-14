@@ -317,7 +317,7 @@ namespace anton {
                 new_capacity *= 2;
             }
 
-            value_type* new_data = static_cast<value_type*>(_allocator.allocate(new_capacity, alignof(value_type)));
+            value_type* new_data = (value_type*)_allocator.allocate(new_capacity, alignof(value_type));
             zero_memory(new_data + _size, new_data + new_capacity);
             move(_data, _data + _size, new_data);
             _allocator.deallocate(_data, _capacity, alignof(value_type));
@@ -328,7 +328,7 @@ namespace anton {
 
     void String::ensure_capacity_exact(size_type const requested_capacity) {
         if(requested_capacity > _capacity) {
-            value_type* new_data = static_cast<value_type*>(_allocator.allocate(requested_capacity, alignof(value_type)));
+            value_type* new_data = (value_type*)_allocator.allocate(requested_capacity, alignof(value_type));
             zero_memory(new_data + _size, new_data + requested_capacity);
             move(_data, _data + _size, new_data);
             _allocator.deallocate(_data, _capacity, alignof(value_type));

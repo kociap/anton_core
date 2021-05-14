@@ -303,14 +303,14 @@ namespace anton {
 
     template<typename T, typename Allocator>
     Array<T, Allocator>& Array<T, Allocator>::operator=(Array const& other) {
-        destruct_n(_data, _size);
+        anton::destruct_n(_data, _size);
         deallocate(_data, _capacity);
         _capacity = other._capacity;
         _size = other._size;
         _allocator = other._allocator;
         if(_capacity > 0) {
-            _data = allocate(other._capacity);
-            anton::uninitialized_copy_n(other._data, other._size, new_storage);
+            _data = allocate(_capacity);
+            anton::uninitialized_copy_n(other._data, other._size, _data);
         }
         return *this;
     }

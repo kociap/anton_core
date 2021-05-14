@@ -296,6 +296,7 @@ namespace anton {
         // O(n) if the allocators compare not equal.
         //
         friend void swap(List& list1, List& list2) {
+            using anton::swap;
             if(list1._allocator == list2._allocator) {
                 swap(list1._allocator, list2._allocator);
                 // We swap the internal nodes and then fix up the addresses

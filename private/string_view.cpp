@@ -22,23 +22,6 @@ namespace anton {
         }
     }
 
-    i64 find_last_substring(String_View const string, String_View const substr) {
-        // Bruteforce
-        char8 const* const string_data = string.data();
-        char8 const* const substr_data = substr.data();
-        for(i64 i = string.size_bytes() - substr.size_bytes(); i >= 0; --i) {
-            bool equal = true;
-            for(i64 j = i, k = 0; k < substr.size_bytes(); ++j, ++k) {
-                equal &= string_data[j] == substr_data[k];
-            }
-
-            if(equal) {
-                return i;
-            }
-        }
-        return npos;
-    }
-
     // str_to_integer
     // Expects a string containing a number in base [2, 36].
     // There must be no whitespace in the string.

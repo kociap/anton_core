@@ -11,7 +11,7 @@
 namespace anton {
     constexpr i64 npos = -1;
 
-    class String_View {
+    struct String_View {
     public:
         using size_type = i64;
         using difference_type = isize;
@@ -141,7 +141,9 @@ namespace anton {
 
     // compare
     // Orders two strings lexicographically by comparing codepoints.
-    // Returns: -1 if lhs < rhs, 0 if lhs == rhs and 1 if lhs > rhs.
+    //
+    // Returns:
+    //-1 if lhs < rhs, 0 if lhs == rhs and 1 if lhs > rhs.
     //
     [[nodiscard]] i32 compare(String_View lhs, String_View rhs);
 
@@ -186,7 +188,68 @@ namespace anton {
     // Returns:
     // The start position of the substring within string or npos if the substring is not present.
     //
-    [[nodiscard]] i64 find_last_substring(String_View const string, String_View const substr);
+    [[nodiscard]] constexpr i64 find_last_substring(String_View const string, String_View const substr) {
+        // Bruteforce
+        char8 const* const string_data = string.data();
+        char8 const* const substr_data = substr.data();
+        for(i64 i = string.size_bytes() - substr.size_bytes(); i >= 0; --i) {
+            bool equal = true;
+            for(i64 j = i, k = 0; k < substr.size_bytes(); ++j, ++k) {
+                equal &= string_data[j] == substr_data[k];
+            }
+
+            if(equal) {
+                return i;
+            }
+        }
+        return npos;
+    }
+
+    // begins_with
+    // Checks whether string starts with substr.
+    //
+    // Parameters:
+    // string - the source string.
+    // substr - the substring to check for.
+    //
+    // Returns:
+    // If string begins with substr, returns true, false otherwise.
+    //
+    [[nodiscard]] constexpr bool begins_with(String_View const string, String_View const substr) {
+        char8 const* str_begin = string.bytes_begin();
+        char8 const* str_end = string.bytes_end();
+        char8 const* substr_begin = string.bytes_begin();
+        char8 const* substr_end = string.bytes_end();
+        for(; str_begin != str_end && substr_begin != substr_end; ++str_begin, ++substr_begin) {
+            if(*str_begin != *substr_begin) {
+                return false;
+            }
+        }
+        return substr_begin == substr_end;
+    }
+
+    // ends_with
+    // Checks whether string ends with substr.
+    //
+    // Parameters:
+    // string - the source string.
+    // substr - the substring to check for.
+    //
+    // Returns:
+    // If string ends with substr, returns true, false otherwise.
+    //
+    [[nodiscard]] constexpr bool ends_with(String_View const string, String_View const substr) {
+        char8 const* str_begin = string.bytes_begin() - 1;
+        char8 const* str_end = string.bytes_end() - 1;
+        char8 const* substr_begin = string.bytes_begin() - 1;
+        char8 const* substr_end = string.bytes_end() - 1;
+        for(; str_end != str_begin && substr_end != substr_begin; --str_begin, --substr_begin) {
+            if(*str_end != *substr_end) {
+                return false;
+            }
+        }
+        return substr_begin == substr_end;
+    }
 
     // str_to_i64
     // Expects a string containing a number in base [2, 36].

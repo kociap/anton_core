@@ -2,8 +2,6 @@
 
 #include <anton/types.hpp>
 
-// TODO: Is this header necessary?
-
 namespace anton {
     template<typename C>
     constexpr auto size(C& c) -> decltype(c.size()) {

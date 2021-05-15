@@ -14,7 +14,7 @@ namespace anton {
 #define ANTON_ARRAY_MIN_ALLOCATION_SIZE ((i64)64)
 
     template<typename T, typename Allocator = Allocator>
-    class Array {
+    struct Array {
     public:
         using value_type = T;
         using allocator_type = Allocator;

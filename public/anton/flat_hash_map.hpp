@@ -14,13 +14,12 @@ namespace anton {
     // Stores both keys and values in the main array, which minimizes memory indirections.
     // It doesn't provide pointer stability and moves data on rehashing.
     // TODO: Implement state sentinel for iterators.
-    // TODO: Add launder.
     //
     template<typename Key, typename Value, typename Hash = Default_Hash<Key>, typename Key_Equal = Equal_Compare<Key>>
-    class Flat_Hash_Map {
+    struct Flat_Hash_Map {
     private:
-        enum class State : u8;
-        class Slot;
+        enum struct State : u8;
+        struct Slot;
 
         template<typename _Key, typename _Hash, typename _Key_Equal, typename = void>
         struct Transparent_Key {
@@ -38,7 +37,7 @@ namespace anton {
         using transparent_key = typename Transparent_Key<Key, Hash, Key_Equal>::template type<T>;
 
     public:
-        class Entry {
+        struct Entry {
         public:
             Key const key;
             Value value;
@@ -49,7 +48,7 @@ namespace anton {
         using hasher = Hash;
         using key_equal = Key_Equal;
 
-        class const_iterator {
+        struct const_iterator {
         public:
             using value_type = Entry const;
             using difference_type = isize;
@@ -117,8 +116,8 @@ namespace anton {
             }
 
         private:
-            friend class Flat_Hash_Map;
-            friend class iterator;
+            friend struct Flat_Hash_Map;
+            friend struct iterator;
 
             Slot const* _slots;
             State const* _states;
@@ -126,7 +125,7 @@ namespace anton {
             const_iterator(Slot const* slots, State const* states): _slots(slots), _states(states) {}
         };
 
-        class iterator {
+        struct iterator {
         public:
             using value_type = Entry;
             using difference_type = isize;
@@ -316,14 +315,14 @@ namespace anton {
         }
 
     private:
-        enum class State : u8 {
+        enum struct State : u8 {
             empty = 0,
             active,
             deleted,
             sentinel,
         };
 
-        class Slot {
+        struct Slot {
         public:
             Key key;
             Value value;

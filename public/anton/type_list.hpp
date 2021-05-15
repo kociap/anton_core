@@ -5,7 +5,7 @@
 
 namespace anton {
     template<typename... Ts>
-    class Type_List {
+    struct Type_List {
     public:
         using type = Type_List<Ts...>;
     };

@@ -3,7 +3,7 @@
 #include <anton/stream.hpp>
 
 namespace anton {
-    class Console_Output: public Output_Stream {
+    struct Console_Output: public Output_Stream {
     public:
         virtual ~Console_Output() override;
 

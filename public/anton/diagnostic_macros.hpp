@@ -1,6 +1,5 @@
 #pragma once
 
-// TODO: Add GCC support
 #if ANTON_COMPILER_CLANG
 #    define ANTON_DISABLE_WARNINGS()      \
         _Pragma("clang diagnostic push"); \

@@ -21,7 +21,7 @@ namespace anton {
     // TODO: SSO
     // TODO: Grapheme Clusters
     //
-    class String {
+    struct String {
     public:
         using value_type = char8;
         using size_type = i64;

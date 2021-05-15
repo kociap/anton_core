@@ -6,7 +6,7 @@
 
 namespace anton {
     template<typename T1, typename T2>
-    class Pair {
+    struct Pair {
     public:
         using first_type = T1;
         using second_type = T2;

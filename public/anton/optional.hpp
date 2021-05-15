@@ -17,7 +17,7 @@ namespace anton {
 
     namespace detail {
         template<typename T, bool = is_trivially_destructible<T>>
-        class Optional_Destruct_Base {
+        struct Optional_Destruct_Base {
         public:
             Optional_Destruct_Base(): _null_state(), _holds_value(false) {}
             template<typename... Args>
@@ -38,7 +38,7 @@ namespace anton {
         };
 
         template<typename T>
-        class Optional_Destruct_Base<T, false> {
+        struct Optional_Destruct_Base<T, false> {
         public:
             Optional_Destruct_Base(): _null_state(), _holds_value(false) {}
 
@@ -66,7 +66,7 @@ namespace anton {
         };
 
         template<typename T>
-        class Optional_Storage_Base: public Optional_Destruct_Base<T> {
+        struct Optional_Storage_Base: public Optional_Destruct_Base<T> {
         public:
             using Optional_Destruct_Base<T>::Optional_Destruct_Base;
 
@@ -129,13 +129,13 @@ namespace anton {
         };
 
         template<typename T, bool = is_trivially_copy_constructible<T>>
-        class Optional_Copy_Base: public Optional_Storage_Base<T> {
+        struct Optional_Copy_Base: public Optional_Storage_Base<T> {
         public:
             using Optional_Storage_Base<T>::Optional_Storage_Base;
         };
 
         template<typename T>
-        class Optional_Copy_Base<T, false>: public Optional_Storage_Base<T> {
+        struct Optional_Copy_Base<T, false>: public Optional_Storage_Base<T> {
         public:
             using Optional_Storage_Base<T>::Optional_Storage_Base;
 
@@ -153,13 +153,13 @@ namespace anton {
         };
 
         template<typename T, bool = is_trivially_move_constructible<T>>
-        class Optional_Move_Base: public Optional_Copy_Base<T> {
+        struct Optional_Move_Base: public Optional_Copy_Base<T> {
         public:
             using Optional_Copy_Base<T>::Optional_Copy_Base;
         };
 
         template<typename T>
-        class Optional_Move_Base<T, false>: public Optional_Copy_Base<T> {
+        struct Optional_Move_Base<T, false>: public Optional_Copy_Base<T> {
         public:
             using Optional_Copy_Base<T>::Optional_Copy_Base;
 
@@ -178,13 +178,13 @@ namespace anton {
         };
 
         template<typename T, bool = is_trivially_copy_assignable<T>>
-        class Optional_Copy_Assign_Base: public Optional_Move_Base<T> {
+        struct Optional_Copy_Assign_Base: public Optional_Move_Base<T> {
         public:
             using Optional_Move_Base<T>::Optional_Move_Base;
         };
 
         template<typename T>
-        class Optional_Copy_Assign_Base<T, false>: public Optional_Move_Base<T> {
+        struct Optional_Copy_Assign_Base<T, false>: public Optional_Move_Base<T> {
         public:
             using Optional_Move_Base<T>::Optional_Move_Base;
 
@@ -201,13 +201,13 @@ namespace anton {
         };
 
         template<typename T, bool = is_trivially_move_assignable<T>>
-        class Optional_Move_Assign_Base: public Optional_Copy_Assign_Base<T> {
+        struct Optional_Move_Assign_Base: public Optional_Copy_Assign_Base<T> {
         public:
             using Optional_Copy_Assign_Base<T>::Optional_Copy_Assign_Base;
         };
 
         template<typename T>
-        class Optional_Move_Assign_Base<T, false>: public Optional_Copy_Assign_Base<T> {
+        struct Optional_Move_Assign_Base<T, false>: public Optional_Copy_Assign_Base<T> {
         public:
             using Optional_Copy_Assign_Base<T>::Optional_Copy_Assign_Base;
 
@@ -228,7 +228,7 @@ namespace anton {
     // TODO: hashing
     // TODO: emplace
     template<typename T>
-    class Optional: private detail::Optional_Move_Assign_Base<T> {
+    struct Optional: private detail::Optional_Move_Assign_Base<T> {
     private:
         using _base = detail::Optional_Move_Assign_Base<T>;
 

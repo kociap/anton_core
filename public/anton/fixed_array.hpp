@@ -9,7 +9,7 @@
 
 namespace anton {
     template<typename T, i64 Capacity>
-    class Fixed_Array {
+    struct Fixed_Array {
         static_assert(Capacity >= 0, u8"Fixed_Array's capacity may not be less than 0");
 
     public:

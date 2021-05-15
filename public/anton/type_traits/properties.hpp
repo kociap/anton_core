@@ -352,7 +352,8 @@ namespace anton {
 
     namespace detail {
         template<typename From, typename To, bool = disjunction<Is_Void<To>, Is_Array<To>, Is_Function<To>>>
-        class Is_Convertible_Helper {
+        struct Is_Convertible_Helper {
+        private:
             template<typename F, typename T, typename = enable_if<is_void<F> && is_void<T>>>
             static True_Type test(int);
 
@@ -364,7 +365,8 @@ namespace anton {
         };
 
         template<typename From, typename To>
-        class Is_Convertible_Helper<From, To, false> {
+        struct Is_Convertible_Helper<From, To, false> {
+        private:
             template<typename T>
             static void test_aux(T);
 

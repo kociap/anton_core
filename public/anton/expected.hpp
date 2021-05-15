@@ -19,7 +19,7 @@ namespace anton {
     constexpr Expected_Value_Tag expected_value;
 
     template<typename T, typename E>
-    class Expected {
+    struct Expected {
     public:
         using value_type = T;
         using error_type = E;
@@ -210,7 +210,7 @@ namespace anton {
     };
 
     template<typename E>
-    class Expected<void, E> {
+    struct Expected<void, E> {
     public:
         using value_type = void;
         using error_type = E;

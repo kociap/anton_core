@@ -52,13 +52,13 @@ namespace anton::fs {
     //
     i64 file_size(String_View path);
 
-    enum class Open_Mode : u32 {
+    enum struct Open_Mode : u32 {
         // Has effect only on Windows. Makes all reading operations translate the \n\r sequences into \n.
         // Opposite of std::ios_base::open_mode::binary.
         windows_translate_newline = 1,
     };
 
-    class Output_File_Stream: public Output_Stream {
+    struct Output_File_Stream: public Output_Stream {
     public:
         Output_File_Stream();
         explicit Output_File_Stream(String const& filename);
@@ -88,7 +88,7 @@ namespace anton::fs {
         void* _buffer = nullptr;
     };
 
-    class Input_File_Stream: public Input_Stream {
+    struct Input_File_Stream: public Input_Stream {
     public:
         Input_File_Stream();
         explicit Input_File_Stream(String const& filename);

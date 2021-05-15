@@ -8,7 +8,7 @@
 
 namespace anton {
     template<typename T>
-    class Slice;
+    struct Slice;
 
     template<typename T>
     struct Is_Slice: False_Type {};
@@ -23,7 +23,7 @@ namespace anton {
     constexpr bool is_slice = Is_Slice<T>::value;
 
     template<typename T>
-    class Slice {
+    struct Slice {
     public:
         using value_type = T;
         using size_type = i64;

@@ -74,9 +74,8 @@ namespace anton {
         using iterator_category = Contiguous_Iterator_Tag;
     };
 
-    // TODO: Fix this
     template<typename Iterator>
-    class Reverse_Iterator {
+    struct Reverse_Iterator {
     public:
         using value_type = typename Iterator::value_type;
         using pointer = typename Iterator::pointer;
@@ -192,7 +191,7 @@ namespace anton {
     }
 
     template<typename Iterator>
-    class Move_Iterator {
+    struct Move_Iterator {
     public:
         using value_type = typename Iterator_Traits<Iterator>::value_type;
         using reference = decltype(ANTON_MOV(*anton::declval<Iterator>()));

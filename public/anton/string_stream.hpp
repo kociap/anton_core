@@ -4,7 +4,7 @@
 #include <anton/string.hpp>
 
 namespace anton {
-    class Input_String_Stream: public anton::Input_Stream {
+    struct Input_String_Stream: public anton::Input_Stream {
     public:
         Input_String_Stream(anton::String string);
 

@@ -19,7 +19,7 @@ namespace anton {
     // TODO: Fix new/deallocate mismatch
     //
     template<typename T>
-    class Owning_Ptr {
+    struct Owning_Ptr {
     public:
         using element_type = T;
         using deleter_type = void (*)(T*);

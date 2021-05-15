@@ -9,7 +9,7 @@ namespace anton {
     // An abstract class that provides an interface for all allocators that are supposed
     // to be used with Polymorphic_Allocator in polymorphic containers.
     //
-    class Memory_Allocator {
+    struct Memory_Allocator {
     public:
         virtual ~Memory_Allocator() = default;
 
@@ -30,7 +30,7 @@ namespace anton {
     // This allocator class is not templated on any type and inherits from Memory_Allocator
     // to allow it to be used in polymorphic containers.
     //
-    class Allocator: public Memory_Allocator {
+    struct Allocator: public Memory_Allocator {
     public:
         [[nodiscard]] ANTON_DECLSPEC_ALLOCATOR void* allocate(isize size, isize alignment) override;
         void deallocate(void*, isize size, isize alignment) override;
@@ -43,7 +43,7 @@ namespace anton {
     [[nodiscard]] bool operator!=(Allocator const& lhs, Allocator const& rhs);
 
     // // Buffer_Allocator
-    // class Buffer_Allocator: public Memory_Allocator {
+    // struct Buffer_Allocator: public Memory_Allocator {
     // private:
     //     struct Block_Data {
     //         Block_Data* previous_block = nullptr;
@@ -70,7 +70,7 @@ namespace anton {
     // The effective size of the buffer is smaller due to.
     //
     // template <usize Size, usize Alignment>
-    // class Stack_Allocator: public Memory_Allocator {
+    // struct Stack_Allocator: public Memory_Allocator {
     // public:
     //     [[nodiscard]] ANTON_DECLSPEC_ALLOCATOR void* allocate(isize size, isize alignment) override {}
 
@@ -104,7 +104,7 @@ namespace anton {
     // A wrapper around Memory_Allocator to allow any custom allocator to be used with any
     // container without baking the allocator type into container type.
     //
-    class Polymorphic_Allocator {
+    struct Polymorphic_Allocator {
     public:
         Polymorphic_Allocator();
         Polymorphic_Allocator(Polymorphic_Allocator const&);

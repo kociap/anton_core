@@ -9,13 +9,13 @@ namespace anton {
     constexpr char16 eof_char16 = (char16)-1;
     constexpr char32 eof_char32 = (char32)-1;
 
-    enum class Seek_Dir {
+    enum struct Seek_Dir {
         beg,
         cur,
         end,
     };
 
-    class Output_Stream {
+    struct Output_Stream {
     public:
         virtual ~Output_Stream() {}
 
@@ -30,7 +30,7 @@ namespace anton {
         [[nodiscard]] virtual i64 tell() = 0;
     };
 
-    class Input_Stream {
+    struct Input_Stream {
     public:
         virtual ~Input_Stream() {}
 

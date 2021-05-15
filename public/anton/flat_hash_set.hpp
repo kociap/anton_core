@@ -14,12 +14,11 @@ namespace anton {
     // Stores both keys and values in the main array, which minimizes memory indirections.
     // It doesn't provide pointer stability and moves data on rehashing.
     // TODO: Implement state sentinel for iterators.
-    // TODO: Add launder.
     //
     template<typename Key, typename Hash = Default_Hash<Key>, typename Key_Equal = Equal_Compare<Key>>
-    class Flat_Hash_Set {
+    struct Flat_Hash_Set {
     private:
-        enum class State : u8 {
+        enum struct State : u8 {
             empty = 0,
             active,
             deleted,
@@ -49,7 +48,7 @@ namespace anton {
         using hasher = Hash;
         using key_equal = Key_Equal;
 
-        class const_iterator {
+        struct const_iterator {
         public:
             using value_type = Key const;
             using difference_type = isize;
@@ -117,8 +116,8 @@ namespace anton {
             }
 
         private:
-            friend class Flat_Hash_Set;
-            friend class iterator;
+            friend struct Flat_Hash_Set;
+            friend struct iterator;
 
             Slot const* _slots;
             State const* _states;

@@ -9,7 +9,7 @@
 namespace anton {
     namespace detail {
         template<u64 Index, typename Type>
-        class Tuple_Child {
+        struct Tuple_Child {
         public:
             constexpr Tuple_Child() = default;
 
@@ -20,10 +20,10 @@ namespace anton {
         };
 
         template<typename, typename...>
-        class Tuple_Expand;
+        struct Tuple_Expand;
 
         template<u64... Indices, typename... Types>
-        class Tuple_Expand<Integer_Sequence<u64, Indices...>, Types...>: public Tuple_Child<Indices, Types>... {
+        struct Tuple_Expand<Integer_Sequence<u64, Indices...>, Types...>: public Tuple_Child<Indices, Types>... {
         public:
             constexpr Tuple_Expand() = default;
 
@@ -33,7 +33,7 @@ namespace anton {
     } // namespace detail
 
     template<typename... Ts>
-    class Tuple: public detail::Tuple_Expand<make_integer_sequence<u64, sizeof...(Ts)>, Ts...> {
+    struct Tuple: public detail::Tuple_Expand<make_integer_sequence<u64, sizeof...(Ts)>, Ts...> {
     private:
         using base_t = detail::Tuple_Expand<make_integer_sequence<u64, sizeof...(Ts)>, Ts...>;
 

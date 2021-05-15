@@ -6,9 +6,9 @@
 // TODO: constexpr
 
 namespace anton {
-    class String;
-    class String_View;
-    class UTF8_Chars;
+    struct String;
+    struct String_View;
+    struct UTF8_Chars;
 
     // TODO: Move to string_utility
     [[nodiscard]] bool is_whitespace(char32);
@@ -21,7 +21,7 @@ namespace anton {
     // Does not provide operator->
     // Does not provide operator[]
     //
-    class UTF8_Char_Iterator {
+    struct UTF8_Char_Iterator {
     public:
         using value_type = char32;
         using difference_type = isize;
@@ -129,7 +129,7 @@ namespace anton {
         return difference;
     }
 
-    class UTF8_Bytes {
+    struct UTF8_Bytes {
     public:
         using value_type = char8;
         using iterator = char8*;
@@ -150,7 +150,7 @@ namespace anton {
         value_type* _end;
     };
 
-    class UTF8_Const_Bytes {
+    struct UTF8_Const_Bytes {
     public:
         using value_type = char8;
         using iterator = char8 const*;
@@ -169,7 +169,7 @@ namespace anton {
         value_type const* _end;
     };
 
-    class UTF8_Chars {
+    struct UTF8_Chars {
     public:
         using value_type = char8;
         using iterator = UTF8_Char_Iterator;

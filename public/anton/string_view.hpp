@@ -218,8 +218,8 @@ namespace anton {
     [[nodiscard]] constexpr bool begins_with(String_View const string, String_View const substr) {
         char8 const* str_begin = string.bytes_begin();
         char8 const* str_end = string.bytes_end();
-        char8 const* substr_begin = string.bytes_begin();
-        char8 const* substr_end = string.bytes_end();
+        char8 const* substr_begin = substr.bytes_begin();
+        char8 const* substr_end = substr.bytes_end();
         for(; str_begin != str_end && substr_begin != substr_end; ++str_begin, ++substr_begin) {
             if(*str_begin != *substr_begin) {
                 return false;
@@ -241,8 +241,8 @@ namespace anton {
     [[nodiscard]] constexpr bool ends_with(String_View const string, String_View const substr) {
         char8 const* str_begin = string.bytes_begin() - 1;
         char8 const* str_end = string.bytes_end() - 1;
-        char8 const* substr_begin = string.bytes_begin() - 1;
-        char8 const* substr_end = string.bytes_end() - 1;
+        char8 const* substr_begin = substr.bytes_begin() - 1;
+        char8 const* substr_end = substr.bytes_end() - 1;
         for(; str_end != str_begin && substr_end != substr_begin; --str_begin, --substr_begin) {
             if(*str_end != *substr_end) {
                 return false;

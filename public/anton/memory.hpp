@@ -43,14 +43,14 @@ namespace anton {
     // Allocates a block of memory aligned to alignment.
     //
     // Parameters:
-    // size      - the number of bytes to allocate.
+    //     size  - the number of bytes to allocate.
     // alignment - alignment of the memory block. Must be a power of 2.
     //
     // Returns:
     // A newly allocated block of memory aligned to alignment
     // or nullptr if allocation failed.
     //
-    void* allocate(i64 size, i64 alignment);
+    [[nodiscard]] void* allocate(i64 size, i64 alignment);
 
     // deallocate
     // Deallocates a block of memory allocated by allocate.
@@ -66,7 +66,7 @@ namespace anton {
     //
     // Parameters:
     // first - The beginning of the memory range to fill. May be nullptr;
-    // last  - The end of the memory range to fill. If first is nullptr, must also be nullptr.
+    //  last - The end of the memory range to fill. If first is nullptr, must also be nullptr.
     // value - The value to fill the memory range with.
     //
     void fill_memory(void* first, void* last, char8 value);
@@ -76,10 +76,17 @@ namespace anton {
     //
     // Parameters:
     // first - The beginning of the memory range to fill. May be nullptr;
-    // last  - The end of the memory range to fill. If first is nullptr, must also be nullptr.
+    //  last - The end of the memory range to fill. If first is nullptr, must also be nullptr.
     //
     void zero_memory(void* first, void* last);
 
+    // construct
+    // Construct an object of type T at pointer with args forwarded to the constructor.
+    //
+    // Parameters:
+    // pointer - memory location where to construct the object.
+    // args... - arguments to forward to the constructor.
+    //
     template<typename T, typename... Args>
     void construct(T* pointer, Args&&... args) {
         if constexpr(is_constructible<T, decltype(ANTON_FWD(args))...>) {
@@ -89,6 +96,37 @@ namespace anton {
         }
     }
 
+    // new_obj
+    // Allocate memory and construct a single new object of type T.
+    //
+    // Parameters:
+    // args... - arguments to forward to the constructor.
+    //
+    template<typename T, typename... Args>
+    [[nodiscard]] T* new_obj(Args&&... args) {
+        T* const p = (T*)allocate(sizeof(T), alignof(T));
+        construct(p, ANTON_FWD(args)...);
+        return p;
+    }
+
+    // delete_obj
+    // Destruct a single object of type T allocated by new_obj and deallocate memory.
+    //
+    // Parameters:
+    // pointer - pointer to the object to delete.
+    //
+    template<typename T>
+    void delete_obj(T* pointer) {
+        pointer->~T();
+        deallocate(pointer);
+    }
+
+    // destruct
+    // Destruct an object of type T at pointer.
+    //
+    // Parameters:
+    // pointer - pointer to the object to destruct.
+    //
     template<typename T>
     void destruct(T* pointer) {
         pointer->~T();

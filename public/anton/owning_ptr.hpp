@@ -16,8 +16,6 @@ namespace anton {
     // The object is destroyed using either a user-supplied deleter or the delete operator if the user did not provide a deleter.
     // Deleter is a function pointer. Stateful deleters are not suporrted.
     //
-    // TODO: Fix new/deallocate mismatch
-    //
     template<typename T>
     struct Owning_Ptr {
     public:
@@ -36,10 +34,10 @@ namespace anton {
         Owning_Ptr(T* pointer, deleter_type deleter): _pointer(pointer), _deleter(deleter) {}
 
         template<typename... Args>
-        Owning_Ptr(Variadic_Construct_Tag tag, Args&&... args): _pointer(new T(ANTON_FWD(args)...)) {}
+        Owning_Ptr(Variadic_Construct_Tag tag, Args&&... args): _pointer(new_obj<T>(ANTON_FWD(args)...)) {}
 
         template<typename... Args>
-        Owning_Ptr(deleter_type deleter, Variadic_Construct_Tag tag, Args&&... args): _pointer(new T(ANTON_FWD(args)...)), _deleter(deleter) {}
+        Owning_Ptr(deleter_type deleter, Variadic_Construct_Tag tag, Args&&... args): _pointer(new_obj<T>(ANTON_FWD(args)...)), _deleter(deleter) {}
 
         Owning_Ptr(Owning_Ptr const& other) = delete;
 

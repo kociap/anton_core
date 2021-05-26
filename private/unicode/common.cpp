@@ -249,6 +249,11 @@ namespace anton::unicode {
         }
     }
 
+    char32 convert_codepoint_utf8_to_utf32(char8 const* buffer_utf8) {
+        auto const [codepoint, byte_count] = utf8_bytes_to_codepoint(buffer_utf8);
+        return codepoint;
+    }
+
     i64 convert_utf8_to_utf32(char8 const* buffer_utf8, i64 const count, char32* buffer_utf32) {
         if constexpr(ANTON_UNICODE_VALIDATE_ENCODING) {
             // TODO: Implement

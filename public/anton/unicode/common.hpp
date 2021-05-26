@@ -85,6 +85,19 @@ namespace anton::unicode {
     //
     i64 convert_utf8_to_utf16(char8 const* buffer_utf8, i64 count, char16* buffer_utf16);
 
+    // convert_codepoint_utf8_to_utf32
+    // Converts a single UTF-8 encoded codepoint contained in buffer_utf8 into a UTF-32
+    // encoded codepoint.
+    // This function accesses only as many bytes as indicated by the leading byte.
+    //
+    // Parameters:
+    // buffer_utf8 - a buffer containing the UTF-8 encoded codepoint.
+    //
+    // Returns:
+    // UTF-32 encoded codepoint.
+    //
+    char32 convert_codepoint_utf8_to_utf32(char8 const* buffer_utf8);
+
     // convert_utf8_to_utf32
     // Converts a UTF-8 encoded string contained in buffer_utf8 to a UTF-32 encoded
     // string and writes it to buffer_utf32.

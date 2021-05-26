@@ -17,9 +17,13 @@ namespace anton::unicode {
         //  - 11 bits in 2 bytes
         //  - 16 bits in 3 bytes
         //  - 21 bits in 4 bytes
-        // Since the max bit count increases by 5 per added byte, we can calculate
-        // the number of bytes by performing integer division by 5.
-        u32 const byte_count = (highest_bit - 7 + 4) / 5 + 1;
+        // There is no linear relation between the max number of bits and the number of bytes,
+        // so we are going to check each threshold separately.
+        bool const has_byte_2 = highest_bit > 7;
+        bool const has_byte_3 = highest_bit > 11;
+        bool const has_byte_4 = highest_bit > 16;
+        // First byte is always present
+        u32 const byte_count = 1 + has_byte_2 + has_byte_3 + has_byte_4;
         return byte_count;
     }
 

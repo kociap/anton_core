@@ -22,9 +22,8 @@ namespace anton {
 
     UTF8_Char_Iterator& UTF8_Char_Iterator::operator++() {
         if(_offset >= 0) {
-            u8 const first_byte = *_data;
-            u8 const leading_zeros = math::clz((u8)~first_byte);
-            u32 const byte_count = math::max((u8)1, leading_zeros);
+            u8 const leading_byte = *_data;
+            u32 const byte_count = unicode::get_byte_count_from_utf8_leading_byte(leading_byte);
             _data += byte_count;
             _offset += byte_count;
             return *this;
@@ -82,9 +81,7 @@ namespace anton {
     }
 
     UTF8_Char_Iterator::value_type UTF8_Char_Iterator::operator*() const {
-        char32 c;
-        i64 const byte_count = unicode::get_byte_count_from_utf8_leading_byte(_data[0]);
-        unicode::convert_utf8_to_utf32(_data, byte_count, &c);
+        char32 const c = unicode::convert_codepoint_utf8_to_utf32(_data);
         return c;
     }
 

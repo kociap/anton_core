@@ -1,5 +1,6 @@
 #pragma once
 
+#include <anton/array.hpp>
 #include <anton/stream.hpp>
 #include <anton/string.hpp>
 #include <anton/string_view.hpp>
@@ -51,6 +52,18 @@ namespace anton::fs {
     // Obtain size of a file in bytes.
     //
     i64 file_size(String_View path);
+
+    // enumerate_directories
+    // Enumerates all subdirectories within the directory identified by path.
+    // Does not include the current directory (".") or the parent directory ("..").
+    //
+    // Parameters:
+    // path - directory to enumerate. The path must not end in a slash ('/' or '\\').
+    //
+    // Returns:
+    // Array of subdirectory names relative to path.
+    //
+    Array<String> enumerate_directories(String_View path);
 
     enum struct Open_Mode : u32 {
         // Has effect only on Windows. Makes all reading operations translate the \n\r sequences into \n.

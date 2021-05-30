@@ -156,6 +156,47 @@ namespace anton::fs {
         return static_cast<i64>(std::filesystem::file_size(a));
     }
 
+    Array<String> enumerate_directories(String_View path) {
+        // We have to append the wildcard character at the end /* to search the directory.
+        // TODO: Consider prefixing the path with \\?\ to enable long paths.
+        String path_match{reserve, path.size_bytes() + 2};
+        path_match += path;
+        path_match += u8"/*"_sv;
+
+        // Convert to UTF-16
+        i64 const wpath_length = unicode::convert_utf8_to_utf16(path_match.data(), path_match.size_bytes(), nullptr);
+        // Add 1 to the length for null-terminator
+        Array<char16> wpath(1 + wpath_length / sizeof(char16), 0);
+        unicode::convert_utf8_to_utf16(path_match.data(), path_match.size_bytes(), wpath.data());
+
+        WIN32_FIND_DATA data = {};
+        // We use FindExInfoBasic because we don't want the 8.3 name.
+        HANDLE find_handle = FindFirstFileExW((wchar_t*)wpath.data(), FindExInfoBasic, &data, FindExSearchLimitToDirectories, nullptr, 0);
+        if(find_handle == INVALID_HANDLE_VALUE) {
+            return {};
+        }
+
+        Array<String> directories;
+        while(true) {
+            // The FindExSearchLimitToDirectories flag might be silently ignored
+            if(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+                // We don't want to enumerate '.' and '..' directories
+                bool const is_current_directory = data.cFileName[0] == '.' && data.cFileName[1] == '\0';
+                bool const is_parent_directory = data.cFileName[0] == '.' && data.cFileName[1] == '.' && data.cFileName[2] == '\0';
+                if(!is_current_directory && !is_parent_directory) {
+                    String directory = String::from_utf16((char16*)data.cFileName);
+                    directories.emplace_back(ANTON_MOV(directory));
+                }
+            }
+
+            bool const r = FindNextFileW(find_handle, &data);
+            if(!r) {
+                break;
+            }
+        }
+        return directories;
+    }
+
     Output_File_Stream::Output_File_Stream() {}
 
     Output_File_Stream::Output_File_Stream(String const& filename) {

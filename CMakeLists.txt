@@ -139,3 +139,37 @@ else()
 endif()
 
 target_link_libraries(anton_core PUBLIC anton_math PRIVATE DbgHelp)
+
+# Detect compilers
+
+# clang++ (CLANG)
+string(FIND "${CMAKE_CXX_COMPILER}" "clang++" ANTON_COMPILER_CLANGPP)
+if(ANTON_COMPILER_CLANGPP GREATER -1)
+  set(ANTON_COMPILER_CLANGPP ON)
+else()
+  set(ANTON_COMPILER_CLANGPP OFF)
+endif()
+
+# clang-cl (CLANG)
+string(FIND "${CMAKE_CXX_COMPILER}" "clang-cl" ANTON_COMPILER_CLANGCL)
+if(ANTON_COMPILER_CLANGCL GREATER -1)
+  set(ANTON_COMPILER_CLANGCL ON)
+else()
+  set(ANTON_COMPILER_CLANGCL OFF)
+endif()
+
+# cl (MSVC)
+string(FIND "${CMAKE_CXX_COMPILER}" "cl" ANTON_COMPILER_CL)
+if(ANTON_COMPILER_CL GREATER -1)
+  set(ANTON_COMPILER_CL ON)
+else()
+  set(ANTON_COMPILER_CL OFF)
+endif()
+
+if(ANTON_COMPILER_CLANGPP OR ANTON_COMPILER_CLANGCL)
+    target_compile_definitions(anton_core PUBLIC ANTON_COMPILER_CLANG=1 ANTON_COMPILER_MSVC=0)
+elseif(ANTON_COMPILER_CL)
+    target_compile_definitions(anton_core PUBLIC ANTON_COMPILER_CLANG=0 ANTON_COMPILER_MSVC=1)
+else()
+    message(FATAL "unrecognized compiler")
+endif()

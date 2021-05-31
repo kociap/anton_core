@@ -429,7 +429,7 @@ namespace anton {
     struct Is_Trivially_Destructible: Bool_Constant<__is_trivially_destructible(T)> {};
 
     template<typename T>
-    constexpr bool is_trivially_destructible = __is_trivially_destructible(T)
+    constexpr bool is_trivially_destructible = __is_trivially_destructible(T);
 #else
     // GCC provides __has_trivial_destructor instead of __is_trivially_destructible
 
@@ -440,7 +440,7 @@ namespace anton {
     constexpr bool is_trivially_destructible = __has_trivial_destructor(T);
 #endif // ANTON_COMPILER_CLANG || ANTON_COMPILER_MSVC
 
-        namespace detail {
+    namespace detail {
         template<typename T>
         struct Is_Integral: False_Type {};
         // clang-format off

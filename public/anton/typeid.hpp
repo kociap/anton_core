@@ -1,3 +1,5 @@
+#pragma once
+
 #include <anton/string_view.hpp>
 #include <anton/types.hpp>
 
@@ -17,10 +19,9 @@ namespace anton {
         //     String_View type_name() [T = name]
         // Aliases will be expanded. We want to extract the name from the string.
         constexpr String_View fn = __PRETTY_FUNCTION__;
-        // Add 3 because we have to skip the " = "
         constexpr i64 begin_offset = 29;
         constexpr i64 end_offset = 1;
-        return String_View{fn.bytes_begin() + end_offset, fn.bytes_end() - end_offset};
+        return String_View{fn.bytes_begin() + begin_offset, fn.bytes_end() - end_offset};
 #elif ANTON_COMPILER_MSVC
         // __FUNCSIG__ will be defined as:
         // - for structs:

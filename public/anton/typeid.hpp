@@ -16,25 +16,26 @@ namespace anton {
     constexpr String_View type_name() {
 #if ANTON_COMPILER_CLANG
         // __PRETTY_FUNCTION__ will be defined as:
-        //     String_View type_name() [T = name]
+        //     anton::String_View anton::type_name() [T = name]
         // Aliases will be expanded. We want to extract the name from the string.
         constexpr String_View fn = __PRETTY_FUNCTION__;
-        constexpr i64 begin_offset = 29;
+        constexpr i64 begin_offset = 43;
         constexpr i64 end_offset = 1;
         return String_View{fn.bytes_begin() + begin_offset, fn.bytes_end() - end_offset};
 #elif ANTON_COMPILER_MSVC
+        // TODO: NAMESPACES
         // __FUNCSIG__ will be defined as:
         // - for structs:
-        //     struct String_View __cdecl type_name<struct name>(void)
+        //     struct anton::String_View __cdecl anton::type_name<struct name>(void)
         // - for classes:
-        //     struct String_View __cdecl type_name<class name>(void)
+        //     struct anton::String_View __cdecl anton::type_name<class name>(void)
         // - for enums:
-        //     struct String_View __cdecl type_name<enum name>(void)
+        //     struct anton::String_View __cdecl anton::type_name<enum name>(void)
         // - for other types:
-        //     struct String_View __cdecl type_name<name>(void)
+        //     struct anton::String_View __cdecl anton::type_name<name>(void)
         // Aliases will be expanded. We want to extract the name from the string.
         constexpr String_View fn = __FUNCSIG__;
-        constexpr i64 begin_offset = 37;
+        constexpr i64 begin_offset = 51;
         constexpr i64 end_offset = 7;
         constexpr String_View qualified_type{fn.bytes_begin() + begin_offset, fn.bytes_end() - end_offset};
         // Remove the qualification

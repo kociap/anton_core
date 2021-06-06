@@ -77,12 +77,12 @@ namespace anton {
     } // namespace detail
 
     template<typename... Args>
-    String format(Format_Buffer& buffer, String_View const format_string, Args&&... args) {
+    [[nodiscard]] String format(Format_Buffer& buffer, String_View const format_string, Args&&... args) {
         return detail::format(buffer, format_string, Formatter<decay<Args>>(ANTON_FWD(args))...);
     }
 
     template<typename... Args>
-    String format(String_View const format_string, Args&&... args) {
+    [[nodiscard]] String format(String_View const format_string, Args&&... args) {
         return detail::format(format_string, Formatter<decay<Args>>(ANTON_FWD(args))...);
     }
 } // namespace anton

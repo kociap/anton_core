@@ -12,6 +12,14 @@
 #include <string_view>
 
 namespace anton::fs {
+    static Array<char16> string8_to_string16(String_View const string8) {
+        i64 const string16_bytes = unicode::convert_utf8_to_utf16(string8.data(), string8.size_bytes(), nullptr);
+        // Add 1 to the length for null-terminator.
+        Array<char16> string16(1 + string16_bytes / sizeof(char16), 0);
+        unicode::convert_utf8_to_utf16(string8.data(), string8.size_bytes(), string16.data());
+        return string16;
+    }
+
     static String fs_path_to_string(std::filesystem::path const& path) {
         std::string gen_str = path.generic_string();
         return String{gen_str.data(), (i64)gen_str.size()};
@@ -100,12 +108,10 @@ namespace anton::fs {
     }
 
     i64 get_last_write_time(String_View path) {
-        i64 const wpath_length = unicode::convert_utf8_to_utf16(path.data(), path.size_bytes(), nullptr);
-        // Add 1 to the length for null-terminator.
-        Array<char16> wpath(1 + wpath_length / sizeof(char16), 0);
-        unicode::convert_utf8_to_utf16(path.data(), path.size_bytes(), wpath.data());
+        Array<char16> const wpath = string8_to_string16(path);
         // Open file for reading, allow other processes to open for reading, must exist.
-        HANDLE const file_handle = CreateFileW((wchar_t*)wpath.data(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        HANDLE const file_handle =
+            CreateFileW((wchar_t const*)wpath.data(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
         if(file_handle == INVALID_HANDLE_VALUE) {
             return -1;
         }
@@ -145,6 +151,22 @@ namespace anton::fs {
         return fs_path_to_string(a.parent_path());
     }
 
+    bool copy_file(String_View source, String_View destination, bool overwrite) {
+        Array<char16> const source16 = string8_to_string16(source);
+        Array<char16> const destination16 = string8_to_string16(destination);
+        BOOL cancel = false;
+        // We set the NO_BUFFERING flag to support large files,
+        // since the microsoft documentation says that it's recommended for large files.
+        // https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-copyfileexa
+        u32 flags = COPY_FILE_NO_BUFFERING;
+        if(!overwrite) {
+            flags |= COPY_FILE_FAIL_IF_EXISTS;
+        }
+
+        bool const result = CopyFileEx((wchar_t const*)source16.data(), (wchar_t const*)destination16.data(), nullptr, nullptr, &cancel, flags);
+        return result;
+    }
+
     void rename(String_View const from, String_View const to) {
         std::filesystem::path a(std::string_view(from.data(), from.size_bytes()));
         std::filesystem::path b(std::string_view(to.data(), to.size_bytes()));
@@ -163,15 +185,10 @@ namespace anton::fs {
         path_match += path;
         path_match += u8"/*"_sv;
 
-        // Convert to UTF-16
-        i64 const wpath_length = unicode::convert_utf8_to_utf16(path_match.data(), path_match.size_bytes(), nullptr);
-        // Add 1 to the length for null-terminator
-        Array<char16> wpath(1 + wpath_length / sizeof(char16), 0);
-        unicode::convert_utf8_to_utf16(path_match.data(), path_match.size_bytes(), wpath.data());
-
+        Array<char16> const wpath = string8_to_string16(path_match);
         WIN32_FIND_DATA data = {};
         // We use FindExInfoBasic because we don't want the 8.3 name.
-        HANDLE find_handle = FindFirstFileExW((wchar_t*)wpath.data(), FindExInfoBasic, &data, FindExSearchLimitToDirectories, nullptr, 0);
+        HANDLE find_handle = FindFirstFileExW((wchar_t const*)wpath.data(), FindExInfoBasic, &data, FindExSearchLimitToDirectories, nullptr, 0);
         if(find_handle == INVALID_HANDLE_VALUE) {
             return {};
         }

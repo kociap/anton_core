@@ -46,6 +46,22 @@ namespace anton::fs {
     [[nodiscard]] bool has_filename(String_View path);
     [[nodiscard]] bool exists(String_View path);
 
+    // copy_file
+    // Copies and existing file to a new file.
+    // If the file does not exist, this function will return false.
+    //
+    // Parameters:
+    //      source - the name of an existing file.
+    // destination - the new name of the copied file.
+    //   overwrite - whether to overwrite the file if it already extists.
+    //               If this parameter is false, the existing file is kept
+    //               and no copies are performed.
+    //
+    // Returns:
+    // true if the file has been copied, false otherwise.
+    //
+    bool copy_file(String_View source, String_View destination, bool overwrite);
+
     void rename(String_View from, String_View to);
 
     // file_size

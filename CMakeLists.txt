@@ -38,6 +38,7 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/detail/tuple.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/detail/utility.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/hashing/murmurhash2.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/memory/core.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/unicode/common.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/algorithm.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/aligned_buffer.hpp"

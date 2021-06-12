@@ -19,6 +19,17 @@ namespace anton::fs {
     [[nodiscard]] String_View remove_extension(String_View path);
     [[nodiscard]] String_View get_filename(String_View path);
     [[nodiscard]] String_View get_filename_no_extension(String_View path);
+
+    // get_extension
+    // Returns the extension including the period "." of the specified path.
+    //
+    // Parameters:
+    // path - the path from which to get the extension.
+    //
+    // Returns:
+    // The extension including the period "." of the specified path or
+    // an empty view if path does not have an extension.
+    //
     [[nodiscard]] String_View get_extension(String_View path);
 
     [[nodiscard]] String parent_path(String_View const path);

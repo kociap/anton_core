@@ -89,15 +89,28 @@ namespace anton::fs {
     }
 
     String_View get_directory_name(String_View const path) {
-        // TODO: Doesn't correctly handle drives or path root
         auto i = path.chars_end() - 1;
-        for(auto const begin = path.chars_begin() - 1; i != begin; --i) {
+        auto const begin = path.chars_begin() - 1;
+        for(; i != begin; --i) {
             char32 const c = *i;
             if(c == U'/' || c == U'\\') {
-                return {path.chars_begin(), i};
+                break;
             }
         }
-        return {};
+
+        if(i == begin) {
+            return {};
+        }
+
+        String_View directory_name{path.chars_begin(), i};
+        // Handle root directory
+        if(ends_with(directory_name, ":"_sv)) {
+            // The path specifies a drive (identified by the volume separator ":").
+            // We return an empty string in this case.
+            return {};
+        }
+
+        return directory_name;
     }
 
     String make_relative(String_View path, String_View base_path) {

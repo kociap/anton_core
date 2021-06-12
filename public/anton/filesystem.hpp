@@ -35,7 +35,16 @@ namespace anton::fs {
     [[nodiscard]] String parent_path(String_View const path);
 
     // get_directory_name
-    // Does not support paths using "file:".
+    // Returns the directory information for the specified path.
+    // Does not support paths using "file:". Does not support UNC.
+    //
+    // Parameters:
+    // path - the path of a file or directory.
+    //
+    // Returns:
+    // Returns a string consisting of all characters in path up to, but not including,
+    // the last directory separator. If the path consists of a root directory, e.g. "C:/",
+    // the returned string is empty.
     //
     [[nodiscard]] String_View get_directory_name(String_View path);
 
@@ -72,6 +81,17 @@ namespace anton::fs {
     // true if the file has been copied, false otherwise.
     //
     bool copy_file(String_View source, String_View destination, bool overwrite);
+
+    struct Copy_Options {
+        // Whether to overwrite the directories if they already exist.
+        // If false, the existing files and directories are kept.
+        bool overwrite;
+        // Whether to copy all subdirectories.
+        bool recursive;
+        // Whether to copy only the directory structure.
+        // If false, all files within the directories are also copied.
+        bool only_directories;
+    };
 
     void rename(String_View from, String_View to);
 

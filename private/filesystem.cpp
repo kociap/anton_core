@@ -63,11 +63,13 @@ namespace anton::fs {
     String_View get_filename(String_View const path) {
         for(auto i = path.chars_end() - 1, begin = path.chars_begin() - 1; i != begin; --i) {
             char32 const c = *i;
-            if(c == U'/' || c == U'\\') {
+            if(c == U'/' || c == U'\\' || c == U':') {
                 return {i + 1, path.chars_end()};
             }
         }
-        return {};
+        // The path does not contain a directory separator or a volume separator,
+        // therefore the entire path is the filename.
+        return path;
     }
 
     String_View get_filename_no_extension(String_View const path) {

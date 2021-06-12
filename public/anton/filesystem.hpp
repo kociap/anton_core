@@ -17,7 +17,30 @@ namespace anton::fs {
 
     [[nodiscard]] String_View remove_filename(String_View path);
     [[nodiscard]] String_View remove_extension(String_View path);
+
+    // get_filename
+    // Returns the filename and extension of the specified path.
+    // Does not support paths using "file:". Does not support UNC.
+    //
+    // Parameters:
+    // path - the path from which to get the filename and extension.
+    //
+    // Returns:
+    // A string containing the characters after the last directory or volume separator.
+    //
     [[nodiscard]] String_View get_filename(String_View path);
+
+    // get_filename_no_extension
+    // Returns the filename of the specified path without the extension.
+    // Does not support paths using "file:". Does not support UNC.
+    //
+    // Parameters:
+    // path - the path from which to get the filename.
+    //
+    // Returns:
+    // A string containing the characters after the last directory or volume separator
+    // exlcuding the last period and the characters following it.
+    //
     [[nodiscard]] String_View get_filename_no_extension(String_View path);
 
     // get_extension

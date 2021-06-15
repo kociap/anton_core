@@ -160,18 +160,22 @@ namespace anton {
         // and then copying value into position.
         // position must be a valid iterator.
         //
-        // Returns: iterator to the inserted element.
+        // Returns:
+        // Iterator to the inserted element.
         //
         iterator insert_unsorted(const_iterator position, value_type const& value);
+        iterator insert_unsorted(const_iterator position, value_type&& value);
 
         // insert_unsorted
         // Inserts an element into array by moving the object at position to the end of the array
         // and then copying value into position.
         // position must be an index greater than or equal 0 and less than or equal size.
         //
-        // Returns: iterator to the inserted element.
+        // Returns:
+        // Iterator to the inserted element.
         //
         iterator insert_unsorted(size_type position, value_type const& value);
+        iterator insert_unsorted(size_type position, value_type&& value);
 
         T& push_back(value_type const&);
         T& push_back(value_type&&);
@@ -610,6 +614,12 @@ namespace anton {
     }
 
     template<typename T, typename Allocator>
+    auto Array<T, Allocator>::insert_unsorted(const_iterator position, value_type&& value) -> iterator {
+        size_type const offset = static_cast<size_type>(position - begin());
+        return insert_unsorted(offset, ANTON_MOV(value));
+    }
+
+    template<typename T, typename Allocator>
     auto Array<T, Allocator>::insert_unsorted(size_type position, value_type const& value) -> iterator {
         if constexpr(ANTON_ITERATOR_DEBUG) {
             ANTON_FAIL(position >= 0 && position <= _size, u8"index out of bounds");
@@ -627,6 +637,30 @@ namespace anton {
             }
             anton::destruct(elem_ptr);
             anton::construct(elem_ptr, value);
+        }
+
+        ++_size;
+        return elem_ptr;
+    }
+
+    template<typename T, typename Allocator>
+    auto Array<T, Allocator>::insert_unsorted(size_type position, value_type&& value) -> iterator {
+        if constexpr(ANTON_ITERATOR_DEBUG) {
+            ANTON_FAIL(position >= 0 && position <= _size, u8"index out of bounds");
+        }
+
+        ensure_capacity(_size + 1);
+        T* elem_ptr = _data + position;
+        if(position == _size) {
+            anton::construct(elem_ptr, ANTON_MOV(value));
+        } else {
+            if constexpr(is_move_constructible<T>) {
+                anton::construct(_data + _size, ANTON_MOV(*elem_ptr));
+            } else {
+                anton::construct(_data + _size, *elem_ptr);
+            }
+            anton::destruct(elem_ptr);
+            anton::construct(elem_ptr, ANTON_MOV(value));
         }
 
         ++_size;

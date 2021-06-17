@@ -211,7 +211,8 @@ namespace anton::fs {
         Array<String> directories;
         while(true) {
             // The FindExSearchLimitToDirectories flag might be silently ignored
-            if(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+            bool const is_directory = data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+            if(is_directory) {
                 // We don't want to enumerate '.' and '..' directories
                 bool const is_current_directory = data.cFileName[0] == '.' && data.cFileName[1] == '\0';
                 bool const is_parent_directory = data.cFileName[0] == '.' && data.cFileName[1] == '.' && data.cFileName[2] == '\0';
@@ -226,6 +227,45 @@ namespace anton::fs {
                 break;
             }
         }
+
+        // The Microsoft documentation states that FindClose might fail.
+        // I am unsure what to do in such case.
+        FindClose(find_handle);
+        return directories;
+    }
+
+    Array<String> enumerate_files(String_View path) {
+        // We have to append the wildcard character at the end /* to search the directory.
+        // TODO: Consider prefixing the path with \\?\ to enable long paths.
+        String path_match{reserve, path.size_bytes() + 2};
+        path_match += path;
+        path_match += u8"/*"_sv;
+
+        Array<char16> const wpath = string8_to_string16(path_match);
+        WIN32_FIND_DATA data = {};
+        // We use FindExInfoBasic because we don't want the 8.3 name.
+        HANDLE find_handle = FindFirstFileExW((wchar_t const*)wpath.data(), FindExInfoBasic, &data, FindExSearchNameMatch, nullptr, 0);
+        if(find_handle == INVALID_HANDLE_VALUE) {
+            return {};
+        }
+
+        Array<String> directories;
+        while(true) {
+            bool const is_file = !(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+            if(is_file) {
+                String directory = String::from_utf16((char16*)data.cFileName);
+                directories.emplace_back(ANTON_MOV(directory));
+            }
+
+            bool const r = FindNextFileW(find_handle, &data);
+            if(!r) {
+                break;
+            }
+        }
+
+        // The Microsoft documentation states that FindClose might fail.
+        // I am unsure what to do in such case.
+        FindClose(find_handle);
         return directories;
     }
 

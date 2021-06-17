@@ -135,6 +135,17 @@ namespace anton::fs {
     //
     Array<String> enumerate_directories(String_View path);
 
+    // enumerate_files
+    // Enumerates all files within the directory identified by path.
+    //
+    // Parameters:
+    // path - directory to enumerate. The path must not end in a slash ('/' or '\\').
+    //
+    // Returns:
+    // Array of file names relative to path.
+    //
+    Array<String> enumerate_files(String_View path);
+
     enum struct Open_Mode : u32 {
         // Has effect only on Windows. Makes all reading operations translate the \n\r sequences into \n.
         // Opposite of std::ios_base::open_mode::binary.

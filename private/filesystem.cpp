@@ -182,6 +182,18 @@ namespace anton::fs {
         return result;
     }
 
+    bool delete_file(String_View path) {
+        Array<char16> const path16 = string8_to_string16(path);
+        bool const r = DeleteFileW((wchar_t const*)path16.data());
+        return r;
+    }
+
+    bool delete_directory(String_View path) {
+        Array<char16> const path16 = string8_to_string16(path);
+        bool const r = RemoveDirectoryW((wchar_t const*)path16.data());
+        return r;
+    }
+
     void rename(String_View const from, String_View const to) {
         std::filesystem::path a(std::string_view(from.data(), from.size_bytes()));
         std::filesystem::path b(std::string_view(to.data(), to.size_bytes()));

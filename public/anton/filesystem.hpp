@@ -89,6 +89,17 @@ namespace anton::fs {
     [[nodiscard]] bool has_filename(String_View path);
     [[nodiscard]] bool exists(String_View path);
 
+    struct Copy_Options {
+        // Whether to overwrite the directories if they already exist.
+        // If false, the existing files and directories are kept.
+        bool overwrite;
+        // Whether to copy all subdirectories.
+        bool recursive;
+        // Whether to copy only the directory structure.
+        // If false, all files within the directories are also copied.
+        bool only_directories;
+    };
+
     // copy_file
     // Copies and existing file to a new file.
     // If the file does not exist, this function will return false.
@@ -105,16 +116,29 @@ namespace anton::fs {
     //
     bool copy_file(String_View source, String_View destination, bool overwrite);
 
-    struct Copy_Options {
-        // Whether to overwrite the directories if they already exist.
-        // If false, the existing files and directories are kept.
-        bool overwrite;
-        // Whether to copy all subdirectories.
-        bool recursive;
-        // Whether to copy only the directory structure.
-        // If false, all files within the directories are also copied.
-        bool only_directories;
-    };
+    // delete_file
+    // Deletes an existing file.
+    // If the file does not exist, this function will return false.
+    //
+    // Parameters:
+    // path - the name of the file to be deleted.
+    //
+    // Returns:
+    // true if the file has been deleted, false otherwise.
+    //
+    bool delete_file(String_View path);
+
+    // delete_directory
+    // Deletes an existing empty directory.
+    // If the directory does not exist, this function will return false.
+    //
+    // Parameters:
+    // path - the name of the empty directory to be deleted.
+    //
+    // Returns:
+    // true if the file has been deleted, false otherwise.
+    //
+    bool delete_directory(String_View path);
 
     void rename(String_View from, String_View to);
 

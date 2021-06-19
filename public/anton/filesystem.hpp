@@ -145,7 +145,7 @@ namespace anton::fs {
     // file_size
     // Obtain size of a file in bytes.
     //
-    i64 file_size(String_View path);
+    [[nodiscard]] i64 file_size(String_View path);
 
     // enumerate_directories
     // Enumerates all subdirectories within the directory identified by path.
@@ -157,7 +157,7 @@ namespace anton::fs {
     // Returns:
     // Array of subdirectory names relative to path.
     //
-    Array<String> enumerate_directories(String_View path);
+    [[nodiscard]] Array<String> enumerate_directories(String_View path);
 
     // enumerate_files
     // Enumerates all files within the directory identified by path.
@@ -168,7 +168,7 @@ namespace anton::fs {
     // Returns:
     // Array of file names relative to path.
     //
-    Array<String> enumerate_files(String_View path);
+    [[nodiscard]] Array<String> enumerate_files(String_View path);
 
     enum struct Open_Mode : u32 {
         // Has effect only on Windows. Makes all reading operations translate the \n\r sequences into \n.

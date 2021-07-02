@@ -140,16 +140,15 @@ namespace anton::stacktrace {
     }
 
     [[nodiscard]] static String process_pointer_type(HANDLE const process, ULONG64 const module_base, ULONG64 const index) {
-        bool is_reference = false;
-        // For some bizzare reason `process` changes after the call to SymGetTypeInfo,
-        // so we make a copy of the valid value and use it instead.
-        HANDLE const prcs = process;
+        // SymGetTypeInfo writes a DWORD instead of the documented
+        // boolean when the GetType parameter is TI_GET_IS_REFERENCE.
+        DWORD is_reference = false;
         if(!SymGetTypeInfo(process, module_base, index, TI_GET_IS_REFERENCE, &is_reference)) {
             return u8"unknown_type"_s;
         }
 
-        if(DWORD type_index = 0; SymGetTypeInfo(prcs, module_base, index, TI_GET_TYPEID, &type_index)) {
-            String subtype = get_type_as_string(prcs, module_base, type_index);
+        if(DWORD type_index = 0; SymGetTypeInfo(process, module_base, index, TI_GET_TYPEID, &type_index)) {
+            String subtype = get_type_as_string(process, module_base, type_index);
             if(is_reference) {
                 subtype += U'&';
             } else {

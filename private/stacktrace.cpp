@@ -213,7 +213,11 @@ namespace anton::stacktrace {
             return u8"unknown_function"_s;
         }
 
-        if(WCHAR* fn_name_wchar = nullptr; SymGetTypeInfo(process, module_base, index, TI_GET_SYMNAME, &fn_name_wchar)) {
+        WCHAR* fn_name_wchar = nullptr;
+        bool const success = SymGetTypeInfo(process, module_base, index, TI_GET_SYMNAME, &fn_name_wchar);
+        // For some reason SymGetTypeInfo may return true, but still not return a valid pointer in fn_name_wchar.
+        // We must guard against that undocumented behaviour with a nullptr check.
+        if(success && fn_name_wchar != nullptr) {
             String function_name = String::from_utf16(reinterpret_cast<char16_t*>(fn_name_wchar));
             LocalFree(fn_name_wchar);
             return process_function_type(process, module_base, type_index, function_name);

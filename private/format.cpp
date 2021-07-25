@@ -4,11 +4,7 @@
 #include <anton/assert.hpp>
 
 namespace anton {
-    struct Format_Field {
-        bool dont_print;
-    };
-
-    static bool parse_format_string(String_View const string, Array<String_View>& string_slices, Array<Format_Field>& format_fields) {
+    static bool parse_format_string(String_View const string, Array<String_View>& string_slices, Array<String_View>& format_fields) {
         auto i = string.chars_begin();
         auto const end = string.chars_end();
         auto str_slice_begin = i;
@@ -22,36 +18,35 @@ namespace anton {
                 return true;
             }
 
-            // Check if we've encountered an escaped brace `{{`.
+            // Check whether we've encountered an escaped brace `{{`.
             auto backup = i;
-            if(++i != end) {
-                if(*i == U'{') {
-                    string_slices.emplace_back(str_slice_begin, i);
-                    format_fields.emplace_back(true);
-                    ++i;
-                    str_slice_begin = i;
-                    continue;
-                } else {
-                    i = backup;
-                    string_slices.emplace_back(str_slice_begin, i);
-                }
-            } else {
+            ++i;
+            if(i == end) {
                 // Invalid string format - missing matching `}`.
                 return false;
             }
 
-            // TODO: Currently only supports `{}` as format.
+            auto format_field_begin = i;
+            if(*i == U'{') {
+                // We have found an escaped brace.
+                continue;
+            } else {
+                // We have found a format field.
+                string_slices.emplace_back(str_slice_begin, backup);
+                i = backup;
+            }
+
             while(i != end && *i != U'}') {
                 ++i;
             }
 
-            if(i != end && *i == U'}') {
-                format_fields.emplace_back(false);
-                str_slice_begin = ++i;
-            } else {
-                //Invalid string format - missing matching `}`;
+            if(i == end) {
+                // Invalid string format - missing matching `}`.
                 return false;
             }
+
+            format_fields.emplace_back(format_field_begin, i);
+            str_slice_begin = ++i;
         }
     }
 
@@ -132,7 +127,7 @@ namespace anton {
 
     String detail::format_internal(Format_Buffer& buffer, String_View const format_string, Slice<Formatter_Base const* const> const arguments) {
         Array<String_View> string_slices;
-        Array<Format_Field> format_fields;
+        Array<String_View> format_fields;
         if(!parse_format_string(format_string, string_slices, format_fields)) {
             ANTON_FAIL(false, "invalid format string");
         }
@@ -142,20 +137,14 @@ namespace anton {
             ANTON_FAIL(false, "mismatched argument and format fields counts");
         }
 
-        auto field = format_fields.begin();
-        auto field_end = format_fields.end();
-        auto args = arguments.begin();
-        auto args_end = arguments.end();
+        auto format_field = format_fields.begin();
+        auto argument = arguments.begin();
         for(auto i = string_slices.begin(), end = string_slices.end(); i != end; ++i) {
             buffer.write(*i);
-            if(field != field_end && args != args_end) {
-                if(!field->dont_print) {
-                    auto arg = *args;
-                    arg->format(buffer);
-                    ++args;
-                }
-                ++field;
-            }
+            auto arg = *argument;
+            arg->format(buffer);
+            ++argument;
+            ++format_field;
         }
         return buffer.to_string();
     }

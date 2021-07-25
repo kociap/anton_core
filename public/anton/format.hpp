@@ -65,14 +65,22 @@ namespace anton {
 
         template<typename... Args>
         String format(Format_Buffer& buffer, String_View const format_string, Args&&... args) {
-            Formatter_Base const* const arguments[sizeof...(Args)] = {&args...};
-            return format_internal(buffer, format_string, arguments);
+            if constexpr(sizeof...(Args) > 0) {
+                Formatter_Base const* const arguments[sizeof...(Args)] = {&args...};
+                return format_internal(buffer, format_string, arguments);
+            } else {
+                return format_internal(buffer, format_string, {});
+            }
         }
 
         template<typename... Args>
         String format(String_View const format_string, Args&&... args) {
-            Formatter_Base const* const arguments[sizeof...(Args)] = {&args...};
-            return format_internal(format_string, arguments);
+            if constexpr(sizeof...(Args) > 0) {
+                Formatter_Base const* const arguments[sizeof...(Args)] = {&args...};
+                return format_internal(format_string, arguments);
+            } else {
+                return format_internal(format_string, {});
+            }
         }
     } // namespace detail
 

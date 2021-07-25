@@ -133,7 +133,12 @@ namespace anton {
         Array<String_View> string_slices;
         Array<Format_Field> format_fields;
         if(!parse_format_string(format_string, string_slices, format_fields)) {
-            return String{""};
+            return ""_s;
+        }
+
+        // Guard against argument/format-field mistmach
+        if(format_fields.size() != arguments.size()) {
+            return ""_s;
         }
 
         auto field = format_fields.begin();

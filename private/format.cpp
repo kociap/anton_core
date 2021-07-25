@@ -1,6 +1,7 @@
 #include <anton/format.hpp>
 
 #include <anton/array.hpp>
+#include <anton/assert.hpp>
 
 namespace anton {
     struct Format_Field {
@@ -133,12 +134,12 @@ namespace anton {
         Array<String_View> string_slices;
         Array<Format_Field> format_fields;
         if(!parse_format_string(format_string, string_slices, format_fields)) {
-            return ""_s;
+            ANTON_FAIL(false, "invalid format string"_sv);
         }
 
         // Guard against argument/format-field mistmach
         if(format_fields.size() != arguments.size()) {
-            return ""_s;
+            ANTON_FAIL(false, "mismatched argument and format fields counts"_sv);
         }
 
         auto field = format_fields.begin();

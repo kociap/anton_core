@@ -134,12 +134,12 @@ namespace anton {
         Array<String_View> string_slices;
         Array<Format_Field> format_fields;
         if(!parse_format_string(format_string, string_slices, format_fields)) {
-            ANTON_FAIL(false, "invalid format string"_sv);
+            ANTON_FAIL(false, "invalid format string");
         }
 
         // Guard against argument/format-field mistmach
         if(format_fields.size() != arguments.size()) {
-            ANTON_FAIL(false, "mismatched argument and format fields counts"_sv);
+            ANTON_FAIL(false, "mismatched argument and format fields counts");
         }
 
         auto field = format_fields.begin();

@@ -29,11 +29,12 @@ namespace anton {
             auto format_field_begin = i;
             if(*i == U'{') {
                 // We have found an escaped brace.
+                // Skip the second brace we have found.
+                ++i;
                 continue;
             } else {
                 // We have found a format field.
                 string_slices.emplace_back(str_slice_begin, backup);
-                i = backup;
             }
 
             while(i != end && *i != U'}') {

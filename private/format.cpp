@@ -137,14 +137,20 @@ namespace anton {
             ANTON_FAIL(false, "mismatched argument and format fields counts");
         }
 
-        auto format_field = format_fields.begin();
-        auto argument = arguments.begin();
+        // We don't use format_field yet. We should pass it to the argument format function.
+        // auto format_field = format_fields.begin();
+        auto argument_first = arguments.begin();
+        auto argument_last = arguments.end();
         for(auto i = string_slices.begin(), end = string_slices.end(); i != end; ++i) {
             buffer.write(*i);
-            auto arg = *argument;
-            arg->format(buffer);
-            ++argument;
-            ++format_field;
+            // We don't have to check format_field for end
+            // because we have already ensured those ranges are equal.
+            if(argument_first != argument_last) {
+                Formatter_Base const* const argument = *argument_first;
+                argument->format(buffer);
+                ++argument_first;
+                // ++format_field;
+            }
         }
         return buffer.to_string();
     }

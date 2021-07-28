@@ -2,9 +2,15 @@
 
 #include <anton/array.hpp>
 #include <anton/assert.hpp>
+#include <anton/optional.hpp>
 
 namespace anton {
-    static bool parse_format_string(String_View const string, Array<String_View>& string_slices, Array<String_View>& format_fields) {
+    struct Format_Field {
+        String_View format;
+        bool print;
+    };
+
+    static bool parse_format_string(String_View const string, Array<String_View>& string_slices, Array<Format_Field>& format_fields) {
         auto i = string.chars_begin();
         auto const end = string.chars_end();
         auto str_slice_begin = i;
@@ -26,14 +32,13 @@ namespace anton {
                 return false;
             }
 
-            auto format_field_begin = i;
+            auto format_begin = i;
             if(*i == U'{') {
-                // We have found an escaped brace.
-                // Skip the second brace we have found.
-                ++i;
+                string_slices.emplace_back(str_slice_begin, i);
+                format_fields.emplace_back(String_View{}, false);
+                str_slice_begin = ++i;
                 continue;
             } else {
-                // We have found a format field.
                 string_slices.emplace_back(str_slice_begin, backup);
             }
 
@@ -41,13 +46,13 @@ namespace anton {
                 ++i;
             }
 
-            if(i == end) {
+            if(i != end && *i == U'}') {
+                format_fields.emplace_back(String_View{format_begin, i}, true);
+                str_slice_begin = ++i;
+            } else {
                 // Invalid string format - missing matching `}`.
                 return false;
             }
-
-            format_fields.emplace_back(format_field_begin, i);
-            str_slice_begin = ++i;
         }
     }
 
@@ -128,31 +133,31 @@ namespace anton {
 
     String detail::format_internal(Format_Buffer& buffer, String_View const format_string, Slice<Formatter_Base const* const> const arguments) {
         Array<String_View> string_slices;
-        Array<String_View> format_fields;
+        Array<Format_Field> format_fields;
         if(!parse_format_string(format_string, string_slices, format_fields)) {
             ANTON_FAIL(false, "invalid format string");
         }
 
-        // Guard against argument/format-field mistmach
-        if(format_fields.size() != arguments.size()) {
-            ANTON_FAIL(false, "mismatched argument and format fields counts");
-        }
-
-        // We don't use format_field yet. We should pass it to the argument format function.
-        // auto format_field = format_fields.begin();
-        auto argument_first = arguments.begin();
-        auto argument_last = arguments.end();
-        for(auto i = string_slices.begin(), end = string_slices.end(); i != end; ++i) {
-            buffer.write(*i);
-            // We don't have to check format_field for end
-            // because we have already ensured those ranges are equal.
-            if(argument_first != argument_last) {
-                Formatter_Base const* const argument = *argument_first;
-                argument->format(buffer);
-                ++argument_first;
-                // ++format_field;
+        auto field = format_fields.begin();
+        auto const field_end = format_fields.end();
+        auto args = arguments.begin();
+        auto const args_end = arguments.end();
+        for(String_View const slice: string_slices) {
+            buffer.write(slice);
+            if(field != field_end) {
+                if(field->print && args != args_end) {
+                    auto arg = *args;
+                    arg->format(buffer);
+                    ++args;
+                }
+                ++field;
             }
         }
+
+        if(field != field_end || args != args_end) {
+            ANTON_FAIL(false, "incorrect number of arguments");
+        }
+
         return buffer.to_string();
     }
 

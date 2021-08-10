@@ -145,12 +145,14 @@ namespace anton {
         for(String_View const slice: string_slices) {
             buffer.write(slice);
             if(field != field_end) {
-                if(field->print && args != args_end) {
+                if(!field->print) {
+                    ++field;
+                } else if(args != args_end) {
                     auto arg = *args;
                     arg->format(buffer);
                     ++args;
+                    ++field;
                 }
-                ++field;
             }
         }
 

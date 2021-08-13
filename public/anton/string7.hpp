@@ -67,6 +67,8 @@ namespace anton {
         [[nodiscard]] value_type const* data() const;
         [[nodiscard]] value_type const* c_str() const;
 
+        [[nodiscard]] value_type operator[](size_type index) const;
+
         [[nodiscard]] iterator begin();
         [[nodiscard]] const_iterator begin() const;
         [[nodiscard]] const_iterator cbegin() const;

@@ -218,6 +218,14 @@ namespace anton {
         return _allocator;
     }
 
+    auto String7::operator[](size_type const index) const -> value_type {
+        if constexpr(ANTON_ITERATOR_DEBUG) {
+            ANTON_FAIL(index < _size && index >= 0, u8"index out of bounds");
+        }
+
+        return _data[index];
+    }
+
     auto String7::data() -> value_type* {
         return _data;
     }

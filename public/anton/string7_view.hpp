@@ -46,6 +46,14 @@ namespace anton {
 
         constexpr String7_View& operator=(String7_View const&) = default;
 
+        [[nodiscard]] constexpr value_type operator[](size_type const index) const {
+            if constexpr(ANTON_ITERATOR_DEBUG) {
+                ANTON_FAIL(index < _end - _begin && index >= 0, u8"index out of bounds");
+            }
+
+            return _begin[index];
+        }
+
         [[nodiscard]] constexpr const_iterator begin() const {
             return _begin;
         }

@@ -1,6 +1,7 @@
 #include <anton/string7_stream.hpp>
 
 namespace anton {
+    Input_String7_Stream::Input_String7_Stream(String7_View string): _string(string), _current(_string.begin()) {}
     Input_String7_Stream::Input_String7_Stream(String7 string): _string(ANTON_MOV(string)), _current(_string.begin()) {}
 
     Input_String7_Stream::operator bool() const {

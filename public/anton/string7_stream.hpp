@@ -2,10 +2,12 @@
 
 #include <anton/stream.hpp>
 #include <anton/string7.hpp>
+#include <anton/string7_view.hpp>
 
 namespace anton {
     struct Input_String7_Stream: public Input_Stream {
     public:
+        Input_String7_Stream(String7_View string);
         Input_String7_Stream(String7 string);
 
         [[nodiscard]] virtual operator bool() const override;

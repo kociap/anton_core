@@ -1,7 +1,8 @@
 #include <anton/string_stream.hpp>
 
 namespace anton {
-    Input_String_Stream::Input_String_Stream(anton::String string): _string(ANTON_MOV(string)), _current(_string.chars_begin()) {}
+    Input_String_Stream::Input_String_Stream(String_View string): _string(string), _current(_string.chars_begin()) {}
+    Input_String_Stream::Input_String_Stream(String string): _string(ANTON_MOV(string)), _current(_string.chars_begin()) {}
 
     Input_String_Stream::operator bool() const {
         return true;
@@ -11,7 +12,7 @@ namespace anton {
         // TODO: Implement. We currently do not use those, so I just skipped those.
     }
 
-    void Input_String_Stream::read(anton::Slice<u8>) {
+    void Input_String_Stream::read(Slice<u8>) {
         // TODO: Implement. We currently do not use those, so I just skipped those.
     }
 
@@ -19,7 +20,7 @@ namespace anton {
         if(_current != _string.chars_end()) {
             return *_current;
         } else {
-            return anton::eof_char32;
+            return eof_char32;
         }
     }
 
@@ -29,7 +30,7 @@ namespace anton {
             ++_current;
             return c;
         } else {
-            return anton::eof_char32;
+            return eof_char32;
         }
     }
 
@@ -39,10 +40,10 @@ namespace anton {
         }
     }
 
-    void Input_String_Stream::seek(anton::Seek_Dir dir, i64 offset) {
-        if(dir == anton::Seek_Dir::beg) {
+    void Input_String_Stream::seek(Seek_Dir dir, i64 offset) {
+        if(dir == Seek_Dir::beg) {
             auto begin = _string.chars_begin();
-            _current = anton::UTF8_Char_Iterator{begin.get_underlying_pointer() + offset, offset};
+            _current = UTF8_Char_Iterator{begin.get_underlying_pointer() + offset, offset};
         }
     }
 

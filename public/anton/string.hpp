@@ -1,7 +1,6 @@
 #pragma once
 
 #include <anton/allocator.hpp>
-#include <anton/detail/string_common.hpp>
 #include <anton/functors.hpp>
 #include <anton/iterators.hpp>
 #include <anton/string_view.hpp>

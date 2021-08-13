@@ -1,7 +1,6 @@
 #pragma once
 
 #include <anton/assert.hpp>
-#include <anton/detail/string8_common.hpp>
 #include <anton/detail/string_common.hpp>
 #include <anton/hashing/murmurhash2.hpp>
 #include <anton/iterators.hpp>
@@ -9,21 +8,20 @@
 #include <anton/types.hpp>
 
 namespace anton {
-    struct String_View {
+    struct String7_View {
     public:
         using size_type = i64;
         using difference_type = isize;
         using value_type = char8;
-        using byte_iterator = char8*;
-        using byte_const_iterator = char8 const*;
-        using char_iterator = UTF8_Char_Iterator;
+        using iterator = char8*;
+        using const_iterator = char8 const*;
 
     public:
-        constexpr String_View(): _begin(nullptr), _end(nullptr) {}
+        constexpr String7_View(): _begin(nullptr), _end(nullptr) {}
 
-        constexpr String_View(String_View const&) = default;
+        constexpr String7_View(String7_View const&) = default;
 
-        constexpr String_View(value_type const* str): _begin(str), _end(str) {
+        constexpr String7_View(value_type const* str): _begin(str), _end(str) {
             if(_begin != nullptr) {
                 while(*_end)
                     ++_end;
@@ -34,62 +32,38 @@ namespace anton {
             }
         }
 
-        constexpr String_View(value_type const* str, size_type size): _begin(str), _end(str + size) {
+        constexpr String7_View(value_type const* str, size_type size): _begin(str), _end(str + size) {
             if constexpr(ANTON_STRING_VIEW_VERIFY_ENCODING) {
                 // TODO: Implement
             }
         }
 
-        constexpr String_View(value_type const* first, value_type const* last): _begin(first), _end(last) {
+        constexpr String7_View(value_type const* first, value_type const* last): _begin(first), _end(last) {
             if constexpr(ANTON_STRING_VIEW_VERIFY_ENCODING) {
                 // TODO: Implement
             }
         }
 
-        String_View(char_iterator first, char_iterator last): _begin(first.get_underlying_pointer()), _end(last.get_underlying_pointer()) {}
+        constexpr String7_View& operator=(String7_View const&) = default;
 
-        constexpr String_View& operator=(String_View const&) = default;
-
-        // TODO: proxies are non-constexpr
-        [[nodiscard]] /* constexpr */ UTF8_Const_Bytes bytes() const {
-            return {_begin, _end};
-        }
-
-        [[nodiscard]] /* constexpr */ UTF8_Const_Bytes const_bytes() const {
-            return {_begin, _end};
-        }
-
-        [[nodiscard]] /* constexpr */ UTF8_Chars chars() const {
-            return {_begin, _end};
-        }
-
-        [[nodiscard]] constexpr byte_const_iterator bytes_begin() const {
+        [[nodiscard]] constexpr const_iterator begin() const {
             return _begin;
         }
 
-        [[nodiscard]] constexpr byte_const_iterator bytes_cbegin() const {
+        [[nodiscard]] constexpr const_iterator cbegin() const {
             return _begin;
         }
 
-        [[nodiscard]] constexpr byte_const_iterator bytes_end() const {
+        [[nodiscard]] constexpr const_iterator end() const {
             return _end;
         }
 
-        [[nodiscard]] constexpr byte_const_iterator bytes_cend() const {
+        [[nodiscard]] constexpr const_iterator cend() const {
             return _end;
-        }
-
-        // TODO: iterators are non-constexpr
-        [[nodiscard]] /* constexpr */ char_iterator chars_begin() const {
-            return char_iterator{_begin, 0};
-        }
-
-        [[nodiscard]] /* constexpr */ char_iterator chars_end() const {
-            return char_iterator{_end, _end - _begin};
         }
 
         // Size of the string in bytes
-        [[nodiscard]] constexpr size_type size_bytes() const {
+        [[nodiscard]] constexpr size_type size() const {
             return _end - _begin;
         }
 
@@ -97,7 +71,7 @@ namespace anton {
             return _begin;
         }
 
-        friend constexpr void swap(String_View& sv1, String_View& sv2) {
+        friend constexpr void swap(String7_View& sv1, String7_View& sv2) {
             swap(sv1._begin, sv2._begin);
             swap(sv1._end, sv2._end);
         }
@@ -108,21 +82,21 @@ namespace anton {
     };
 
     inline namespace literals {
-        [[nodiscard]] constexpr String_View operator"" _sv(char8 const* literal, u64 size) {
-            return String_View{literal, (i64)size};
+        [[nodiscard]] constexpr String7_View operator"" _sv7(char8 const* literal, u64 size) {
+            return String7_View{literal, (i64)size};
         }
     } // namespace literals
 
     // Compares bytes
-    [[nodiscard]] constexpr bool operator==(String_View const& lhs, String_View const& rhs) {
-        if(lhs.size_bytes() != rhs.size_bytes()) {
+    [[nodiscard]] constexpr bool operator==(String7_View const& lhs, String7_View const& rhs) {
+        if(lhs.size() != rhs.size()) {
             return false;
         }
 
-        char8 const* lhs_f = lhs.bytes_begin();
-        char8 const* lhs_e = lhs.bytes_end();
-        char8 const* rhs_f = rhs.bytes_begin();
-        char8 const* rhs_e = rhs.bytes_end();
+        char8 const* lhs_f = lhs.begin();
+        char8 const* lhs_e = lhs.end();
+        char8 const* rhs_f = rhs.begin();
+        char8 const* rhs_e = rhs.end();
         for(; lhs_f != lhs_e && rhs_f != rhs_e; ++lhs_f, ++rhs_f) {
             if(*lhs_f != *rhs_f) {
                 return false;
@@ -133,7 +107,7 @@ namespace anton {
     }
 
     // Compares bytes
-    [[nodiscard]] constexpr bool operator!=(String_View const& lhs, String_View const& rhs) {
+    [[nodiscard]] constexpr bool operator!=(String7_View const& lhs, String7_View const& rhs) {
         return !(lhs == rhs);
     }
 
@@ -143,10 +117,10 @@ namespace anton {
     // Returns:
     //-1 if lhs < rhs, 0 if lhs == rhs and 1 if lhs > rhs.
     //
-    [[nodiscard]] i32 compare(String_View lhs, String_View rhs);
+    [[nodiscard]] i32 compare(String7_View lhs, String7_View rhs);
 
-    constexpr u64 hash(String_View const view) {
-        return murmurhash2_64(view.bytes_begin(), view.size_bytes());
+    constexpr u64 hash(String7_View const view) {
+        return murmurhash2_64(view.begin(), view.size());
     }
 
     // find_substring
@@ -159,13 +133,13 @@ namespace anton {
     // Returns:
     // The start position of the substring within string or npos if the substring is not present.
     //
-    [[nodiscard]] constexpr i64 find_substring(String_View const string, String_View const substr) {
+    [[nodiscard]] constexpr i64 find_substring(String7_View const string, String7_View const substr) {
         // Bruteforce
         char8 const* const string_data = string.data();
         char8 const* const substr_data = substr.data();
-        for(i64 i = 0, end = string.size_bytes() - substr.size_bytes(); i <= end; ++i) {
+        for(i64 i = 0, end = string.size() - substr.size(); i <= end; ++i) {
             bool equal = true;
-            for(i64 j = i, k = 0; k < substr.size_bytes(); ++j, ++k) {
+            for(i64 j = i, k = 0; k < substr.size(); ++j, ++k) {
                 equal &= string_data[j] == substr_data[k];
             }
 
@@ -186,13 +160,13 @@ namespace anton {
     // Returns:
     // The start position of the substring within string or npos if the substring is not present.
     //
-    [[nodiscard]] constexpr i64 find_last_substring(String_View const string, String_View const substr) {
+    [[nodiscard]] constexpr i64 find_last_substring(String7_View const string, String7_View const substr) {
         // Bruteforce
         char8 const* const string_data = string.data();
         char8 const* const substr_data = substr.data();
-        for(i64 i = string.size_bytes() - substr.size_bytes(); i >= 0; --i) {
+        for(i64 i = string.size() - substr.size(); i >= 0; --i) {
             bool equal = true;
-            for(i64 j = i, k = 0; k < substr.size_bytes(); ++j, ++k) {
+            for(i64 j = i, k = 0; k < substr.size(); ++j, ++k) {
                 equal &= string_data[j] == substr_data[k];
             }
 
@@ -213,11 +187,11 @@ namespace anton {
     // Returns:
     // If string begins with substr, returns true, false otherwise.
     //
-    [[nodiscard]] constexpr bool begins_with(String_View const string, String_View const substr) {
-        char8 const* str_begin = string.bytes_begin();
-        char8 const* str_end = string.bytes_end();
-        char8 const* substr_begin = substr.bytes_begin();
-        char8 const* substr_end = substr.bytes_end();
+    [[nodiscard]] constexpr bool begins_with(String7_View const string, String7_View const substr) {
+        char8 const* str_begin = string.begin();
+        char8 const* str_end = string.end();
+        char8 const* substr_begin = substr.begin();
+        char8 const* substr_end = substr.end();
         for(; str_begin != str_end && substr_begin != substr_end; ++str_begin, ++substr_begin) {
             if(*str_begin != *substr_begin) {
                 return false;
@@ -236,11 +210,11 @@ namespace anton {
     // Returns:
     // If string ends with substr, returns true, false otherwise.
     //
-    [[nodiscard]] constexpr bool ends_with(String_View const string, String_View const substr) {
-        char8 const* str_begin = string.bytes_begin() - 1;
-        char8 const* str_end = string.bytes_end() - 1;
-        char8 const* substr_begin = substr.bytes_begin() - 1;
-        char8 const* substr_end = substr.bytes_end() - 1;
+    [[nodiscard]] constexpr bool ends_with(String7_View const string, String7_View const substr) {
+        char8 const* str_begin = string.begin() - 1;
+        char8 const* str_end = string.end() - 1;
+        char8 const* substr_begin = substr.begin() - 1;
+        char8 const* substr_end = substr.end() - 1;
         for(; str_end != str_begin && substr_end != substr_begin; --str_begin, --substr_begin) {
             if(*str_end != *substr_end) {
                 return false;
@@ -257,7 +231,7 @@ namespace anton {
     // Does not guard against overflow.
     // If the string is not valid, the return value is unspecified.
     //
-    [[nodiscard]] i64 str_to_i64(String_View string, u64 base = 10);
+    [[nodiscard]] i64 str_to_i64(String7_View string, u64 base = 10);
 
     // str_to_u64
     // Expects a string containing a number in base [2, 36].
@@ -267,7 +241,7 @@ namespace anton {
     // Does not guard against overflow.
     // If the string is not valid, the return value is unspecified.
     //
-    [[nodiscard]] u64 str_to_u64(String_View string, u64 base = 10);
+    [[nodiscard]] u64 str_to_u64(String7_View string, u64 base = 10);
 } // namespace anton
 
 namespace std {
@@ -275,8 +249,8 @@ namespace std {
     struct hash;
 
     template<>
-    struct hash<anton::String_View> {
-        anton::u64 operator()(anton::String_View const view) const {
+    struct hash<anton::String7_View> {
+        anton::u64 operator()(anton::String7_View const view) const {
             return anton::hash(view);
         }
     };

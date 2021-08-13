@@ -1,4 +1,4 @@
-#include <anton/detail/string_common.hpp>
+#include <anton/detail/string8_common.hpp>
 
 #include <anton/assert.hpp>
 #include <anton/math/math.hpp>

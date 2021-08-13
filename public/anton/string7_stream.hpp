@@ -14,7 +14,7 @@ namespace anton {
 
         virtual void read(void* buffer, i64 count) override;
         virtual void read(Slice<u8> buffer) override;
-        [[nodiscard]] String7_View read(i64 count);
+        String7_View read(i64 count);
         [[nodiscard]] virtual char32 peek() override;
         [[nodiscard]] String7_View peek(i64 count);
         virtual char32 get() override;

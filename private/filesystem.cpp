@@ -157,8 +157,18 @@ namespace anton::fs {
     }
 
     bool exists(String_View const path) {
-        std::filesystem::path a(std::string_view(path.data(), path.size_bytes()));
-        return std::filesystem::exists(a);
+        Array<char16> const path16 = string8_to_string16(path);
+        DWORD const result = GetFileAttributesW((wchar_t const*)path16.data());
+        if(result != INVALID_FILE_ATTRIBUTES) {
+            return true;
+        }
+
+        // If GetFileAttributes returns INVALID_FILE_ATTRIBUTES, then it means the
+        // function could not access the attributes for some reason.
+        // To figure out whether the file actually does not exist, we must check
+        // the error code returned by GetLastError.
+        DWORD const error = GetLastError();
+        return error != ERROR_PATH_NOT_FOUND && error != ERROR_FILE_NOT_FOUND && error != ERROR_INVALID_NAME && error != ERROR_BAD_NETPATH;
     }
 
     String parent_path(String_View const path) {

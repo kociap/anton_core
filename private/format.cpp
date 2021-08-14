@@ -72,6 +72,11 @@ namespace anton {
         }
     };
 
+    void format_type(Format_Buffer& format_buffer, bool value) {
+        String_View str = (value ? u8"true"_sv : u8"false"_sv);
+        format_buffer.write(str);
+    }
+
     void format_type(Format_Buffer& format_buffer, i8 value) {
         String str = to_string(value);
         format_buffer.write(str);

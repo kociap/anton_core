@@ -12,6 +12,7 @@ namespace anton {
         virtual String to_string() = 0;
     };
 
+    void format_type(Format_Buffer& buffer, bool value);
     void format_type(Format_Buffer& buffer, i8 value);
     void format_type(Format_Buffer& buffer, u8 value);
     void format_type(Format_Buffer& buffer, i16 value);

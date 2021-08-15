@@ -3,6 +3,7 @@
 #include <anton/assert.hpp>
 #include <anton/detail/string8_common.hpp>
 #include <anton/detail/string_common.hpp>
+#include <anton/functors.hpp>
 #include <anton/hashing/murmurhash2.hpp>
 #include <anton/iterators.hpp>
 #include <anton/swap.hpp>
@@ -268,6 +269,24 @@ namespace anton {
     // If the string is not valid, the return value is unspecified.
     //
     [[nodiscard]] u64 str_to_u64(String_View string, u64 base = 10);
+
+    template<>
+    struct Default_Hash<String_View> {
+        using transparent = void;
+
+        [[nodiscard]] constexpr u64 operator()(String_View const v) const {
+            return anton::hash(v);
+        }
+    };
+
+    template<>
+    struct Equal_Compare<String_View> {
+        using transparent = void;
+
+        [[nodiscard]] constexpr bool operator()(String_View const lhs, String_View const rhs) const {
+            return lhs == rhs;
+        }
+    };
 } // namespace anton
 
 namespace std {

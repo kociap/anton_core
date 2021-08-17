@@ -102,7 +102,7 @@ namespace anton {
 
     template<typename T, i64 Capacity>
     Fixed_Array<T, Capacity>::Fixed_Array(Fixed_Array const& other): _size(other._size) {
-        uninitialized_copy_n(reinterpret_cast<T*>(other._data), _size, reinterpret_cast<T*>(_data));
+        uninitialized_copy_n(reinterpret_cast<T const*>(other._data), _size, reinterpret_cast<T*>(_data));
     }
 
     template<typename T, i64 Capacity>
@@ -133,13 +133,14 @@ namespace anton {
     template<typename T, i64 Capacity>
     Fixed_Array<T, Capacity>& Fixed_Array<T, Capacity>::operator=(Fixed_Array const& other) {
 #define PTR(data, offset) reinterpret_cast<T*>(data + offset)
+#define PTRC(data, offset) reinterpret_cast<T const*>(data + offset)
         if(_size >= other._size) {
-            copy(PTR(other._data, 0), PTR(other._data, other._size), PTR(_data, 0));
+            copy(PTRC(other._data, 0), PTRC(other._data, other._size), PTR(_data, 0));
             destruct_n(PTR(_data, other._size), _size - other._size);
             _size = other._size;
         } else {
-            copy(PTR(other._data, 0), PTR(other._data, _size), PTR(_data, 0));
-            uninitialized_copy(PTR(other._data, _size), PTR(other._data, other._size), PTR(_data, _size));
+            copy(PTRC(other._data, 0), PTRC(other._data, _size), PTR(_data, 0));
+            uninitialized_copy(PTRC(other._data, _size), PTRC(other._data, other._size), PTR(_data, _size));
             _size = other._size;
         }
         return *this;

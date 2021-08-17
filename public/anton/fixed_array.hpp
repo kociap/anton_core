@@ -135,7 +135,7 @@ namespace anton {
 #define PTR(data, offset) reinterpret_cast<T*>(data + offset)
         if(_size >= other._size) {
             copy(PTR(other._data, 0), PTR(other._data, other._size), PTR(_data, 0));
-            destruct_n(PTR(other._size), _size - other._size);
+            destruct_n(PTR(_data, other._size), _size - other._size);
             _size = other._size;
         } else {
             copy(PTR(other._data, 0), PTR(other._data, _size), PTR(_data, 0));

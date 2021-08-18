@@ -90,13 +90,13 @@ namespace anton {
 
     template<typename T, i64 Capacity>
     Fixed_Array<T, Capacity>::Fixed_Array(size_type const s): _size(s) {
-        ANTON_VERIFY(s <= Capacity, u8"size is greater than capacity.");
+        ANTON_VERIFY(s <= Capacity, u8"size is greater than capacity");
         uninitialized_default_construct_n(reinterpret_cast<T*>(_data), _size);
     }
 
     template<typename T, i64 Capacity>
     Fixed_Array<T, Capacity>::Fixed_Array(size_type const s, value_type const& v): _size(s) {
-        ANTON_VERIFY(s <= Capacity, u8"size is greater than capacity.");
+        ANTON_VERIFY(s <= Capacity, u8"size is greater than capacity");
         uninitialized_fill_n(reinterpret_cast<T*>(_data), _size, v);
     }
 
@@ -114,14 +114,14 @@ namespace anton {
     template<typename Input_Iterator>
     Fixed_Array<T, Capacity>::Fixed_Array(Range_Construct_Tag, Input_Iterator first, Input_Iterator last) {
         i64 const distance = last - first;
-        ANTON_VERIFY(distance <= Capacity, u8"distance between last and first is greater than the capacity.");
+        ANTON_VERIFY(distance <= Capacity, u8"distance between last and first is greater than the capacity");
         uninitialized_copy(first, last, reinterpret_cast<T*>(_data));
     }
 
     template<typename T, i64 Capacity>
     template<typename... Args>
     Fixed_Array<T, Capacity>::Fixed_Array(Variadic_Construct_Tag, Args&&... args): _size(sizeof...(Args)) {
-        static_assert(sizeof...(Args) <= Capacity, u8"attempting to construct Fixed_Array with more elements than capacity.");
+        static_assert(sizeof...(Args) <= Capacity, u8"attempting to construct Fixed_Array with more elements than capacity");
         uninitialized_variadic_construct(reinterpret_cast<T*>(_data), ANTON_FWD(args)...);
     }
 
@@ -169,7 +169,7 @@ namespace anton {
             ANTON_FAIL(index < _size && index >= 0, u8"index out of bounds");
         }
 
-        return *reinterpret_cast<T*>(_data + _size);
+        return *reinterpret_cast<T*>(_data + index);
     }
 
     template<typename T, i64 Capacity>
@@ -178,7 +178,7 @@ namespace anton {
             ANTON_FAIL(index < _size && index >= 0, u8"index out of bounds");
         }
 
-        return *reinterpret_cast<T const*>(_data + _size);
+        return *reinterpret_cast<T const*>(_data + index);
     }
 
     template<typename T, i64 Capacity>
@@ -256,7 +256,7 @@ namespace anton {
 
     template<typename T, i64 Capacity>
     void Fixed_Array<T, Capacity>::resize(size_type const s) {
-        ANTON_VERIFY(s <= Capacity && s >= 0, u8"requested size was outside the range [0, capacity()].");
+        ANTON_VERIFY(s <= Capacity && s >= 0, u8"requested size was outside the range [0, capacity()]");
         if(s >= _size) {
             uninitialized_default_construct_n(reinterpret_cast<T*>(_data + _size), s - _size);
         } else {
@@ -267,7 +267,7 @@ namespace anton {
 
     template<typename T, i64 Capacity>
     void Fixed_Array<T, Capacity>::resize(size_type const s, T const& v) {
-        ANTON_VERIFY(s <= Capacity && s >= 0, u8"requested size was outside the range [0, capacity()].");
+        ANTON_VERIFY(s <= Capacity && s >= 0, u8"requested size was outside the range [0, capacity()]");
         if(s >= _size) {
             uninitialized_fill_n(reinterpret_cast<T*>(_data + _size), s - _size, v);
         } else {
@@ -285,7 +285,7 @@ namespace anton {
     template<typename T, i64 Capacity>
     template<typename... Args>
     auto Fixed_Array<T, Capacity>::emplace_back(Args&&... args) -> T& {
-        ANTON_VERIFY(_size < Capacity, u8"cannot emplace_back element in a full Fixed_Array.");
+        ANTON_VERIFY(_size < Capacity, u8"cannot emplace_back element in a full Fixed_Array");
         T* const elem = reinterpret_cast<T*>(_data + _size);
         construct(elem, ANTON_FWD(args)...);
         _size += 1;

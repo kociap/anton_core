@@ -68,8 +68,12 @@ namespace anton {
         void resize(size_type count);
         void resize(size_type count, T const& value);
         void clear();
+
+        T& push_back(value_type const&);
+        T& push_back(value_type&&);
         template<typename... Args>
         T& emplace_back(Args&&... args);
+
         void pop_back();
 
         friend void swap(Fixed_Array& a1, Fixed_Array& a2) {
@@ -91,23 +95,23 @@ namespace anton {
     template<typename T, i64 Capacity>
     Fixed_Array<T, Capacity>::Fixed_Array(size_type const s): _size(s) {
         ANTON_VERIFY(s <= Capacity, u8"size is greater than capacity");
-        uninitialized_default_construct_n(reinterpret_cast<T*>(_data), _size);
+        anton::uninitialized_default_construct_n(reinterpret_cast<T*>(_data), _size);
     }
 
     template<typename T, i64 Capacity>
     Fixed_Array<T, Capacity>::Fixed_Array(size_type const s, value_type const& v): _size(s) {
         ANTON_VERIFY(s <= Capacity, u8"size is greater than capacity");
-        uninitialized_fill_n(reinterpret_cast<T*>(_data), _size, v);
+        anton::uninitialized_fill_n(reinterpret_cast<T*>(_data), _size, v);
     }
 
     template<typename T, i64 Capacity>
     Fixed_Array<T, Capacity>::Fixed_Array(Fixed_Array const& other): _size(other._size) {
-        uninitialized_copy_n(reinterpret_cast<T const*>(other._data), _size, reinterpret_cast<T*>(_data));
+        anton::uninitialized_copy_n(reinterpret_cast<T const*>(other._data), _size, reinterpret_cast<T*>(_data));
     }
 
     template<typename T, i64 Capacity>
     Fixed_Array<T, Capacity>::Fixed_Array(Fixed_Array&& other): _size(other._size) {
-        uninitialized_move_n(reinterpret_cast<T*>(other._data), _size, reinterpret_cast<T*>(_data));
+        anton::uninitialized_move_n(reinterpret_cast<T*>(other._data), _size, reinterpret_cast<T*>(_data));
     }
 
     template<typename T, i64 Capacity>
@@ -115,19 +119,19 @@ namespace anton {
     Fixed_Array<T, Capacity>::Fixed_Array(Range_Construct_Tag, Input_Iterator first, Input_Iterator last) {
         i64 const distance = last - first;
         ANTON_VERIFY(distance <= Capacity, u8"distance between last and first is greater than the capacity");
-        uninitialized_copy(first, last, reinterpret_cast<T*>(_data));
+        anton::uninitialized_copy(first, last, reinterpret_cast<T*>(_data));
     }
 
     template<typename T, i64 Capacity>
     template<typename... Args>
     Fixed_Array<T, Capacity>::Fixed_Array(Variadic_Construct_Tag, Args&&... args): _size(sizeof...(Args)) {
         static_assert(sizeof...(Args) <= Capacity, u8"attempting to construct Fixed_Array with more elements than capacity");
-        uninitialized_variadic_construct(reinterpret_cast<T*>(_data), ANTON_FWD(args)...);
+        anton::uninitialized_variadic_construct(reinterpret_cast<T*>(_data), ANTON_FWD(args)...);
     }
 
     template<typename T, i64 Capacity>
     Fixed_Array<T, Capacity>::~Fixed_Array() {
-        destruct_n(reinterpret_cast<T*>(_data), _size);
+        anton::destruct_n(reinterpret_cast<T*>(_data), _size);
     }
 
     template<typename T, i64 Capacity>
@@ -135,12 +139,12 @@ namespace anton {
 #define PTR(data, offset) reinterpret_cast<T*>(data + offset)
 #define PTRC(data, offset) reinterpret_cast<T const*>(data + offset)
         if(_size >= other._size) {
-            copy(PTRC(other._data, 0), PTRC(other._data, other._size), PTR(_data, 0));
-            destruct_n(PTR(_data, other._size), _size - other._size);
+            anton::copy(PTRC(other._data, 0), PTRC(other._data, other._size), PTR(_data, 0));
+            anton::destruct_n(PTR(_data, other._size), _size - other._size);
             _size = other._size;
         } else {
-            copy(PTRC(other._data, 0), PTRC(other._data, _size), PTR(_data, 0));
-            uninitialized_copy(PTRC(other._data, _size), PTRC(other._data, other._size), PTR(_data, _size));
+            anton::copy(PTRC(other._data, 0), PTRC(other._data, _size), PTR(_data, 0));
+            anton::uninitialized_copy(PTRC(other._data, _size), PTRC(other._data, other._size), PTR(_data, _size));
             _size = other._size;
         }
         return *this;
@@ -151,12 +155,12 @@ namespace anton {
     Fixed_Array<T, Capacity>& Fixed_Array<T, Capacity>::operator=(Fixed_Array&& other) {
 #define PTR(data, offset) reinterpret_cast<T*>(data + offset)
         if(_size >= other._size) {
-            move(PTR(other._data, 0), PTR(other._data, other._size), PTR(_data, 0));
-            destruct_n(PTR(_data, other._size), _size - other._size);
+            anton::move(PTR(other._data, 0), PTR(other._data, other._size), PTR(_data, 0));
+            anton::destruct_n(PTR(_data, other._size), _size - other._size);
             _size = other._size;
         } else {
-            move(PTR(other._data, 0), PTR(other._data, _size), PTR(_data, 0));
-            uninitialized_move(PTR(other._data, _size), PTR(other._data, other._size), PTR(_data, _size));
+            anton::move(PTR(other._data, 0), PTR(other._data, _size), PTR(_data, 0));
+            anton::uninitialized_move(PTR(other._data, _size), PTR(other._data, other._size), PTR(_data, _size));
             _size = other._size;
         }
         return *this;
@@ -258,9 +262,9 @@ namespace anton {
     void Fixed_Array<T, Capacity>::resize(size_type const s) {
         ANTON_VERIFY(s <= Capacity && s >= 0, u8"requested size was outside the range [0, capacity()]");
         if(s >= _size) {
-            uninitialized_default_construct_n(reinterpret_cast<T*>(_data + _size), s - _size);
+            anton::uninitialized_default_construct_n(reinterpret_cast<T*>(_data + _size), s - _size);
         } else {
-            destruct_n(reinterpret_cast<T*>(_data + s), _size - s);
+            anton::destruct_n(reinterpret_cast<T*>(_data + s), _size - s);
         }
         _size = s;
     }
@@ -269,34 +273,52 @@ namespace anton {
     void Fixed_Array<T, Capacity>::resize(size_type const s, T const& v) {
         ANTON_VERIFY(s <= Capacity && s >= 0, u8"requested size was outside the range [0, capacity()]");
         if(s >= _size) {
-            uninitialized_fill_n(reinterpret_cast<T*>(_data + _size), s - _size, v);
+            anton::uninitialized_fill_n(reinterpret_cast<T*>(_data + _size), s - _size, v);
         } else {
-            destruct_n(reinterpret_cast<T*>(_data + s), _size - s);
+            anton::destruct_n(reinterpret_cast<T*>(_data + s), _size - s);
         }
         _size = s;
     }
 
     template<typename T, i64 Capacity>
     void Fixed_Array<T, Capacity>::clear() {
-        destruct_n(reinterpret_cast<T*>(_data), _size);
+        anton::destruct_n(reinterpret_cast<T*>(_data), _size);
         _size = 0;
+    }
+
+    template<typename T, i64 Capacity>
+    auto Fixed_Array<T, Capacity>::push_back(value_type const& value) -> T& {
+        ANTON_VERIFY(_size < Capacity, u8"cannot emplace_back element in a full Fixed_Array");
+        T* const element = reinterpret_cast<T*>(_data + _size);
+        anton::construct(element, value);
+        _size += 1;
+        return *element;
+    }
+
+    template<typename T, i64 Capacity>
+    auto Fixed_Array<T, Capacity>::push_back(value_type&& value) -> T& {
+        ANTON_VERIFY(_size < Capacity, u8"cannot emplace_back element in a full Fixed_Array");
+        T* const element = _data + _size;
+        anton::construct(element, ANTON_MOV(value));
+        _size += 1;
+        return *element;
     }
 
     template<typename T, i64 Capacity>
     template<typename... Args>
     auto Fixed_Array<T, Capacity>::emplace_back(Args&&... args) -> T& {
         ANTON_VERIFY(_size < Capacity, u8"cannot emplace_back element in a full Fixed_Array");
-        T* const elem = reinterpret_cast<T*>(_data + _size);
-        construct(elem, ANTON_FWD(args)...);
+        T* const element = reinterpret_cast<T*>(_data + _size);
+        anton::construct(element, ANTON_FWD(args)...);
         _size += 1;
-        return *elem;
+        return *element;
     }
 
     template<typename T, i64 Capacity>
     void Fixed_Array<T, Capacity>::pop_back() {
         ANTON_VERIFY(_size > 0, u8"trying to pop an element from an empty Fixed_Array");
         T* const elem = reinterpret_cast<T*>(_data + _size - 1);
-        destruct(elem);
+        anton::destruct(elem);
         _size -= 1;
     }
 } // namespace anton

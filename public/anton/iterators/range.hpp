@@ -21,4 +21,9 @@ namespace anton {
         T _begin;
         T _end;
     };
+
+    template<typename T>
+    Range(T const&, T const&) -> Range<T>;
+    template<typename T>
+    Range(T&&, T&&) -> Range<T>;
 } // namespace anton

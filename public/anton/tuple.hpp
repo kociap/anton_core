@@ -148,15 +148,26 @@ namespace anton {
     }
 
     namespace detail {
-        template<typename Callable, typename Tuple, u64... Indices>
-        constexpr decltype(auto) apply(Callable&& callable, Tuple&& tuple, integer_sequence<u64, Indices...>) {
+        template<typename Tuple, typename Callable, u64... Indices>
+        constexpr decltype(auto) apply(Tuple&& tuple, Callable&& callable, integer_sequence<u64, Indices...>) {
             return callable(get<Indices>(ANTON_FWD(tuple))...);
         }
     } // namespace detail
 
-    template<typename Callable, typename Tuple>
-    constexpr decltype(auto) apply(Callable&& callable, Tuple&& tuple) {
-        return detail::apply(ANTON_FWD(callable), ANTON_FWD(tuple), make_integer_sequence<u64, tuple_size<remove_reference<Tuple>>>());
+    // apply
+    // Invokes a callable object with all elements of a tuple passed as the arguments.
+    //
+    // Parameters:
+    //    tuple - the tuple whose elements to pass to the callable.
+    // callable - callable to be invoked. Must have the signature R(T1, T2, T3, ...)
+    //            where each TX matches the type in the tuple at position X.
+    //
+    // Returns:
+    // The value returned by callable.
+    //
+    template<typename Tuple, typename Callable>
+    constexpr decltype(auto) apply(Tuple&& tuple, Callable&& callable) {
+        return detail::apply(ANTON_FWD(tuple), ANTON_FWD(callable), make_integer_sequence<u64, tuple_size<remove_reference<Tuple>>>());
     }
 } // namespace anton
 

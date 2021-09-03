@@ -69,12 +69,12 @@ namespace anton {
         }
 
         Zip_Iterator& operator+=(difference_type n) {
-            apply(_iterators, [n](auto&&... iterators) -> void { (iterators += n, ...); });
+            apply(_iterators, [n](auto&&... iterators) -> void { ((iterators += n), ...); });
             return *this;
         }
 
         Zip_Iterator& operator-=(difference_type n) {
-            apply(_iterators, [n](auto&&... iterators) -> void { (iterators -= n, ...); });
+            apply(_iterators, [n](auto&&... iterators) -> void { ((iterators -= n), ...); });
             return *this;
         }
 

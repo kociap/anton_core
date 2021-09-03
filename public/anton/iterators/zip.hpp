@@ -26,22 +26,25 @@ namespace anton {
         }
     } // namespace detail
 
-    // TODO: Implement base()
-    // TODO: Implement pointer, wrapped_iterator_type
+    // TODO: implement iterator difference
     template<typename... Iterators>
     struct Zip_Iterator {
         static_assert(sizeof...(Iterators) > 1, "Zip_Iterator > 1");
 
         using value_type = Tuple<typename Iterator_Traits<Iterators>::value_type...>;
-        // using pointer =
+        using pointer = Tuple<typename Iterator_Traits<Iterators>::pointer...>;
         using reference = Tuple<typename Iterator_Traits<Iterators>::reference...>;
         using difference_type = i64;
         using iterator_category = Random_Access_Iterator_Tag;
-        // using wrapped_iterator_type =
+        using wrapped_iterator_type = Tuple<Iterators...>;
 
         Zip_Iterator() = default;
-        explicit Zip_Iterator(T const&... iterators): _iterators(iterators...) {}
-        explicit Zip_Iterator(T&&... iterators): _iterators(ANTON_MOV(iterators)...) {}
+        explicit Zip_Iterator(Iterators const&... iterators): _iterators(iterators...) {}
+        explicit Zip_Iterator(Iterators&&... iterators): _iterators(ANTON_MOV(iterators)...) {}
+
+        Tuple<Iterators const&> base() const {
+            return apply(_iterators, [](auto&&... iterators) -> Tuple<Iterators const&> { return {iterators...}; });
+        }
 
         Zip_Iterator& operator++() {
             apply(_iterators, [](auto&&... iterators) -> void { (++iterators, ...); });

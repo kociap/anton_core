@@ -51,7 +51,9 @@ namespace anton {
         struct const_iterator {
         public:
             using value_type = Entry const;
-            using difference_type = isize;
+            using reference = Entry const&;
+            using pointer = Entry const*;
+            using difference_type = i64;
             using iterator_category = Bidirectional_Iterator_Tag;
 
             const_iterator() = delete;
@@ -128,6 +130,8 @@ namespace anton {
         struct iterator {
         public:
             using value_type = Entry;
+            using reference = Entry&;
+            using pointer = Entry*;
             using difference_type = isize;
             using iterator_category = Bidirectional_Iterator_Tag;
 

@@ -52,6 +52,8 @@ namespace anton {
         struct const_iterator {
         public:
             using value_type = Key const;
+            using reference = Key const&;
+            using pointer = Key const*;
             using difference_type = isize;
             using iterator_category = Bidirectional_Iterator_Tag;
 

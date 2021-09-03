@@ -78,7 +78,7 @@ namespace anton {
             return *this;
         }
 
-        [[nodiscard]] Zip_Iterator operator+(difference_type n) {
+        [[nodiscard]] Zip_Iterator operator+(difference_type n) const {
             Zip_Iterator iterator(*this);
             iterator += n;
             return iterator;
@@ -90,7 +90,7 @@ namespace anton {
             return iterator;
         }
 
-        [[nodiscard]] Zip_Iterator operator-(difference_type n) {
+        [[nodiscard]] Zip_Iterator operator-(difference_type n) const {
             Zip_Iterator iterator(*this);
             iterator -= n;
             return iterator;
@@ -106,27 +106,27 @@ namespace anton {
             return apply(_iterators, [](auto&&... iterators) -> reference { return {*(iterators + n)}; });
         }
 
-        [[nodiscard]] bool operator==(Zip_Iterator const& rhs) {
+        [[nodiscard]] bool operator==(Zip_Iterator const& rhs) const {
             return detail::zip_tuple_equal(_iterators, rhs._iterators);
         }
 
-        [[nodiscard]] bool operator!=(Zip_Iterator const& rhs) {
+        [[nodiscard]] bool operator!=(Zip_Iterator const& rhs) const {
             return !(*this == rhs);
         }
 
-        [[nodiscard]] bool operator<(Zip_Iterator const& rhs) {
+        [[nodiscard]] bool operator<(Zip_Iterator const& rhs) const {
             return detail::zip_tuple_less(_iterators, rhs._iterators);
         }
 
-        [[nodiscard]] bool operator>(Zip_Iterator const& rhs) {
+        [[nodiscard]] bool operator>(Zip_Iterator const& rhs) const {
             return detail::zip_tuple_less(rhs._iterators, _iterators);
         }
 
-        [[nodiscard]] bool operator<=(Zip_Iterator const& rhs) {
+        [[nodiscard]] bool operator<=(Zip_Iterator const& rhs) const {
             return !(rhs > *this);
         }
 
-        [[nodiscard]] bool operator>=(Zip_Iterator const& rhs) {
+        [[nodiscard]] bool operator>=(Zip_Iterator const& rhs) const {
             return !(rhs < *this);
         }
 

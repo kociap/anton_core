@@ -89,6 +89,23 @@ namespace anton::fs {
     [[nodiscard]] bool has_filename(String_View path);
     [[nodiscard]] bool exists(String_View path);
 
+    // create_directory
+    // Creates a new directory identified by path.
+    // If the directory already exists, the function will fail.
+    // Only the final directory will be created. Intermediate directories
+    // will not be created and if they do not exist, the function will fail.
+    //
+    // Parameters:
+    // path - the path of the directory to be created.
+    //
+    // Returns:
+    // true if the directory has been successfully created.
+    // false if the directory could not be created. Possible reasons include:
+    // - The directory already exists.
+    // - The intermediate directories do not exist.
+    //
+    bool create_directory(String_View path);
+
     struct Copy_Options {
         // Whether to overwrite the directories if they already exist.
         // If false, the existing files and directories are kept.

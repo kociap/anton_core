@@ -178,7 +178,7 @@ namespace anton::fs {
 
     bool create_directory(String_View const path) {
         Array<char16> const path16 = string8_to_string16(path);
-        return CreateDirectory((wchar_t const*)path.data(), NULL);
+        return CreateDirectory((wchar_t const*)path16.data(), NULL);
     }
 
     bool copy_file(String_View source, String_View destination, bool overwrite) {

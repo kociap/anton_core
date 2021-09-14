@@ -538,4 +538,42 @@ namespace anton {
     f32 str_to_f32(String const& string) {
         return ::strtof(string.data(), nullptr);
     }
+
+    [[nodiscard]] static bool match(char8 const* iterator, String_View const pattern) {
+        char8 const* b = pattern.bytes_begin();
+        char8 const* const e = pattern.bytes_end();
+        for(; b != e && *iterator == *b; ++iterator, ++b) {}
+        return b == e;
+    }
+
+    String replace(String_View const string, String_View const pattern, String_View const replacement) {
+        // Preallocate memory. We can't estimate how much we will need,
+        // so we allocate enough to fit the old string.
+        String replaced{reserve, string.size_bytes()};
+        char8 const* iterator = string.bytes_begin();
+        char8 const* const end = string.bytes_end();
+        i64 const pattern_size = pattern.size_bytes();
+        if(pattern_size > 0) {
+            while(end - iterator >= pattern_size) {
+                bool const matched = match(iterator, pattern);
+                if(matched) {
+                    replaced.append(replacement);
+                    iterator += pattern_size;
+                } else {
+                    // TODO: Assumes there is no encoding validation in append(char8).
+                    replaced.append(*iterator);
+                    iterator += 1;
+                }
+            }
+        }
+
+        // Append the rest of the string.
+        char8* const replaced_end = replaced.data() + replaced.size_bytes();
+        i64 const remaining_size = end - iterator;
+        i64 const total_size = replaced.size_bytes() + remaining_size;
+        replaced.ensure_capacity(total_size);
+        replaced.force_size(total_size);
+        copy(iterator, end, replaced_end);
+        return replaced;
+    }
 } // namespace anton

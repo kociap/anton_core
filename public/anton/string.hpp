@@ -183,6 +183,19 @@ namespace anton {
     // TODO: Implement in terms of String_View.
     [[nodiscard]] f32 str_to_f32(String const& string);
 
+    // replace
+    // Replaces all occurences of pattern in string with replacement.
+    //
+    // Parameters:
+    //      string - the source string to perform replacement on.
+    //     pattern - the pattern to be replaced.
+    // replacement - the replacement string.
+    //
+    // Returns:
+    // A new string with all occurences of pattern replaced with replacement.
+    //
+    [[nodiscard]] String replace(String_View string, String_View pattern, String_View replacement);
+
     template<>
     struct Default_Hash<String> {
         using transparent = void;

@@ -539,6 +539,25 @@ namespace anton {
         return ::strtof(string.data(), nullptr);
     }
 
+    String concat(Slice<String_View const> const strings) {
+        // Precalculate allocation size to allocate exact size
+        // and avoid reallocations.
+        i64 size = 0;
+        for(String_View const& string: strings) {
+            size += string.size_bytes();
+        }
+
+        String result{reserve, size};
+        result.force_size(size);
+        char8* iterator = result.data();
+        // Concatenate the strings into result string.
+        for(String_View const& string: strings) {
+            copy(string.bytes_begin(), string.bytes_end(), iterator);
+            iterator += string.size_bytes();
+        }
+        return result;
+    }
+
     [[nodiscard]] static bool match(char8 const* iterator, String_View const pattern) {
         char8 const* b = pattern.bytes_begin();
         char8 const* const e = pattern.bytes_end();

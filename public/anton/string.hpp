@@ -3,6 +3,7 @@
 #include <anton/allocator.hpp>
 #include <anton/functors.hpp>
 #include <anton/iterators.hpp>
+#include <anton/slice.hpp>
 #include <anton/string_view.hpp>
 #include <anton/tags.hpp>
 
@@ -182,6 +183,32 @@ namespace anton {
 
     // TODO: Implement in terms of String_View.
     [[nodiscard]] f32 str_to_f32(String const& string);
+
+    // concat
+    // Concatenate a slice of strings.
+    //
+    // Parameters:
+    // strings - a slice of strings to be concatenated.
+    //
+    // Returns:
+    // Concatenated string.
+    //
+    [[nodiscard]] String concat(Slice<String_View const> strings);
+
+    // concat
+    // Concatenate strings.
+    //
+    // Parameters:
+    // first, second, rest... - strings to be concatenated.
+    //
+    // Returns:
+    // Concatenated string.
+    //
+    template<typename... T>
+    [[nodiscard]] String concat(String_View const first, String_View const second, T&&... rest) {
+        String_View strings[2 + sizeof...(rest)] = {first, second, String_View(rest)...};
+        return concat(Slice<String_View>{strings});
+    }
 
     // replace
     // Replaces all occurences of pattern in string with replacement.

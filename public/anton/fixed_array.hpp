@@ -298,7 +298,7 @@ namespace anton {
     template<typename T, i64 Capacity>
     auto Fixed_Array<T, Capacity>::push_back(value_type&& value) -> T& {
         ANTON_VERIFY(_size < Capacity, u8"cannot emplace_back element in a full Fixed_Array");
-        T* const element = _data + _size;
+        T* const element = reinterpret_cast<T*>(_data + _size);
         anton::construct(element, ANTON_MOV(value));
         _size += 1;
         return *element;

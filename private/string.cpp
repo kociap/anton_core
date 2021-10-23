@@ -246,6 +246,10 @@ namespace anton {
         return _data;
     }
 
+    auto String::c_str() -> value_type* {
+        return _data;
+    }
+
     auto String::c_str() const -> value_type const* {
         return _data;
     }

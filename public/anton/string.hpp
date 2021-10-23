@@ -94,6 +94,7 @@ namespace anton {
 
         [[nodiscard]] value_type* data();
         [[nodiscard]] value_type const* data() const;
+        [[nodiscard]] value_type* c_str();
         [[nodiscard]] value_type const* c_str() const;
 
         [[nodiscard]] UTF8_Bytes bytes();

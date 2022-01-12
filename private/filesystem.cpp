@@ -445,14 +445,14 @@ namespace anton::fs {
         return _buffer != nullptr;
     }
 
-    void Input_File_Stream::read(void* buffer, i64 count) {
+    i64 Input_File_Stream::read(void* buffer, i64 count) {
         ANTON_ASSERT(_buffer, "Attempting to read from the stream, but no file has been opened.");
-        fread(buffer, count, 1, (FILE*)_buffer);
+        return fread(buffer, 1, count, (FILE*)_buffer);
     }
 
-    void Input_File_Stream::read(Slice<u8> const buffer) {
+    i64 Input_File_Stream::read(Slice<u8> const buffer) {
         ANTON_ASSERT(_buffer, "Attempting to read from the stream, but no file has been opened.");
-        fread(buffer.data(), buffer.size(), 1, (FILE*)_buffer);
+        return fread(buffer.data(), 1, buffer.size(), (FILE*)_buffer);
     }
 
     char32 Input_File_Stream::peek() {

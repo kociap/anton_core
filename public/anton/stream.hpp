@@ -36,8 +36,20 @@ namespace anton {
 
         [[nodiscard]] virtual operator bool() const = 0;
 
-        virtual void read(void* buffer, i64 count) = 0;
-        virtual void read(Slice<u8> buffer) = 0;
+        // read
+        //
+        // Returns:
+        // The number of bytes read.
+        //
+        virtual i64 read(void* buffer, i64 count) = 0;
+
+        // read
+        //
+        // Returns:
+        // The number of bytes read.
+        //
+        virtual i64 read(Slice<u8> buffer) = 0;
+
         [[nodiscard]] virtual char32 peek() = 0;
         virtual char32 get() = 0;
         virtual void unget() = 0;

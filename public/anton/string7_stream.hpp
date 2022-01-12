@@ -12,8 +12,20 @@ namespace anton {
 
         [[nodiscard]] virtual operator bool() const override;
 
-        virtual void read(void* buffer, i64 count) override;
-        virtual void read(Slice<u8> buffer) override;
+        // read
+        //
+        // Returns:
+        // The number of bytes read.
+        //
+        virtual i64 read(void* buffer, i64 count) override;
+
+        // read
+        //
+        // Returns:
+        // The number of bytes read.
+        //
+        virtual i64 read(Slice<u8> buffer) override;
+
         String7_View read(i64 count);
         [[nodiscard]] virtual char32 peek() override;
         [[nodiscard]] String7_View peek(i64 count);

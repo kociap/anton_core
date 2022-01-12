@@ -10,12 +10,14 @@ namespace anton {
         return true;
     }
 
-    void Input_String7_Stream::read(void*, i64) {
+    i64 Input_String7_Stream::read(void*, i64) {
         // TODO: Implement. We currently do not use those, so I just skipped those.
+        return 0;
     }
 
-    void Input_String7_Stream::read(Slice<u8>) {
+    i64 Input_String7_Stream::read(Slice<u8>) {
         // TODO: Implement. We currently do not use those, so I just skipped those.
+        return 0;
     }
 
     String7_View Input_String7_Stream::read(i64 count) {

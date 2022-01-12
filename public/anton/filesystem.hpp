@@ -241,8 +241,20 @@ namespace anton::fs {
         void close();
         [[nodiscard]] bool is_open() const;
 
-        virtual void read(void* buffer, i64 count) override;
-        virtual void read(Slice<u8> buffer) override;
+        // read
+        //
+        // Returns:
+        // The number of bytes read.
+        //
+        virtual i64 read(void* buffer, i64 count) override;
+
+        // read
+        //
+        // Returns:
+        // The number of bytes read.
+        //
+        virtual i64 read(Slice<u8> buffer) override;
+
         [[nodiscard]] virtual char32 peek() override;
         virtual char32 get() override;
 

@@ -8,11 +8,13 @@ namespace anton {
         return true;
     }
 
-    void Input_String_Stream::read(void*, i64) {
+    i64 Input_String_Stream::read(void*, i64) {
+        return 0;
         // TODO: Implement. We currently do not use those, so I just skipped those.
     }
 
-    void Input_String_Stream::read(Slice<u8>) {
+    i64 Input_String_Stream::read(Slice<u8>) {
+        return 0;
         // TODO: Implement. We currently do not use those, so I just skipped those.
     }
 

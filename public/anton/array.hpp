@@ -84,6 +84,9 @@ namespace anton {
 
         [[nodiscard]] size_type capacity() const;
 
+        [[nodiscard]] allocator_type& get_allocator();
+        [[nodiscard]] allocator_type const& get_allocator() const;
+
         // resize
         // Resizes the array allocating additional memory if n is greater than capacity.
         // If n is greater than size, the new elements are default constructed.
@@ -413,6 +416,16 @@ namespace anton {
     template<typename T, typename Allocator>
     auto Array<T, Allocator>::capacity() const -> size_type {
         return _capacity;
+    }
+
+    template<typename T, typename Allocator>
+    auto Array<T, Allocator>::get_allocator() -> allocator_type& {
+        return _allocator;
+    }
+
+    template<typename T, typename Allocator>
+    auto Array<T, Allocator>::get_allocator() const -> allocator_type const& {
+        return _allocator;
     }
 
     template<typename T, typename Allocator>

@@ -197,6 +197,18 @@ namespace anton {
     [[nodiscard]] String concat(Slice<String_View const> strings);
 
     // concat
+    // Concatenate a slice of strings.
+    //
+    // Parameters:
+    // allocator - allocator to be used by the concatenated string.
+    //   strings - a slice of strings to be concatenated.
+    //
+    // Returns:
+    // Concatenated string.
+    //
+    [[nodiscard]] String concat(Memory_Allocator* allocator, Slice<String_View const> strings);
+
+    // concat
     // Concatenate strings.
     //
     // Parameters:
@@ -209,6 +221,22 @@ namespace anton {
     [[nodiscard]] String concat(String_View const first, String_View const second, T&&... rest) {
         String_View strings[2 + sizeof...(rest)] = {first, second, String_View(rest)...};
         return concat(Slice<String_View>{strings});
+    }
+
+    // concat
+    // Concatenate strings.
+    //
+    // Parameters:
+    //              allocator - allocator to be used by the concatenated string.
+    // first, second, rest... - strings to be concatenated.
+    //
+    // Returns:
+    // Concatenated string.
+    //
+    template<typename... T>
+    [[nodiscard]] String concat(Memory_Allocator* const allocator, String_View const first, String_View const second, T&&... rest) {
+        String_View strings[2 + sizeof...(rest)] = {first, second, String_View(rest)...};
+        return concat(allocator, Slice<String_View>{strings});
     }
 
     // replace

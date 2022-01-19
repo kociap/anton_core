@@ -544,6 +544,10 @@ namespace anton {
     }
 
     String concat(Slice<String_View const> const strings) {
+        return concat(get_default_allocator(), strings);
+    }
+
+    String concat(Memory_Allocator* allocator, Slice<String_View const> strings) {
         // Precalculate allocation size to allocate exact size
         // and avoid reallocations.
         i64 size = 0;
@@ -551,10 +555,10 @@ namespace anton {
             size += string.size_bytes();
         }
 
-        String result{reserve, size};
+        String result{reserve, size, allocator};
         result.force_size(size);
         char8* iterator = result.data();
-        // Concatenate the strings into result string.
+        // Concatenate the strings into result.
         for(String_View const& string: strings) {
             copy(string.bytes_begin(), string.bytes_end(), iterator);
             iterator += string.size_bytes();

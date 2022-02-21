@@ -96,7 +96,9 @@ namespace anton {
             return iterator;
         }
 
-        // [[nodiscard]] difference_type operator-(Zip_Iterator const& b)
+        [[nodiscard]] difference_type operator-(Zip_Iterator const& other) {
+            return get<0>(_iterators) - get<0>(other._iterators);
+        }
 
         [[nodiscard]] reference operator*() const {
             return apply(_iterators, [](auto&&... iterators) -> reference { return {*iterators...}; });

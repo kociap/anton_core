@@ -119,14 +119,37 @@ namespace anton {
         //
         void force_size(size_type n);
 
+        // assign
+        // Overwrite the contents of the array with elements from the range [first, last[.
+        //
+        // Parameters:
+        // first, last - the range of elements to replace the contents with.
+        //
         template<typename Input_Iterator>
         void assign(Input_Iterator first, Input_Iterator last);
 
         // insert
-        // Constructs an object directly into array at position avoiding copies or moves.
-        // position must be a valid iterator.
+        // Inserts an object into the array at position.
         //
-        // Returns: iterator to the inserted element.
+        // Parameters:
+        // position - iterator to the insert position. Must be a valid iterator.
+        //    value - the object to be inserted into the array.
+        //
+        // Returns:
+        // iterator to the inserted element.
+        //
+        iterator insert(const_iterator position, T const& value);
+        iterator insert(const_iterator position, T&& value);
+
+        // insert
+        // Constructs an object directly into array at position avoiding copies or moves.
+        //
+        // Parameters:
+        // position - iterator to the insert position. Must be a valid iterator.
+        //  args... - arguments to forward to the constructor of T.
+        //
+        // Returns:
+        // iterator to the inserted element.
         //
         template<typename... Args>
         iterator insert(Variadic_Construct_Tag, const_iterator position, Args&&... args);
@@ -135,7 +158,8 @@ namespace anton {
         // Constructs an object directly into array at position avoiding copies or moves.
         // position must be an index greater than or equal 0 and less than or equal size.
         //
-        // Returns: iterator to the inserted element.
+        // Returns:
+        // iterator to the inserted element.
         //
         template<typename... Args>
         iterator insert(Variadic_Construct_Tag, size_type position, Args&&... args);
@@ -144,7 +168,8 @@ namespace anton {
         // Insert a range of elements into array at position.
         // position must be a valid iterator.
         //
-        // Returns: iterator to the first of the inserted elements.
+        // Returns:
+        // iterator to the first of the inserted elements.
         //
         template<typename Input_Iterator>
         iterator insert(const_iterator position, Input_Iterator first, Input_Iterator last);
@@ -153,7 +178,8 @@ namespace anton {
         // Insert a range of elements into array at position.
         // position must be an index greater than or equal 0 and less than or equal size.
         //
-        // Returns: iterator to the first of the inserted elements.
+        // Returns:
+        // iterator to the first of the inserted elements.
         //
         template<typename Input_Iterator>
         iterator insert(size_type position, Input_Iterator first, Input_Iterator last);
@@ -164,7 +190,7 @@ namespace anton {
         // position must be a valid iterator.
         //
         // Returns:
-        // Iterator to the inserted element.
+        // iterator to the inserted element.
         //
         iterator insert_unsorted(const_iterator position, value_type const& value);
         iterator insert_unsorted(const_iterator position, value_type&& value);
@@ -175,7 +201,7 @@ namespace anton {
         // position must be an index greater than or equal 0 and less than or equal size.
         //
         // Returns:
-        // Iterator to the inserted element.
+        // iterator to the inserted element.
         //
         iterator insert_unsorted(size_type position, value_type const& value);
         iterator insert_unsorted(size_type position, value_type&& value);
@@ -508,6 +534,18 @@ namespace anton {
         ensure_capacity(last - first);
         anton::uninitialized_copy(first, last, _data);
         _size = last - first;
+    }
+
+    template<typename T, typename Allocator>
+    auto Array<T, Allocator>::insert(const_iterator position, T const& value) -> iterator {
+        size_type const offset = static_cast<size_type>(position - begin());
+        return insert(variadic_construct, offset, value);
+    }
+
+    template<typename T, typename Allocator>
+    auto Array<T, Allocator>::insert(const_iterator position, T&& value) -> iterator {
+        size_type const offset = static_cast<size_type>(position - begin());
+        return insert(variadic_construct, offset, ANTON_MOV(value));
     }
 
     template<typename T, typename Allocator>

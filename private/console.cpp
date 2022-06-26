@@ -2,6 +2,11 @@
 
 #include <stdio.h>
 
+#if defined(_WIN64)
+#    include <fcntl.h>
+#    include <io.h>
+#endif
+
 namespace anton {
     Console_Output::~Console_Output() {}
 
@@ -35,5 +40,21 @@ namespace anton {
 
     i64 Console_Output::tell() {
         return ftell(stdout);
+    }
+
+    bool set_stdin_binary() {
+#if defined(_WIN64)
+        return _setmode(_fileno(stdin), _O_BINARY) != -1;
+#else
+        return true;
+#endif
+    }
+
+    bool set_stdout_binary() {
+#if defined(_WIN64)
+        return _setmode(_fileno(stdout), _O_BINARY) != -1;
+#else
+        return true;
+#endif
     }
 } // namespace anton

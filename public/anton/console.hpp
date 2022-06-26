@@ -17,4 +17,30 @@ namespace anton {
         virtual void seek(Seek_Dir dir, i64 offset) override;
         virtual i64 tell() override;
     };
+
+    // set_stdin_binary
+    // Set stdin to binary mode preventing \r\n sequences
+    // from being translated into \n.
+    //
+    // This function has effect only on Windows. On Linux
+    // there is no difference between binary and text mode.
+    //
+    // Returns:
+    // (Windows) true if the mode has been successfully changed.
+    // (Linux) always true.
+    //
+    bool set_stdin_binary();
+
+    // set_stdout_binary
+    // Set stdout to binary mode preventing \n from being
+    // translated into \r\n sequences.
+    //
+    // This function has effect only on Windows. On Linux
+    // there is no difference between binary and text mode.
+    //
+    // Returns:
+    // (Windows) true if the mode has been successfully changed.
+    // (Linux) always true.
+    //
+    bool set_stdout_binary();
 } // namespace anton

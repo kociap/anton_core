@@ -30,11 +30,6 @@ namespace anton {
         template<typename... Args>
         Expected(Expected_Error_Tag, Args&&... args): _error{ANTON_FWD(args)...}, _holds_value(false) {}
 
-        Expected(T const& v): _value{v}, _holds_value(true) {}
-        Expected(T&& v): _value{ANTON_MOV(v)}, _holds_value(true) {}
-        Expected(E const& v): _error{v}, _holds_value(false) {}
-        Expected(E&& v): _error{ANTON_MOV(v)}, _holds_value(false) {}
-
         Expected(Expected const& other): _null_state(), _holds_value(other._holds_value) {
             if(other._holds_value) {
                 anton::construct(anton::addressof(_value), other._value);

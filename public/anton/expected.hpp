@@ -25,12 +25,17 @@ namespace anton {
         using error_type = E;
 
         template<typename... Args>
-        Expected(Expected_Value_Tag, Args&&... args): _holds_value(true), _value{ANTON_FWD(args)...} {}
+        Expected(Expected_Value_Tag, Args&&... args): _value{ANTON_FWD(args)...}, _holds_value(true) {}
 
         template<typename... Args>
-        Expected(Expected_Error_Tag, Args&&... args): _holds_value(false), _error{ANTON_FWD(args)...} {}
+        Expected(Expected_Error_Tag, Args&&... args): _error{ANTON_FWD(args)...}, _holds_value(false) {}
 
-        Expected(Expected const& other): _holds_value(other._holds_value), _null_state() {
+        Expected(T const& v): _value{v}, _holds_value(true) {}
+        Expected(T&& v): _value{ANTON_MOV(v)}, _holds_value(true) {}
+        Expected(E const& v): _error{v}, _holds_value(false) {}
+        Expected(E&& v): _error{ANTON_MOV(v)}, _holds_value(false) {}
+
+        Expected(Expected const& other): _null_state(), _holds_value(other._holds_value) {
             if(other._holds_value) {
                 anton::construct(anton::addressof(_value), other._value);
             } else {
@@ -38,7 +43,7 @@ namespace anton {
             }
         }
 
-        Expected(Expected&& other): _holds_value(other._holds_value), _null_state() {
+        Expected(Expected&& other): _null_state(), _holds_value(other._holds_value) {
             if(other._holds_value) {
                 anton::construct(anton::addressof(_value), ANTON_MOV(other._value));
             } else {
@@ -201,12 +206,12 @@ namespace anton {
         }
 
     private:
-        bool _holds_value;
         union {
             T _value;
             E _error;
             bool _null_state;
         };
+        bool _holds_value;
     };
 
     template<typename E>
@@ -215,18 +220,21 @@ namespace anton {
         using value_type = void;
         using error_type = E;
 
-        Expected(Expected_Value_Tag): _holds_value(true) {}
+        Expected(Expected_Value_Tag): _null_state(), _holds_value(true) {}
 
         template<typename... Args>
-        Expected(Expected_Error_Tag, Args&&... args): _holds_value(false), _error{ANTON_FWD(args)...} {}
+        Expected(Expected_Error_Tag, Args&&... args): _error{ANTON_FWD(args)...}, _holds_value(false) {}
 
-        Expected(Expected const& other): _holds_value(other._holds_value), _null_state() {
+        Expected(E const& v): _error{v}, _holds_value(false) {}
+        Expected(E&& v): _error{ANTON_MOV(v)}, _holds_value(false) {}
+
+        Expected(Expected const& other): _null_state(), _holds_value(other._holds_value) {
             if(!other._holds_value) {
                 anton::construct(anton::addressof(_error), other._error);
             }
         }
 
-        Expected(Expected&& other): _holds_value(other._holds_value), _null_state() {
+        Expected(Expected&& other): _null_state(), _holds_value(other._holds_value) {
             if(!other._holds_value) {
                 anton::construct(anton::addressof(_error), ANTON_MOV(other._error));
             }
@@ -321,10 +329,10 @@ namespace anton {
         }
 
     private:
-        bool _holds_value;
         union {
             E _error;
             bool _null_state;
         };
+        bool _holds_value;
     };
 } // namespace anton

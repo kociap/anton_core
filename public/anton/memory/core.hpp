@@ -1,6 +1,7 @@
 #pragma once
 
 #include <anton/types.hpp>
+#include <anton/utility.hpp>
 
 namespace anton {
 #ifndef ANTON_HAS_NO_BUILTIN_ADDRESSOF
@@ -12,6 +13,13 @@ namespace anton {
 #endif
 
 #define ANTON_LAUNDER(p) __builtin_launder(p)
+
+// Because we need ANTON_FWD here, we provide a duplicate definition of it
+// in this header to avoid including <anton/utility.hpp> which includes
+// traits header that is heavy.
+#ifndef ANTON_FWD
+#    define ANTON_FWD(x) (static_cast<decltype(x)&&>(x))
+#endif
 
     // addressof
     template<typename T>

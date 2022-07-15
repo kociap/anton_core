@@ -6,7 +6,7 @@ option(ANTON_STRING_VIEW_VERIFY_ENCODING "Enable unicode validation in anton::St
 option(ANTON_STRING_VERIFY_ENCODING "Enable unicode validation in anton::String" OFF)
 option(ANTON_ITERATOR_DEBUG "Enable iterator checking" OFF)
 option(ANTON_DISABLE_VERIFY "Disable ANTON_VERIFY" OFF)
-option(ANTON_CHECK_OPTIONAL_VALUE "Enable checking whether optional holds a value" OFF)
+option(ANTON_OPTIONAL_CHECK_VALUE "Enable checking whether optional holds a value" OFF)
 option(ANTON_UNREACHABLE_ASSERTS "ANTON_UNREACHABLE will use assert instead of an intrinsic" OFF)
 
 include(FetchContent)
@@ -139,10 +139,10 @@ else()
     target_compile_definitions(anton_core PUBLIC ANTON_DISABLE_VERIFY=0)
 endif()
 
-if(ANTON_CHECK_OPTIONAL_VALUE)
-    target_compile_definitions(anton_core PUBLIC ANTON_CHECK_OPTIONAL_VALUE=1)
+if(ANTON_OPTIONAL_CHECK_VALUE)
+    target_compile_definitions(anton_core PUBLIC ANTON_OPTIONAL_CHECK_VALUE=1)
 else()
-    target_compile_definitions(anton_core PUBLIC ANTON_CHECK_OPTIONAL_VALUE=0)
+    target_compile_definitions(anton_core PUBLIC ANTON_OPTIONAL_CHECK_VALUE=0)
 endif()
 
 if(ANTON_UNREACHABLE_ASSERTS)

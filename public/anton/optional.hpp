@@ -1,9 +1,8 @@
 #pragma once
 
-#include <anton/aligned_buffer.hpp>
 #include <anton/assert.hpp>
 #include <anton/intrinsics.hpp>
-#include <anton/memory.hpp>
+#include <anton/memory/core.hpp>
 #include <anton/swap.hpp>
 #include <anton/tags.hpp>
 #include <anton/type_traits.hpp>
@@ -16,93 +15,185 @@ namespace anton {
     constexpr Null_Optional_Tag null_optional;
 
     namespace detail {
-        template<typename T, bool = is_trivially_destructible<T>>
-        struct Optional_Destruct_Base {
-        public:
-            Optional_Destruct_Base(): _null_state(), _holds_value(false) {}
-            template<typename... Args>
-            Optional_Destruct_Base(Variadic_Construct_Tag, Args&&... args): _value(ANTON_FWD(args)...), _holds_value(true) {}
-            ~Optional_Destruct_Base() = default;
+        template<typename T, bool Reference = is_reference<T>, bool Trivially_Destructible = is_trivially_destructible<T>>
+        struct Optional_Storage_Base;
 
-            void destruct() {
-                if(_holds_value) {
-                    _holds_value = false;
-                }
-            }
-
+        template<typename T>
+        struct Optional_Storage_Base<T, false, true> {
+        private:
             union {
                 char _null_state;
                 T _value;
             };
             bool _holds_value;
-        };
 
-        template<typename T>
-        struct Optional_Destruct_Base<T, false> {
         public:
-            Optional_Destruct_Base(): _null_state(), _holds_value(false) {}
-
+            Optional_Storage_Base(): _null_state(), _holds_value(false) {}
             template<typename... Args>
-            Optional_Destruct_Base(Variadic_Construct_Tag, Args&&... args): _value(ANTON_FWD(args)...), _holds_value(true) {}
+            Optional_Storage_Base(Variadic_Construct_Tag, Args&&... args): _value(ANTON_FWD(args)...), _holds_value(true) {}
+            ~Optional_Storage_Base() = default;
 
-            ~Optional_Destruct_Base() {
-                if(_holds_value) {
-                    _value.~T();
-                }
+            [[nodiscard]] bool holds_value() const {
+                return _holds_value;
             }
 
-            void destruct() {
-                if(_holds_value) {
-                    _value.~T();
-                    _holds_value = false;
-                }
+            [[nodiscard]] T& get() & {
+                return _value;
             }
 
-            union {
-                char _null_state;
-                T _value;
-            };
-            bool _holds_value;
-        };
-
-        template<typename T>
-        struct Optional_Storage_Base: public Optional_Destruct_Base<T> {
-        public:
-            using Optional_Destruct_Base<T>::Optional_Destruct_Base;
-
-            bool holds_value() const {
-                return this->_holds_value;
+            [[nodiscard]] T const& get() const& {
+                return _value;
             }
 
-            T& get() & {
-                return this->_value;
+            [[nodiscard]] T&& get() && {
+                return ANTON_MOV(_value);
             }
 
-            T const& get() const& {
-                return this->_value;
-            }
-
-            T&& get() && {
-                return ANTON_MOV(this->_value);
-            }
-
-            T const&& get() const&& {
-                return ANTON_MOV(this->_value);
+            [[nodiscard]] T const&& get() const&& {
+                return ANTON_MOV(_value);
             }
 
             template<typename... Args>
             void construct(Args&&... args) {
-                ANTON_ASSERT(!holds_value(), u8"construct called on empty Optional.");
-                ::new(addressof(this->_value)) T(ANTON_FWD(args)...);
-                this->_holds_value = true;
+                ANTON_ASSERT(!holds_value(), u8"construct called on engaged Optional");
+                ::new(ANTON_ADDRESSOF(_value)) T(ANTON_FWD(args)...);
+                _holds_value = true;
+            }
+
+            template<typename That>
+            void assign_from(That&& optional) {
+                if(holds_value()) {
+                    if(optional.holds_value()) {
+                        _value = ANTON_FWD(optional).get();
+                    } else {
+                        reset();
+                    }
+                } else {
+                    if(optional.holds_value()) {
+                        construct(ANTON_FWD(optional).get());
+                    }
+                }
+            }
+
+            void reset() {
+                if(_holds_value) {
+                    _holds_value = false;
+                }
+            }
+        };
+
+        template<typename T>
+        struct Optional_Storage_Base<T, false, false> {
+        private:
+            union {
+                char _null_state;
+                T _value;
+            };
+            bool _holds_value;
+
+        public:
+            Optional_Storage_Base(): _null_state(), _holds_value(false) {}
+            template<typename... Args>
+            Optional_Storage_Base(Variadic_Construct_Tag, Args&&... args): _value(ANTON_FWD(args)...), _holds_value(true) {}
+            ~Optional_Storage_Base() {
+                reset();
+            }
+
+            [[nodiscard]] bool holds_value() const {
+                return _holds_value;
+            }
+
+            [[nodiscard]] T& get() & {
+                return _value;
+            }
+
+            [[nodiscard]] T const& get() const& {
+                return _value;
+            }
+
+            [[nodiscard]] T&& get() && {
+                return ANTON_MOV(_value);
+            }
+
+            [[nodiscard]] T const&& get() const&& {
+                return ANTON_MOV(_value);
+            }
+
+            template<typename... Args>
+            void construct(Args&&... args) {
+                ANTON_ASSERT(!holds_value(), u8"construct called on engaged Optional");
+                ::new(ANTON_ADDRESSOF(_value)) T(ANTON_FWD(args)...);
+                _holds_value = true;
+            }
+
+            template<typename That>
+            void assign_from(That&& optional) {
+                if(holds_value()) {
+                    if(optional.holds_value()) {
+                        _value = ANTON_FWD(optional).get();
+                    } else {
+                        reset();
+                    }
+                } else {
+                    if(optional.holds_value()) {
+                        construct(ANTON_FWD(optional).get());
+                    }
+                }
+            }
+
+            void reset() {
+                if(_holds_value) {
+                    _value.~T();
+                    _holds_value = false;
+                }
+            }
+        };
+
+        template<typename T>
+        struct Optional_Storage_Base<T, true, true> {
+        private:
+            using _raw_type = remove_reference<T>;
+
+            _raw_type* _value = nullptr;
+
+        public:
+            Optional_Storage_Base() = default;
+            template<typename Arg>
+            Optional_Storage_Base(Variadic_Construct_Tag, Arg&& args): _value(ANTON_ADDRESSOF(args)) {}
+            ~Optional_Storage_Base() = default;
+
+            [[nodiscard]] bool holds_value() const {
+                return _value != nullptr;
+            }
+
+            [[nodiscard]] T& get() & {
+                return *_value;
+            }
+
+            [[nodiscard]] T const& get() const& {
+                return *_value;
+            }
+
+            [[nodiscard]] T&& get() && {
+                return ANTON_MOV(*_value);
+            }
+
+            [[nodiscard]] T const&& get() const&& {
+                return ANTON_MOV(*_value);
+            }
+
+            template<typename Args>
+            void construct(Args&& args) {
+                ANTON_ASSERT(!holds_value(), u8"construct called on engaged Optional");
+                _value = ANTON_ADDRESSOF(args);
             }
 
             void assign(Optional_Storage_Base const& opt) {
                 if(holds_value()) {
                     if(opt.holds_value()) {
-                        this->_value = opt.get();
+                        *_value = opt.get();
                     } else {
-                        this->destruct();
+                        destruct();
                     }
                 } else {
                     if(opt.holds_value()) {
@@ -114,7 +205,7 @@ namespace anton {
             void assign(Optional_Storage_Base&& opt) {
                 if(holds_value()) {
                     if(opt.holds_value()) {
-                        this->_value = ANTON_MOV(opt).get();
+                        *_value = ANTON_MOV(opt).get();
                         opt.destruct();
                     } else {
                         this->destruct();
@@ -122,9 +213,27 @@ namespace anton {
                 } else {
                     if(opt.holds_value()) {
                         construct(ANTON_MOV(opt).get());
-                        opt.destruct();
                     }
                 }
+            }
+
+            template<typename That>
+            void assign_from(That&& optional) {
+                if(holds_value()) {
+                    if(optional.holds_value()) {
+                        _value = ADDRESSOF(ANTON_FWD(optional).get());
+                    } else {
+                        reset();
+                    }
+                } else {
+                    if(optional.holds_value()) {
+                        construct(ANTON_FWD(optional).get());
+                    }
+                }
+            }
+
+            void reset() {
+                _value = nullptr;
             }
         };
 
@@ -140,6 +249,7 @@ namespace anton {
             using Optional_Storage_Base<T>::Optional_Storage_Base;
 
             Optional_Copy_Base() = default;
+            ~Optional_Copy_Base() = default;
 
             Optional_Copy_Base(Optional_Copy_Base const& other) {
                 if(other.holds_value()) {
@@ -164,12 +274,12 @@ namespace anton {
             using Optional_Copy_Base<T>::Optional_Copy_Base;
 
             Optional_Move_Base() = default;
+            ~Optional_Move_Base() = default;
             Optional_Move_Base(Optional_Move_Base const&) = default;
 
             Optional_Move_Base(Optional_Move_Base&& other) {
                 if(other.holds_value()) {
                     this->construct(ANTON_MOV(other).get());
-                    other.destruct();
                 }
             }
 
@@ -189,11 +299,12 @@ namespace anton {
             using Optional_Move_Base<T>::Optional_Move_Base;
 
             Optional_Copy_Assign_Base() = default;
+            ~Optional_Copy_Assign_Base() = default;
             Optional_Copy_Assign_Base(Optional_Copy_Assign_Base const&) = default;
             Optional_Copy_Assign_Base(Optional_Copy_Assign_Base&&) = default;
 
             Optional_Copy_Assign_Base& operator=(Optional_Copy_Assign_Base const& other) {
-                this->assign(other);
+                this->assign_from(other);
                 return *this;
             }
 
@@ -212,13 +323,13 @@ namespace anton {
             using Optional_Copy_Assign_Base<T>::Optional_Copy_Assign_Base;
 
             Optional_Move_Assign_Base() = default;
+            ~Optional_Move_Assign_Base() = default;
             Optional_Move_Assign_Base(Optional_Move_Assign_Base const&) = default;
             Optional_Move_Assign_Base(Optional_Move_Assign_Base&&) = default;
             Optional_Move_Assign_Base& operator=(Optional_Move_Assign_Base const&) = default;
 
             Optional_Move_Assign_Base& operator=(Optional_Move_Assign_Base&& other) {
-                this->assign(ANTON_MOV(other));
-                other.destruct();
+                this->assign_from(ANTON_MOV(other));
                 return *this;
             }
         };
@@ -241,6 +352,8 @@ namespace anton {
 
     public:
         using value_type = T;
+        using pointer_type = add_pointer<remove_reference<T>>;
+        using pointer_const_type = add_pointer<remove_reference<T> const>;
 
         Optional(Null_Optional_Tag) {}
 
@@ -255,75 +368,86 @@ namespace anton {
             : _base(variadic_construct, ANTON_FWD(arg)) {}
 
         Optional(Optional const&) = default;
-        // Leaves other in null_optional state
+        // Does not change other.has_value().
         Optional(Optional&& other) = default;
         Optional& operator=(Optional const&) = default;
-        // Leaves other in null_optional state
+        // Does not change other.has_value().
         Optional& operator=(Optional&& other) = default;
         ~Optional() = default;
 
+        using _base::holds_value;
+        using _base::reset;
+
         [[nodiscard]] operator bool() const {
-            return _base::holds_value();
+            return holds_value();
         }
 
-        [[nodiscard]] bool holds_value() const {
-            return _base::holds_value();
+        [[nodiscard]] pointer_type operator->() {
+            if constexpr(ANTON_OPTIONAL_CHECK_VALUE) {
+                ANTON_FAIL(holds_value(), u8"operator-> called on disengaged Optional.");
+            }
+            return ANTON_ADDRESSOF(this->get());
         }
 
-        [[nodiscard]] T* operator->() {
-            ANTON_ASSERT(holds_value(), u8"operator-> called on empty Optional.");
-            return addressof(this->get());
-        }
-
-        [[nodiscard]] T const* operator->() const {
-            ANTON_ASSERT(holds_value(), u8"operator-> called on empty Optional.");
-            return addressof(this->get());
+        [[nodiscard]] pointer_const_type operator->() const {
+            if constexpr(ANTON_OPTIONAL_CHECK_VALUE) {
+                ANTON_FAIL(holds_value(), u8"operator-> called on disengaged Optional.");
+            }
+            return ANTON_ADDRESSOF(this->get());
         }
 
         [[nodiscard]] T& operator*() & {
-            ANTON_ASSERT(holds_value(), u8"operator* called on empty Optional.");
+            if constexpr(ANTON_OPTIONAL_CHECK_VALUE) {
+                ANTON_FAIL(holds_value(), u8"operator* called on disengaged Optional.");
+            }
             return this->get();
         }
 
         [[nodiscard]] T const& operator*() const& {
-            ANTON_ASSERT(holds_value(), u8"operator* called on empty Optional.");
+            if constexpr(ANTON_OPTIONAL_CHECK_VALUE) {
+                ANTON_FAIL(holds_value(), u8"operator* called on disengaged Optional.");
+            }
             return this->get();
         }
 
         [[nodiscard]] T&& operator*() && {
-            ANTON_ASSERT(holds_value(), u8"operator* called on empty Optional.");
+            if constexpr(ANTON_OPTIONAL_CHECK_VALUE) {
+                ANTON_FAIL(holds_value(), u8"operator* called on disengaged Optional.");
+            }
             return this->get();
         }
 
         [[nodiscard]] T const&& operator*() const&& {
-            ANTON_ASSERT(holds_value(), u8"operator* called on empty Optional.");
+            if constexpr(ANTON_OPTIONAL_CHECK_VALUE) {
+                ANTON_FAIL(holds_value(), u8"operator* called on disengaged Optional.");
+            }
             return this->get();
         }
 
         [[nodiscard]] T& value() & {
-            if constexpr(ANTON_CHECK_OPTIONAL_VALUE) {
-                ANTON_FAIL(!holds_value(), u8"value() called on empty Optional.");
+            if constexpr(ANTON_OPTIONAL_CHECK_VALUE) {
+                ANTON_FAIL(holds_value(), u8"value() called on disengaged Optional");
             }
             return this->get();
         }
 
         [[nodiscard]] T const& value() const& {
-            if constexpr(ANTON_CHECK_OPTIONAL_VALUE) {
-                ANTON_FAIL(!holds_value(), u8"value() called on empty Optional.");
+            if constexpr(ANTON_OPTIONAL_CHECK_VALUE) {
+                ANTON_FAIL(holds_value(), u8"value() called on disengaged Optional");
             }
             return this->get();
         }
 
         [[nodiscard]] T&& value() && {
-            if constexpr(ANTON_CHECK_OPTIONAL_VALUE) {
-                ANTON_FAIL(!holds_value(), u8"value() called on empty Optional.");
+            if constexpr(ANTON_OPTIONAL_CHECK_VALUE) {
+                ANTON_FAIL(holds_value(), u8"value() called on disengaged Optional");
             }
             return this->get();
         }
 
         [[nodiscard]] T const&& value() const&& {
-            if constexpr(ANTON_CHECK_OPTIONAL_VALUE) {
-                ANTON_FAIL(!holds_value(), u8"value() called on empty Optional.");
+            if constexpr(ANTON_OPTIONAL_CHECK_VALUE) {
+                ANTON_FAIL(holds_value(), u8"value() called on disengaged Optional");
             }
             return this->get();
         }

@@ -175,12 +175,19 @@ namespace anton {
     [[nodiscard]] String operator+(String const& lhs, char8 const* rhs);
 
     [[nodiscard]] String to_string(i32 v);
+    [[nodiscard]] String to_string(Memory_Allocator* allocator, i32 v);
     [[nodiscard]] String to_string(u32 v);
+    [[nodiscard]] String to_string(Memory_Allocator* allocator, u32 v);
     [[nodiscard]] String to_string(i64 v);
+    [[nodiscard]] String to_string(Memory_Allocator* allocator, i64 v);
     [[nodiscard]] String to_string(u64 v);
+    [[nodiscard]] String to_string(Memory_Allocator* allocator, u64 v);
     [[nodiscard]] String to_string(f32 v);
+    [[nodiscard]] String to_string(Memory_Allocator* allocator, f32 v);
     [[nodiscard]] String to_string(f64 v);
+    [[nodiscard]] String to_string(Memory_Allocator* allocator, f64 v);
     [[nodiscard]] String to_string(void const* v);
+    [[nodiscard]] String to_string(Memory_Allocator* allocator, void const* v);
 
     // TODO: Implement in terms of String_View.
     [[nodiscard]] f32 str_to_f32(String const& string);
@@ -251,6 +258,20 @@ namespace anton {
     // A new string with all occurences of pattern replaced with replacement.
     //
     [[nodiscard]] String replace(String_View string, String_View pattern, String_View replacement);
+
+    // replace
+    // Replaces all occurences of pattern in string with replacement.
+    //
+    // Parameters:
+    //   allocator - allocator to be used by the result string.
+    //      string - the source string to perform replacement on.
+    //     pattern - the pattern to be replaced.
+    // replacement - the replacement string.
+    //
+    // Returns:
+    // A new string with all occurences of pattern replaced with replacement.
+    //
+    [[nodiscard]] String replace(Memory_Allocator* allocator, String_View string, String_View pattern, String_View replacement);
 
     template<>
     struct Default_Hash<String> {

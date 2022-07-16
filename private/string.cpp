@@ -454,7 +454,7 @@ namespace anton {
         return lhs + String_View(rhs);
     }
 
-    String to_string(i32 v) {
+    String to_string(Memory_Allocator* const allocator, i32 v) {
         // We don't need null-terminator or initialized elements.
         char buffer[11];
         bool has_sign = false;
@@ -470,10 +470,14 @@ namespace anton {
             v /= 10;
         } while(v > 0);
         buffer[i] = '-';
-        return String{buffer + i + !has_sign, buffer + 11};
+        return String{buffer + i + !has_sign, buffer + 11, allocator};
     }
 
-    String to_string(u32 v) {
+    String to_string(i32 v) {
+        return to_string(get_default_allocator(), v);
+    }
+
+    String to_string(Memory_Allocator* const allocator, u32 v) {
         // We don't need null-terminator or initialized elements.
         char buffer[10];
         i32 i = 9;
@@ -484,10 +488,14 @@ namespace anton {
         } while(v > 0);
         // We add 1 to readjust after the last decrement in the loop
         // that takes us to a position before the first digit.
-        return String{buffer + i + 1, buffer + 10};
+        return String{buffer + i + 1, buffer + 10, allocator};
     }
 
-    String to_string(i64 v) {
+    String to_string(u32 v) {
+        return to_string(get_default_allocator(), v);
+    }
+
+    String to_string(Memory_Allocator* const allocator, i64 v) {
         // We don't need null-terminator or initialized elements.
         char buffer[21];
         bool has_sign = false;
@@ -503,10 +511,14 @@ namespace anton {
             v /= 10;
         } while(v > 0);
         buffer[i] = '-';
-        return String{buffer + i + !has_sign, buffer + 21};
+        return String{buffer + i + !has_sign, buffer + 21, allocator};
     }
 
-    String to_string(u64 v) {
+    String to_string(i64 v) {
+        return to_string(get_default_allocator(), v);
+    }
+
+    String to_string(Memory_Allocator* const allocator, u64 v) {
         // We don't need null-terminator or initialized elements.
         char buffer[21];
         i64 i = 20;
@@ -517,26 +529,42 @@ namespace anton {
         } while(v > 0);
         // We add 1 to readjust after the last decrement in the loop
         // that takes us to a position before the first digit.
-        return String{buffer + i + 1, buffer + 21};
+        return String{buffer + i + 1, buffer + 21, allocator};
     }
 
-    String to_string(f32 value) {
+    String to_string(u64 v) {
+        return to_string(get_default_allocator(), v);
+    }
+
+    String to_string(Memory_Allocator* const allocator, f32 value) {
         char buffer[50] = {};
         i32 written_chars = sprintf(buffer, "%.7f", value);
-        return String{buffer, written_chars};
+        return String{buffer, written_chars, allocator};
     }
 
-    String to_string(f64 value) {
+    String to_string(f32 v) {
+        return to_string(get_default_allocator(), v);
+    }
+
+    String to_string(Memory_Allocator* const allocator, f64 value) {
         char buffer[50] = {};
         i32 written_chars = sprintf(buffer, "%.14f", value);
-        return String{buffer, written_chars};
+        return String{buffer, written_chars, allocator};
     }
 
-    String to_string(void const* value) {
+    String to_string(f64 v) {
+        return to_string(get_default_allocator(), v);
+    }
+
+    String to_string(Memory_Allocator* const allocator, void const* value) {
         char buffer[50] = {};
         usize address = reinterpret_cast<usize>(value);
         i32 written_chars = sprintf(buffer, "0x%016llx", address);
-        return String{buffer, written_chars};
+        return String{buffer, written_chars, allocator};
+    }
+
+    String to_string(void const* v) {
+        return to_string(get_default_allocator(), v);
     }
 
     f32 str_to_f32(String const& string) {
@@ -573,10 +601,10 @@ namespace anton {
         return b == e;
     }
 
-    String replace(String_View const string, String_View const pattern, String_View const replacement) {
+    String replace(Memory_Allocator* const allocator, String_View const string, String_View const pattern, String_View const replacement) {
         // Preallocate memory. We can't estimate how much we will need,
         // so we allocate enough to fit the old string.
-        String replaced{reserve, string.size_bytes()};
+        String replaced{reserve, string.size_bytes(), allocator};
         char8 const* iterator = string.bytes_begin();
         char8 const* const end = string.bytes_end();
         i64 const pattern_size = pattern.size_bytes();
@@ -602,5 +630,9 @@ namespace anton {
         replaced.force_size(total_size);
         copy(iterator, end, replaced_end);
         return replaced;
+    }
+
+    String replace(String_View const string, String_View const pattern, String_View const replacement) {
+        return replace(get_default_allocator(), string, pattern, replacement);
     }
 } // namespace anton

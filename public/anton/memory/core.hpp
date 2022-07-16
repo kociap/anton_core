@@ -1,7 +1,6 @@
 #pragma once
 
 #include <anton/types.hpp>
-#include <anton/utility.hpp>
 
 namespace anton {
 #ifndef ANTON_HAS_NO_BUILTIN_ADDRESSOF

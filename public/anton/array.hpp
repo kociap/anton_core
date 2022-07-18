@@ -45,8 +45,12 @@ namespace anton {
         Array(Array&& other, allocator_type const& allocator);
         template<typename Input_Iterator>
         Array(Range_Construct_Tag, Input_Iterator first, Input_Iterator last);
+        template<typename Input_Iterator>
+        Array(allocator_type const& allocator, Range_Construct_Tag, Input_Iterator first, Input_Iterator last);
         template<typename... Args>
         Array(Variadic_Construct_Tag, Args&&...);
+        template<typename... Args>
+        Array(allocator_type const& allocator, Variadic_Construct_Tag, Args&&...);
         ~Array();
 
         Array& operator=(Array const& other);
@@ -276,7 +280,7 @@ namespace anton {
     Array<T, Allocator>::Array(size_type n, value_type const& value): Array(n, value, allocator_type()) {}
 
     template<typename T, typename Allocator>
-    Array<T, Allocator>::Array(size_type n, value_type const& value, allocator_type const& allocator) {
+    Array<T, Allocator>::Array(size_type n, value_type const& value, allocator_type const& allocator): _allocator(allocator) {
         _capacity = math::max(ANTON_ARRAY_MIN_ALLOCATION_SIZE, n);
         _data = allocate(_capacity);
         anton::uninitialized_fill_n(_data, n, value);
@@ -310,7 +314,12 @@ namespace anton {
 
     template<typename T, typename Allocator>
     template<typename Input_Iterator>
-    Array<T, Allocator>::Array(Range_Construct_Tag, Input_Iterator first, Input_Iterator last) {
+    Array<T, Allocator>::Array(Range_Construct_Tag, Input_Iterator first, Input_Iterator last)
+        : Array(allocator_type(), range_construct, ANTON_MOV(first), ANTON_MOV(last)) {}
+
+    template<typename T, typename Allocator>
+    template<typename Input_Iterator>
+    Array<T, Allocator>::Array(allocator_type const& allocator, Range_Construct_Tag, Input_Iterator first, Input_Iterator last): _allocator(allocator) {
         // TODO: Use distance?
         size_type const count = last - first;
         _capacity = math::max(ANTON_ARRAY_MIN_ALLOCATION_SIZE, count);
@@ -321,7 +330,11 @@ namespace anton {
 
     template<typename T, typename Allocator>
     template<typename... Args>
-    Array<T, Allocator>::Array(Variadic_Construct_Tag, Args&&... args) {
+    Array<T, Allocator>::Array(Variadic_Construct_Tag, Args&&... args): Array(allocator_type(), variadic_construct, ANTON_FWD(args)...) {}
+
+    template<typename T, typename Allocator>
+    template<typename... Args>
+    Array<T, Allocator>::Array(allocator_type const& allocator, Variadic_Construct_Tag, Args&&... args): _allocator(allocator) {
         _capacity = math::max(ANTON_ARRAY_MIN_ALLOCATION_SIZE, static_cast<size_type>(sizeof...(Args)));
         _data = allocate(_capacity);
         anton::uninitialized_variadic_construct(_data, ANTON_FWD(args)...);

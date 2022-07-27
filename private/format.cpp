@@ -5,6 +5,16 @@
 #include <anton/optional.hpp>
 
 namespace anton {
+    Format_Buffer::Format_Buffer(Memory_Allocator* const allocator): _string(allocator) {}
+
+    void Format_Buffer::write(String_View string) {
+        _string += string;
+    }
+
+    String Format_Buffer::to_string() {
+        return ANTON_MOV(_string);
+    }
+
     struct Format_Field {
         String_View format;
         bool print;
@@ -56,93 +66,78 @@ namespace anton {
         }
     }
 
-    struct Default_Format_Buffer final: public Format_Buffer {
-    private:
-        String _string;
-
-    public:
-        virtual ~Default_Format_Buffer() override = default;
-
-        virtual void write(String_View string) override {
-            _string += string;
-        }
-
-        virtual String to_string() override {
-            return ANTON_MOV(_string);
-        }
-    };
-
-    void format_type(Format_Buffer& format_buffer, bool value) {
+    void format_type([[maybe_unused]] Memory_Allocator* const allocator, Format_Buffer& format_buffer, bool value) {
         String_View str = (value ? u8"true"_sv : u8"false"_sv);
         format_buffer.write(str);
     }
 
-    void format_type(Format_Buffer& format_buffer, i8 value) {
-        String str = to_string(value);
+    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, i8 value) {
+        String str = to_string(allocator, value);
         format_buffer.write(str);
     }
 
-    void format_type(Format_Buffer& format_buffer, u8 value) {
-        String str = to_string(value);
+    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, u8 value) {
+        String str = to_string(allocator, value);
         format_buffer.write(str);
     }
 
-    void format_type(Format_Buffer& format_buffer, i16 value) {
-        String str = to_string(value);
+    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, i16 value) {
+        String str = to_string(allocator, value);
         format_buffer.write(str);
     }
 
-    void format_type(Format_Buffer& format_buffer, u16 value) {
-        String str = to_string(value);
+    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, u16 value) {
+        String str = to_string(allocator, value);
         format_buffer.write(str);
     }
 
-    void format_type(Format_Buffer& format_buffer, i32 value) {
-        String str = to_string(value);
+    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, i32 value) {
+        String str = to_string(allocator, value);
         format_buffer.write(str);
     }
 
-    void format_type(Format_Buffer& format_buffer, u32 value) {
-        String str = to_string(value);
+    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, u32 value) {
+        String str = to_string(allocator, value);
         format_buffer.write(str);
     }
 
-    void format_type(Format_Buffer& format_buffer, i64 value) {
-        String str = to_string(value);
+    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, i64 value) {
+        String str = to_string(allocator, value);
         format_buffer.write(str);
     }
 
-    void format_type(Format_Buffer& format_buffer, u64 value) {
-        String str = to_string(value);
+    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, u64 value) {
+        String str = to_string(allocator, value);
         format_buffer.write(str);
     }
 
-    void format_type(Format_Buffer& format_buffer, f32 value) {
-        String str = to_string(value);
+    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, f32 value) {
+        String str = to_string(allocator, value);
         format_buffer.write(str);
     }
 
-    void format_type(Format_Buffer& format_buffer, f64 value) {
-        String str = to_string(value);
+    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, f64 value) {
+        String str = to_string(allocator, value);
         format_buffer.write(str);
     }
 
-    void format_type(Format_Buffer& format_buffer, void const* value) {
-        String str = to_string(value);
+    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, void const* value) {
+        String str = to_string(allocator, value);
         format_buffer.write(str);
     }
 
-    void format_type(Format_Buffer& format_buffer, String_View value) {
+    void format_type([[maybe_unused]] Memory_Allocator* const allocator, Format_Buffer& format_buffer, String_View value) {
         format_buffer.write(value);
     }
 
-    String detail::format_internal(Format_Buffer& buffer, String_View const format_string, Slice<Formatter_Base const* const> const arguments) {
+    String detail::format_internal(Memory_Allocator* const allocator, String_View const format_string, Slice<Formatter_Base const* const> const arguments) {
         Array<String_View> string_slices;
         Array<Format_Field> format_fields;
         if(!parse_format_string(format_string, string_slices, format_fields)) {
             ANTON_FAIL(false, "invalid format string");
         }
 
+        Format_Buffer buffer(allocator);
         auto field = format_fields.begin();
         auto const field_end = format_fields.end();
         auto args = arguments.begin();
@@ -154,7 +149,7 @@ namespace anton {
                     ++field;
                 } else if(args != args_end) {
                     auto arg = *args;
-                    arg->format(buffer);
+                    arg->format(allocator, buffer);
                     ++args;
                     ++field;
                 }
@@ -166,10 +161,5 @@ namespace anton {
         }
 
         return buffer.to_string();
-    }
-
-    String detail::format_internal(String_View const format_string, Slice<Formatter_Base const* const> arguments) {
-        Default_Format_Buffer buffer;
-        return format_internal(buffer, format_string, arguments);
     }
 } // namespace anton

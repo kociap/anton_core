@@ -15,6 +15,72 @@ namespace anton {
         return ANTON_MOV(_string);
     }
 
+    namespace detail {
+        void format_type([[maybe_unused]] Memory_Allocator* const allocator, Format_Buffer& format_buffer, bool value) {
+            String_View str = (value ? u8"true"_sv : u8"false"_sv);
+            format_buffer.write(str);
+        }
+
+        void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, i8 value) {
+            String str = to_string(allocator, value);
+            format_buffer.write(str);
+        }
+
+        void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, u8 value) {
+            String str = to_string(allocator, value);
+            format_buffer.write(str);
+        }
+
+        void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, i16 value) {
+            String str = to_string(allocator, value);
+            format_buffer.write(str);
+        }
+
+        void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, u16 value) {
+            String str = to_string(allocator, value);
+            format_buffer.write(str);
+        }
+
+        void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, i32 value) {
+            String str = to_string(allocator, value);
+            format_buffer.write(str);
+        }
+
+        void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, u32 value) {
+            String str = to_string(allocator, value);
+            format_buffer.write(str);
+        }
+
+        void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, i64 value) {
+            String str = to_string(allocator, value);
+            format_buffer.write(str);
+        }
+
+        void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, u64 value) {
+            String str = to_string(allocator, value);
+            format_buffer.write(str);
+        }
+
+        void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, f32 value) {
+            String str = to_string(allocator, value);
+            format_buffer.write(str);
+        }
+
+        void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, f64 value) {
+            String str = to_string(allocator, value);
+            format_buffer.write(str);
+        }
+
+        void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, void const* value) {
+            String str = to_string(allocator, value);
+            format_buffer.write(str);
+        }
+
+        void format_type([[maybe_unused]] Memory_Allocator* const allocator, Format_Buffer& format_buffer, String_View value) {
+            format_buffer.write(value);
+        }
+    } // namespace detail
+
     struct Format_Field {
         String_View format;
         bool print;
@@ -64,70 +130,6 @@ namespace anton {
                 return false;
             }
         }
-    }
-
-    void format_type([[maybe_unused]] Memory_Allocator* const allocator, Format_Buffer& format_buffer, bool value) {
-        String_View str = (value ? u8"true"_sv : u8"false"_sv);
-        format_buffer.write(str);
-    }
-
-    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, i8 value) {
-        String str = to_string(allocator, value);
-        format_buffer.write(str);
-    }
-
-    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, u8 value) {
-        String str = to_string(allocator, value);
-        format_buffer.write(str);
-    }
-
-    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, i16 value) {
-        String str = to_string(allocator, value);
-        format_buffer.write(str);
-    }
-
-    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, u16 value) {
-        String str = to_string(allocator, value);
-        format_buffer.write(str);
-    }
-
-    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, i32 value) {
-        String str = to_string(allocator, value);
-        format_buffer.write(str);
-    }
-
-    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, u32 value) {
-        String str = to_string(allocator, value);
-        format_buffer.write(str);
-    }
-
-    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, i64 value) {
-        String str = to_string(allocator, value);
-        format_buffer.write(str);
-    }
-
-    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, u64 value) {
-        String str = to_string(allocator, value);
-        format_buffer.write(str);
-    }
-
-    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, f32 value) {
-        String str = to_string(allocator, value);
-        format_buffer.write(str);
-    }
-
-    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, f64 value) {
-        String str = to_string(allocator, value);
-        format_buffer.write(str);
-    }
-
-    void format_type(Memory_Allocator* const allocator, Format_Buffer& format_buffer, void const* value) {
-        String str = to_string(allocator, value);
-        format_buffer.write(str);
-    }
-
-    void format_type([[maybe_unused]] Memory_Allocator* const allocator, Format_Buffer& format_buffer, String_View value) {
-        format_buffer.write(value);
     }
 
     String detail::format_internal(Memory_Allocator* const allocator, String_View const format_string, Slice<Formatter_Base const* const> const arguments) {

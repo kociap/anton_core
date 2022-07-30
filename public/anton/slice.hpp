@@ -31,19 +31,20 @@ namespace anton {
         using iterator = T*;
         using const_iterator = T const*;
 
-        Slice(): _data(nullptr), _size(0) {}
+        constexpr Slice(): _data(nullptr), _size(0) {}
         template<typename Integral, enable_if<is_integral<Integral>, i64> = 0>
-        Slice(T* const first, Integral const length): _data(first), _size(length) {}
-        Slice(T* const first, T* const last): _data(first), _size(last - first) {}
+        constexpr Slice(T* const first, Integral const length): _data(first), _size(length) {}
+        constexpr Slice(T* const first, T* const last): _data(first), _size(last - first) {}
         template<i64 N>
-        Slice(T (&array)[N]): _data(array), _size(N) {}
+        constexpr Slice(T (&array)[N]): _data(array), _size(N) {}
         template<typename Container>
-        Slice(Container& c,
-              enable_if<!is_slice<Container> && is_convertible<remove_pointer<decltype(anton::data(c))> (*)[], value_type (*)[]>, void*> = nullptr)
+        constexpr Slice(Container& c,
+                        enable_if<!is_slice<Container> && is_convertible<remove_pointer<decltype(anton::data(c))> (*)[], value_type (*)[]>, void*> = nullptr)
             : _data(anton::data(c)), _size(anton::size(c)) {}
         template<typename U>
-        Slice(Slice<U> const& other, enable_if<is_convertible<U (*)[], value_type (*)[]>, void*> = nullptr): _data(other.data()), _size(other.size()) {}
-        Slice(Slice const& other): _data(other._data), _size(other._size) {}
+        constexpr Slice(Slice<U> const& other, enable_if<is_convertible<U (*)[], value_type (*)[]>, void*> = nullptr)
+            : _data(other.data()), _size(other.size()) {}
+        constexpr Slice(Slice const& other): _data(other._data), _size(other._size) {}
 
         void operator=(Slice const& other) {
             _data = other._data;

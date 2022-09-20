@@ -1,5 +1,6 @@
 #pragma once
 
+#include <anton/allocator.hpp>
 #include <anton/array.hpp>
 #include <anton/stream.hpp>
 #include <anton/string.hpp>
@@ -14,6 +15,7 @@ namespace anton::fs {
     // Concatenate paths with separator.
     //
     [[nodiscard]] String concat_paths(String_View path1, String_View path2);
+    [[nodiscard]] String concat_paths(Memory_Allocator* allocator, String_View path1, String_View path2);
 
     [[nodiscard]] String_View remove_filename(String_View path);
     [[nodiscard]] String_View remove_extension(String_View path);
@@ -55,7 +57,7 @@ namespace anton::fs {
     //
     [[nodiscard]] String_View get_extension(String_View path);
 
-    [[nodiscard]] String parent_path(String_View const path);
+    [[nodiscard]] String parent_path(String_View path);
 
     // get_directory_name
     // Returns the directory information for the specified path.

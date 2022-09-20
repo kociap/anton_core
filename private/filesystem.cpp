@@ -12,7 +12,7 @@
 #include <string_view>
 
 namespace anton::fs {
-    static Array<char16> string8_to_string16(String_View const string8) {
+    [[nodiscard]] static Array<char16> string8_to_string16(String_View const string8) {
         i64 const string16_bytes = unicode::convert_utf8_to_utf16(string8.data(), string8.size_bytes(), nullptr);
         // Add 1 to the length for null-terminator.
         Array<char16> string16(1 + string16_bytes / sizeof(char16), 0);
@@ -20,9 +20,14 @@ namespace anton::fs {
         return string16;
     }
 
-    static String fs_path_to_string(std::filesystem::path const& path) {
+    [[nodiscard]] static String fs_path_to_string(std::filesystem::path const& path) {
         std::string gen_str = path.generic_string();
         return String{gen_str.data(), (i64)gen_str.size()};
+    }
+
+    [[nodiscard]] static String fs_path_to_string(Memory_Allocator* allocator, std::filesystem::path const& path) {
+        std::string gen_str = path.generic_string();
+        return String{gen_str.data(), (i64)gen_str.size(), allocator};
     }
 
     String normalize_path(String_View const path) {
@@ -35,6 +40,13 @@ namespace anton::fs {
         std::filesystem::path b(std::string_view(rhs.data(), rhs.size_bytes()));
         a /= b;
         return fs_path_to_string(a);
+    }
+
+    String concat_paths(Memory_Allocator* allocator, String_View const lhs, String_View const rhs) {
+        std::filesystem::path a(std::string_view(lhs.data(), lhs.size_bytes()));
+        std::filesystem::path b(std::string_view(rhs.data(), rhs.size_bytes()));
+        a /= b;
+        return fs_path_to_string(allocator, a);
     }
 
     String_View remove_filename(String_View const path) {

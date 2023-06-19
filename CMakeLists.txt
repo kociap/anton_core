@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-option(ANTON_BUILD_DEBUG "Whether to build debug" ON)
+option(ANTON_BUILD_DEBUG "Whether to build debug" OFF)
 option(ANTON_UNICODE_VALIDATE_ENCODING "Enable unicode validation" OFF)
 option(ANTON_STRING_VIEW_VERIFY_ENCODING "Enable unicode validation in anton::String_View" OFF)
 option(ANTON_STRING_VERIFY_ENCODING "Enable unicode validation in anton::String" OFF)

@@ -23,7 +23,7 @@ project(anton_core)
 add_library(anton_core)
 set_target_properties(anton_core PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
 target_include_directories(anton_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/public")
-target_sources(anton_core 
+target_sources(anton_core
     PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/algorithm/sort.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/detail/crt.hpp"
@@ -103,53 +103,16 @@ target_sources(anton_core
 
 target_compile_definitions(anton_core PRIVATE _CRT_SECURE_NO_WARNINGS NOMINMAX WIN32_LEAN_AND_MEAN VC_EXTRALEAN UNICODE _UNICODE)
 
-if(ANTON_UNICODE_VALIDATE_ENCODING)
-    target_compile_definitions(anton_core PUBLIC ANTON_UNICODE_VALIDATE_ENCODING=1)
-else()
-    target_compile_definitions(anton_core PUBLIC ANTON_UNICODE_VALIDATE_ENCODING=0)
-endif()
-
-if(ANTON_ITERATOR_DEBUG)
-    target_compile_definitions(anton_core PUBLIC ANTON_ITERATOR_DEBUG=1)
-else()
-    target_compile_definitions(anton_core PUBLIC ANTON_ITERATOR_DEBUG=0)
-endif()
-
-if(ANTON_STRING_VIEW_VERIFY_ENCODING)
-    target_compile_definitions(anton_core PUBLIC ANTON_STRING_VIEW_VERIFY_ENCODING=1)
-else()
-    target_compile_definitions(anton_core PUBLIC ANTON_STRING_VIEW_VERIFY_ENCODING=0)
-endif()
-
-if(ANTON_STRING_VERIFY_ENCODING)
-    target_compile_definitions(anton_core PUBLIC ANTON_STRING_VERIFY_ENCODING=1)
-else()
-    target_compile_definitions(anton_core PUBLIC ANTON_STRING_VERIFY_ENCODING=0)
-endif()
-
-if(ANTON_BUILD_DEBUG)
-    target_compile_definitions(anton_core PUBLIC ANTON_DEBUG=1)
-else()
-    target_compile_definitions(anton_core PUBLIC ANTON_DEBUG=0)
-endif()
-
-if(ANTON_DISABLE_VERIFY)
-    target_compile_definitions(anton_core PUBLIC ANTON_DISABLE_VERIFY=1)
-else()
-    target_compile_definitions(anton_core PUBLIC ANTON_DISABLE_VERIFY=0)
-endif()
-
-if(ANTON_OPTIONAL_CHECK_VALUE)
-    target_compile_definitions(anton_core PUBLIC ANTON_OPTIONAL_CHECK_VALUE=1)
-else()
-    target_compile_definitions(anton_core PUBLIC ANTON_OPTIONAL_CHECK_VALUE=0)
-endif()
-
-if(ANTON_UNREACHABLE_ASSERTS)
-    target_compile_definitions(anton_core PUBLIC ANTON_UNREACHABLE_ASSERTS=1)
-else()
-    target_compile_definitions(anton_core PUBLIC ANTON_UNREACHABLE_ASSERTS=0)
-endif()
+target_compile_definitions(anton_core PUBLIC
+    ANTON_BUILD_DEBUG=$<BOOL:${ANTON_BUILD_DEBUG}>
+    ANTON_ITERATOR_DEBUG=$<BOOL:${ANTON_ITERATOR_DEBUG}>
+    ANTON_DISABLE_VERIFY=$<BOOL:${ANTON_DISABLE_VERIFY}>
+    ANTON_UNREACHABLE_ASSERTS=$<BOOL:${ANTON_UNREACHABLE_ASSERTS}>
+    ANTON_UNICODE_VALIDATE_ENCODING=$<BOOL:${ANTON_UNICODE_VALIDATE_ENCODING}>
+    ANTON_STRING_VIEW_VERIFY_ENCODING=$<BOOL:${ANTON_STRING_VIEW_VERIFY_ENCODING}>
+    ANTON_STRING_VERIFY_ENCODING=$<BOOL:${ANTON_STRING_VERIFY_ENCODING}>
+    ANTON_OPTIONAL_CHECK_VALUE=$<BOOL:${ANTON_OPTIONAL_CHECK_VALUE}>
+)
 
 target_link_libraries(anton_core PUBLIC anton_math PRIVATE DbgHelp)
 
@@ -178,6 +141,8 @@ if(ANTON_COMPILER_CL GREATER -1)
 else()
   set(ANTON_COMPILER_CL OFF)
 endif()
+
+# TODO: Add appropriate flags, e.g. no exceptions, no rtti, etc.
 
 if(ANTON_COMPILER_CLANGPP OR ANTON_COMPILER_CLANGCL)
     target_compile_definitions(anton_core PUBLIC ANTON_COMPILER_CLANG=1 ANTON_COMPILER_MSVC=0)

@@ -23,7 +23,7 @@ namespace anton {
     };
 
     template<typename T>
-    Range(T const&, T const&) -> Range<T>;
+    Range(T const&, T const&) -> Range<anton::remove_reference<T>>;
     template<typename T>
-    Range(T&&, T&&) -> Range<T>;
+    Range(T&&, T&&) -> Range<anton::remove_reference<T>>;
 } // namespace anton

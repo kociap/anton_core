@@ -8,9 +8,11 @@ namespace anton {
     [[noreturn]] void anton_assert(char8 const* message, char8 const* file, u64 line);
 } // namespace anton
 
-#if defined(__clang__) || defined(__GNUC__)
+#if ANTON_COMPILER_CLANG
 #    if ANTON_UNREACHABLE_ASSERTS
-#        define ANTON_UNREACHABLE() ::anton::anton_assert(u8"unreachable", __FILE__, __LINE__)
+#        define ANTON_UNREACHABLE()                                     \
+            ::anton::anton_assert(u8"unreachable", __FILE__, __LINE__); \
+            __builtin_unreachable()
 #    else
 #        define ANTON_UNREACHABLE() __builtin_unreachable()
 #    endif
@@ -18,9 +20,11 @@ namespace anton {
 #    define ANTON_LIKELY(x) __builtin_expect(!!(x), 1)
 #    define ANTON_FORCEINLINE __attribute__((always_inline))
 #    define ANTON_NOINLINE __attribute__((noinline))
-#elif defined(_MSC_VER)
+#elif ANTON_COMPILER_MSVC
 #    if ANTON_UNREACHABLE_ASSERTS
-#        define ANTON_UNREACHABLE() ::anton::anton_assert(u8"unreachable", __FILE__, __LINE__)
+#        define ANTON_UNREACHABLE()                                     \
+            ::anton::anton_assert(u8"unreachable", __FILE__, __LINE__); \
+            __assume(0)
 #    else
 #        define ANTON_UNREACHABLE() __assume(0)
 #    endif

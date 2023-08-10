@@ -247,7 +247,7 @@ namespace anton {
     }
 
     // replace
-    // Replaces all occurences of pattern in string with replacement.
+    // Replaces all occurrences of pattern in string with replacement.
     //
     // Parameters:
     //      string - the source string to perform replacement on.
@@ -255,12 +255,12 @@ namespace anton {
     // replacement - the replacement string.
     //
     // Returns:
-    // A new string with all occurences of pattern replaced with replacement.
+    // A new string with all occurrences of pattern replaced with replacement.
     //
     [[nodiscard]] String replace(String_View string, String_View pattern, String_View replacement);
 
     // replace
-    // Replaces all occurences of pattern in string with replacement.
+    // Replaces all occurrences of pattern in string with replacement.
     //
     // Parameters:
     //   allocator - allocator to be used by the result string.
@@ -269,7 +269,7 @@ namespace anton {
     // replacement - the replacement string.
     //
     // Returns:
-    // A new string with all occurences of pattern replaced with replacement.
+    // A new string with all occurrences of pattern replaced with replacement.
     //
     [[nodiscard]] String replace(Memory_Allocator* allocator, String_View string, String_View pattern, String_View replacement);
 

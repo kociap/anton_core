@@ -132,7 +132,7 @@ namespace anton {
     }
 
     // find_substring
-    // Finds the first occurence of substr within string.
+    // Finds the first occurrence of substr within string.
     //
     // Parameters:
     // string - the source string.
@@ -159,7 +159,7 @@ namespace anton {
     }
 
     // find_last_substring
-    // Finds the last occurence of substr within string.
+    // Finds the last occurrence of substr within string.
     //
     // Parameters:
     // string - the source string.

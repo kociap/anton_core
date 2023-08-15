@@ -6,6 +6,7 @@
 #include <anton/functors.hpp>
 #include <anton/hashing/murmurhash2.hpp>
 #include <anton/iterators.hpp>
+#include <anton/math/math.hpp>
 #include <anton/swap.hpp>
 #include <anton/types.hpp>
 
@@ -248,6 +249,60 @@ namespace anton {
             }
         }
         return substr_begin == substr_end;
+    }
+
+    // TODO: Implement shrink_chars functions.
+
+    // shrink_front_bytes
+    // Shrink the string from the front by count bytes.
+    // Does not validate that the obtained substring is a valid unicode string.
+    //
+    // Parameters:
+    // string - the source string.
+    //  count - the number of bytes to shave off the front of the string. Must be positive.
+    //
+    // Returns:
+    // String shrunk at the front by count bytes.
+    //
+    [[nodiscard]] constexpr String_View shrink_front_bytes(String_View const string, i64 const count) {
+        ANTON_ASSERT(count >= 0, "shrink count must be positive");
+        i64 const shrink_size = math::min(string.size_bytes(), count);
+        return String_View{string.bytes_begin() + shrink_size, string.bytes_end()};
+    }
+
+    // shrink_back_bytes
+    // Shrink the string from the back by count bytes.
+    // Does not validate that the obtained substring is a valid unicode string.
+    //
+    // Parameters:
+    // string - the source string.
+    //  count - the number of bytes to shave off the back of the string. Must be positive.
+    //
+    // Returns:
+    // String shrunk at the back by count bytes.
+    //
+    [[nodiscard]] constexpr String_View shrink_back_bytes(String_View const string, i64 const count) {
+        ANTON_ASSERT(count >= 0, "shrink count must be positive");
+        i64 const shrink_size = math::min(string.size_bytes(), count);
+        return String_View{string.bytes_begin(), string.bytes_end() - shrink_size};
+    }
+
+    // shrink_bytes
+    // Shrink the string from both ends by front_count and back_count bytes respectively.
+    // Does not validate that the obtained substring is a valid unicode string.
+    //
+    // Parameters:
+    //      string - the source string.
+    // front_count - the number of bytes to shave off the front of the string. Must be positive.
+    //  back_count - the number of bytes to shave off the back of the string. Must be positive.
+    //
+    // Returns:
+    // String shrunk on both ends by front_count and back_count bytes respectively.
+    //
+    [[nodiscard]] constexpr String_View shrink_bytes(String_View const string, i64 const front_count, i64 const back_count) {
+        ANTON_ASSERT(front_count >= 0, "shrink front_count must be positive");
+        ANTON_ASSERT(back_count >= 0, "shrink back_count must be positive");
+        return shrink_back_bytes(shrink_front_bytes(string, front_count), back_count);
     }
 
     // str_to_i64

@@ -147,7 +147,7 @@ namespace anton {
     //
     [[nodiscard]] i32 compare(String_View lhs, String_View rhs);
 
-    constexpr u64 hash(String_View const view) {
+    [[nodiscard]] constexpr u64 hash(String_View const view) {
         return murmurhash2_64(view.bytes_begin(), view.size_bytes());
     }
 

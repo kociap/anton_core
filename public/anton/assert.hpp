@@ -9,7 +9,7 @@ namespace anton {
 
 #define ANTON_FAIL(condition, msg) (ANTON_LIKELY(static_cast<bool>(condition)) ? (void)0 : ::anton::anton_assert(msg, __FILE__, __LINE__))
 
-#if ANTON_DEBUG
+#if ANTON_BUILD_DEBUG
 #    define ANTON_ASSERT(condition, msg) (ANTON_LIKELY(static_cast<bool>(condition)) ? (void)0 : ::anton::anton_assert(msg, __FILE__, __LINE__))
 #else
 #    define ANTON_ASSERT(condition, msg) ((void)0)

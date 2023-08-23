@@ -89,6 +89,7 @@ extern "C" {
 
     #define EOF    (-1)
 
+    ANTON_CRT_IMPORT int fprintf (FILE* stream, char const* format, ...);
     ANTON_CRT_IMPORT FILE* fopen(char const* filename, char const* modes);
     ANTON_CRT_IMPORT FILE* freopen(char const* filename, char const* mode, FILE* stream);
     ANTON_CRT_IMPORT int fclose(FILE* stream);

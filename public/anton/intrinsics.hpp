@@ -8,6 +8,9 @@ namespace anton {
     [[noreturn]] void anton_assert(char8 const* message, char8 const* file, u64 line);
 } // namespace anton
 
+#define ANTON_DEBUG_BREAK() \
+    { __asm__ __volatile__("int3"); }
+
 #if ANTON_COMPILER_CLANG
 #    if ANTON_UNREACHABLE_ASSERTS
 #        define ANTON_UNREACHABLE()                                     \

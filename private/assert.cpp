@@ -1,11 +1,9 @@
 #include <anton/assert.hpp>
 
 #include <anton/format.hpp>
+#include <anton/intrinsics.hpp>
 #include <anton/stacktrace.hpp>
 #include <anton/string.hpp>
-
-#include <Windows.h>
-#include <stdio.h>
 
 namespace anton {
     void anton_assert(char8 const* message, char8 const* file, u64 line) {
@@ -23,15 +21,7 @@ namespace anton {
         fprintf(stderr, "%s", dialog_text.data());
         fflush(stderr);
 
-        dialog_text += u8"\nPress 'Retry' to break into debug mode."_sv;
-        int clicked_button = MessageBoxA(nullptr, dialog_text.data(), "Assertion Failed", MB_ABORTRETRYIGNORE | MB_TASKMODAL);
-        if(clicked_button == IDRETRY) {
-            DebugBreak();
-        } else {
-            HANDLE current_process = GetCurrentProcess();
-            // TODO: Exit code (what does 900 mean?)
-            TerminateProcess(current_process, 900);
-        }
+        ANTON_DEBUG_BREAK();
 
         // If the above methods fail (although they shouldn't), we enter an infinite loop to never return.
         while(true) {}

@@ -105,7 +105,7 @@ namespace anton {
         }
 
         [[nodiscard]] reference operator[](difference_type n) const {
-            return apply(_iterators, [](auto&&... iterators) -> reference { return {*(iterators + n)}; });
+            return apply(_iterators, [n](auto&&... iterators) -> reference { return {*(iterators + n)...}; });
         }
 
         [[nodiscard]] bool operator==(Zip_Iterator const& rhs) const {

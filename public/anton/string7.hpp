@@ -116,7 +116,7 @@ namespace anton {
     };
 
     inline namespace literals {
-        [[nodiscard]] String7 operator"" _s7(char8 const* literal, u64 size);
+        [[nodiscard]] String7 operator""_s7(char8 const* literal, u64 size);
     }
 
     [[nodiscard]] bool operator==(String7 const& lhs, String7 const& rhs);

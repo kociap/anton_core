@@ -319,7 +319,7 @@ namespace anton {
     }
 
     inline namespace literals {
-        String7 operator"" _s(char8 const* const literal, u64 const size) {
+        String7 operator""_s(char8 const* const literal, u64 const size) {
             return String7{literal, (i64)size};
         }
     } // namespace literals

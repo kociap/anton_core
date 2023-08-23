@@ -193,7 +193,7 @@ namespace anton {
                     if(opt.holds_value()) {
                         *_value = opt.get();
                     } else {
-                        destruct();
+                        reset();
                     }
                 } else {
                     if(opt.holds_value()) {
@@ -206,9 +206,9 @@ namespace anton {
                 if(holds_value()) {
                     if(opt.holds_value()) {
                         *_value = ANTON_MOV(opt).get();
-                        opt.destruct();
+                        opt.reset();
                     } else {
-                        this->destruct();
+                        reset();
                     }
                 } else {
                     if(opt.holds_value()) {

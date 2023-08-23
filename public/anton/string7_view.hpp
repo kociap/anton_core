@@ -90,7 +90,7 @@ namespace anton {
     };
 
     inline namespace literals {
-        [[nodiscard]] constexpr String7_View operator"" _sv7(char8 const* literal, u64 size) {
+        [[nodiscard]] constexpr String7_View operator""_sv7(char8 const* literal, u64 size) {
             return String7_View{literal, (i64)size};
         }
     } // namespace literals
@@ -127,7 +127,7 @@ namespace anton {
     //
     [[nodiscard]] i32 compare(String7_View lhs, String7_View rhs);
 
-    constexpr u64 hash(String7_View const view) {
+    [[nodiscard]] constexpr u64 hash(String7_View const view) {
         return murmurhash2_64(view.begin(), view.size());
     }
 

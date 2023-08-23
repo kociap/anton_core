@@ -158,7 +158,7 @@ namespace anton {
     };
 
     inline namespace literals {
-        [[nodiscard]] String operator"" _s(char8 const* literal, u64 size);
+        [[nodiscard]] String operator""_s(char8 const* literal, u64 size);
     }
 
     [[nodiscard]] bool operator==(String const& lhs, String const& rhs);

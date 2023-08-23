@@ -5,11 +5,12 @@
 namespace anton {
     void* allocate(i64 size, i64 alignment) {
         ANTON_VERIFY(alignment > 0 && !(alignment & (alignment - 1)), "alignment is not a power of 2");
-        return _aligned_malloc(size, alignment);
+        // TODO: Ensure size is multiple of alignment?
+        return ALIGNED_ALLOC(size, alignment);
     }
 
     void deallocate(void* memory) {
-        _aligned_free(memory);
+        ALIGNED_FREE(memory);
     }
 
     void fill_memory(void* first, void* last, char8 value) {

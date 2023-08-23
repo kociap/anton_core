@@ -1,11 +1,11 @@
 #pragma once
 
 #if defined(_WIN64)
-    #define ANTON_NOEXCEPT
+    #define ANTON_CRT_NOEXCEPT
     #define ANTON_CRT_IMPORT __declspec(dllimport)
     #define size_t unsigned long long
 #else 
-    #define ANTON_NOEXCEPT noexcept
+    #define ANTON_CRT_NOEXCEPT noexcept
     #define ANTON_CRT_IMPORT
     #define size_t unsigned long int
 #endif
@@ -33,18 +33,28 @@ extern "C" {
 
     size_t strlen(char const* string);
 
-    // malloc.h
+    // Aligned allocation functions
     #if defined(_WIN64)
-        ANTON_CRT_IMPORT void* _aligned_malloc(size_t size, size_t alignment);
-        ANTON_CRT_IMPORT void _aligned_free(void* memory);
+        ANTON_CRT_IMPORT void* _aligned_malloc(size_t size, size_t alignment); // malloc.h
+        ANTON_CRT_IMPORT void _aligned_free(void* memory); // malloc.h
+
+        #define ALIGNED_ALLOC(size, alignment) _aligned_malloc(size, alignment)
+        #define ALIGNED_FREE(ptr) _aligned_free(ptr)
+    #else
+        // aligned_alloc is C11
+        void* aligned_alloc(size_t alignment, size_t size) ANTON_CRT_NOEXCEPT;
+        void free(void* ptr) ANTON_CRT_NOEXCEPT;
+
+        #define ALIGNED_ALLOC(size, alignment) aligned_alloc(alignment, size)
+        #define ALIGNED_FREE(ptr) free(ptr)
     #endif
 
     // stdlib.h
     
-    ANTON_CRT_IMPORT float strtof(char const*, char**);
-    ANTON_CRT_IMPORT double strtod(char const*, char**);
-    ANTON_CRT_IMPORT long long strtoll(char const*, char**, int base);
-    ANTON_CRT_IMPORT unsigned long long strtoull(char const*, char**, int base);
+    ANTON_CRT_IMPORT float strtof(char const*, char**) ANTON_CRT_NOEXCEPT;
+    ANTON_CRT_IMPORT double strtod(char const*, char**) ANTON_CRT_NOEXCEPT;
+    ANTON_CRT_IMPORT long long strtoll(char const*, char**, int base) ANTON_CRT_NOEXCEPT;
+    ANTON_CRT_IMPORT unsigned long long strtoull(char const*, char**, int base) ANTON_CRT_NOEXCEPT;
 
     // stdio.h
 
@@ -79,18 +89,12 @@ extern "C" {
 
     #define EOF    (-1)
 
-    #if defined(_WIN64)
-        #define ANTON_CRT_STDIO_NOEXCEPT
-    #else
-        #define ANTON_CRT_STDIO_NOEXCEPT noexcept
-    #endif
-
     ANTON_CRT_IMPORT FILE* fopen(char const* filename, char const* modes);
     ANTON_CRT_IMPORT FILE* freopen(char const* filename, char const* mode, FILE* stream);
     ANTON_CRT_IMPORT int fclose(FILE* stream);
     ANTON_CRT_IMPORT int fflush(FILE* stream);
-    ANTON_CRT_IMPORT void setbuf(FILE* stream, char* buffer) ANTON_CRT_STDIO_NOEXCEPT;
-    ANTON_CRT_IMPORT int setvbuf(FILE* stream, char* buffer, int mode, size_t size) ANTON_CRT_STDIO_NOEXCEPT;
+    ANTON_CRT_IMPORT void setbuf(FILE* stream, char* buffer) ANTON_CRT_NOEXCEPT;
+    ANTON_CRT_IMPORT int setvbuf(FILE* stream, char* buffer, int mode, size_t size) ANTON_CRT_NOEXCEPT;
     ANTON_CRT_IMPORT size_t fread(void* buffer, size_t size, size_t count, FILE* stream);
     ANTON_CRT_IMPORT size_t fwrite(void const* buffer, size_t size, size_t count, FILE* stream);
     ANTON_CRT_IMPORT int fgetc(FILE* stream);
@@ -105,11 +109,9 @@ extern "C" {
     ANTON_CRT_IMPORT long ftell(FILE* stream);
     ANTON_CRT_IMPORT int fseek(FILE* stream, long offset, int origin);
     ANTON_CRT_IMPORT void rewind(FILE* stream);
-    ANTON_CRT_IMPORT int ferror(FILE* stream) ANTON_CRT_STDIO_NOEXCEPT;
-    ANTON_CRT_IMPORT int feof(FILE* stream) ANTON_CRT_STDIO_NOEXCEPT;
-    ANTON_CRT_IMPORT void clearerr(FILE* stream) ANTON_CRT_STDIO_NOEXCEPT;
-
-    #undef ANTON_CRT_STDIO_NOEXCEPT
+    ANTON_CRT_IMPORT int ferror(FILE* stream) ANTON_CRT_NOEXCEPT;
+    ANTON_CRT_IMPORT int feof(FILE* stream) ANTON_CRT_NOEXCEPT;
+    ANTON_CRT_IMPORT void clearerr(FILE* stream) ANTON_CRT_NOEXCEPT;
 }
 
 // C++ Runtime Forward Declarations
@@ -132,6 +134,6 @@ extern "C" {
     void operator delete(void* ptr, void* place) noexcept;
 #endif 
 
-#undef ANTON_NOEXCEPT
+#undef ANTON_CRT_NOEXCEPT
 #undef ANTON_CRT_IMPORT
 #undef size_t

@@ -110,7 +110,7 @@ namespace anton {
     };
 
     inline namespace literals {
-        [[nodiscard]] constexpr String_View operator"" _sv(char8 const* literal, u64 size) {
+        [[nodiscard]] constexpr String_View operator""_sv(char8 const* literal, u64 size) {
             return String_View{literal, (i64)size};
         }
     } // namespace literals

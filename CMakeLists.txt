@@ -20,6 +20,17 @@ FetchContent_MakeAvailable(anton_math)
 
 project(anton_core)
 
+# Detect OS
+SET(ANTON_LINUX OFF)
+SET(ANTON_WINDOWS OFF)
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+    SET(ANTON_LINUX ON)
+elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    SET(ANTON_WINDOWS ON)
+else()
+    message(FATAL_ERROR "unsupported platform ${CMAKE_SYSTEM_NAME}")
+endif()
+
 add_library(anton_core)
 set_target_properties(anton_core PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
 target_include_directories(anton_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/public")
@@ -90,7 +101,6 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/private/filesystem.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/format.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/memory.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/private/stacktrace.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string_stream.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string_view.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string.cpp"
@@ -101,7 +111,33 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/private/unicode/common.cpp"
 )
 
-target_compile_definitions(anton_core PRIVATE _CRT_SECURE_NO_WARNINGS NOMINMAX WIN32_LEAN_AND_MEAN VC_EXTRALEAN UNICODE _UNICODE)
+if(ANTON_LINUX)
+    target_sources(anton_core 
+        PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/private/linux/stacktrace.cpp"
+    )
+
+    target_link_libraries(anton_core PUBLIC anton_math)
+endif()
+    
+if(ANTON_WINDOWS)
+    target_sources(anton_core 
+        PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/private/windows/stacktrace.cpp"
+    )
+    
+    target_compile_definitions(anton_core 
+        PRIVATE 
+        _CRT_SECURE_NO_WARNINGS 
+        WIN32_LEAN_AND_MEAN 
+        VC_EXTRALEAN 
+        NOMINMAX 
+        UNICODE 
+        _UNICODE
+    )
+
+    target_link_libraries(anton_core PUBLIC anton_math PRIVATE DbgHelp)
+endif()
 
 target_compile_definitions(anton_core PUBLIC
     ANTON_BUILD_DEBUG=$<BOOL:${ANTON_BUILD_DEBUG}>
@@ -113,8 +149,6 @@ target_compile_definitions(anton_core PUBLIC
     ANTON_STRING_VERIFY_ENCODING=$<BOOL:${ANTON_STRING_VERIFY_ENCODING}>
     ANTON_OPTIONAL_CHECK_VALUE=$<BOOL:${ANTON_OPTIONAL_CHECK_VALUE}>
 )
-
-target_link_libraries(anton_core PUBLIC anton_math PRIVATE DbgHelp)
 
 # Detect compilers
 
@@ -149,5 +183,5 @@ if(ANTON_COMPILER_CLANGPP OR ANTON_COMPILER_CLANGCL)
 elseif(ANTON_COMPILER_CL)
     target_compile_definitions(anton_core PUBLIC ANTON_COMPILER_CLANG=0 ANTON_COMPILER_MSVC=1)
 else()
-    message(FATAL "unrecognized compiler")
+    message(FATAL_ERROR "unrecognized compiler")
 endif()

@@ -112,27 +112,29 @@ target_sources(anton_core
 )
 
 if(ANTON_LINUX)
-    target_sources(anton_core 
+    target_sources(anton_core
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/private/linux/stacktrace.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/private/linux/filesystem.cpp"
     )
 
     target_link_libraries(anton_core PUBLIC anton_math)
 endif()
-    
+
 if(ANTON_WINDOWS)
-    target_sources(anton_core 
+    target_sources(anton_core
         PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/private/windows/stacktrace.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/private/windows/filesystem.cpp"
     )
-    
-    target_compile_definitions(anton_core 
-        PRIVATE 
-        _CRT_SECURE_NO_WARNINGS 
-        WIN32_LEAN_AND_MEAN 
-        VC_EXTRALEAN 
-        NOMINMAX 
-        UNICODE 
+
+    target_compile_definitions(anton_core
+        PRIVATE
+        _CRT_SECURE_NO_WARNINGS
+        WIN32_LEAN_AND_MEAN
+        VC_EXTRALEAN
+        NOMINMAX
+        UNICODE
         _UNICODE
     )
 

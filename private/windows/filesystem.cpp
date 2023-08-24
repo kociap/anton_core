@@ -71,6 +71,10 @@ namespace anton::fs {
             return -1;
         }
 
+        // The Microsoft documentation states that CloseHandle might fail.
+        // I am unsure what to do in such a case.
+        CloseHandle(file_handle);
+
         i64 last_write_time_64 = (i64)last_write_time.dwHighDateTime << 32 | (i64)last_write_time.dwLowDateTime;
         // Time is reported since 00:00:00 1601-01-01. We want to adjust it so that it starts at 00:00:00 1970-01-01.
         last_write_time_64 -= 0x19DB1DED53E8000LL;
@@ -180,7 +184,7 @@ namespace anton::fs {
         }
 
         // The Microsoft documentation states that FindClose might fail.
-        // I am unsure what to do in such case.
+        // I am unsure what to do in such a case.
         FindClose(find_handle);
         return directories;
     }
@@ -215,7 +219,7 @@ namespace anton::fs {
         }
 
         // The Microsoft documentation states that FindClose might fail.
-        // I am unsure what to do in such case.
+        // I am unsure what to do in such a case.
         FindClose(find_handle);
         return directories;
     }

@@ -162,30 +162,35 @@ namespace anton::fs {
     void rename(String_View from, String_View to);
 
     // file_size
-    // Obtain size of a file in bytes.
+    // Obtain the size of a file in bytes.
+    //
+    // Returns:
+    // The size of the file in bytes or -1 on error.
     //
     [[nodiscard]] i64 file_size(String_View path);
 
     // enumerate_directories
-    // Enumerates all subdirectories within the directory identified by path.
+    // Enumerates all immediate (i.e. non-recursively) child directories within the directory
+    // identified by path. The names of the directories are not prefixed with the parent path.
     // Does not include the current directory (".") or the parent directory ("..").
     //
     // Parameters:
     // path - directory to enumerate. The path must not end in a slash ('/' or '\\').
     //
     // Returns:
-    // Array of subdirectory names relative to path.
+    // Array of immediate child directory names.
     //
     [[nodiscard]] Array<String> enumerate_directories(String_View path);
 
     // enumerate_files
-    // Enumerates all files within the directory identified by path.
+    // Enumerates all immediate (i.e. non-recursively) child files within the directory identified
+    // by path. The names of the files are not prefixed with the parent path.
     //
     // Parameters:
     // path - directory to enumerate. The path must not end in a slash ('/' or '\\').
     //
     // Returns:
-    // Array of file names relative to path.
+    // Array of immediate child file names.
     //
     [[nodiscard]] Array<String> enumerate_files(String_View path);
 

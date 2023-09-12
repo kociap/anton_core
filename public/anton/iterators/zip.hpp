@@ -7,7 +7,7 @@ namespace anton {
     namespace detail {
         template<typename Tuple, u64... Indices>
         [[nodiscard]] bool zip_tuple_equal_impl(Tuple const& lhs, Tuple const& rhs, integer_sequence<u64, Indices...>) {
-            return ((get<Indices>(lhs) == get<Indices>(rhs)) && ...);
+            return ((get<Indices>(lhs) == get<Indices>(rhs)) || ...);
         }
 
         template<typename... Types>
@@ -108,10 +108,23 @@ namespace anton {
             return apply(_iterators, [n](auto&&... iterators) -> reference { return {*(iterators + n)...}; });
         }
 
+        // operator==
+        // Compare the contained iterators for equality using the rule 'if any'.
+        //
+        // Returns:
+        // true if any of the contained iterators compare equal.
+        //
         [[nodiscard]] bool operator==(Zip_Iterator const& rhs) const {
             return detail::zip_tuple_equal(_iterators, rhs._iterators);
         }
 
+        // operator!=
+        // Compare the contained iterators for inequality using the rule 'if all'.
+        // Negation of the operator==.
+        //
+        // Returns:
+        // false if any of the contained iterators compare equal.
+        //
         [[nodiscard]] bool operator!=(Zip_Iterator const& rhs) const {
             return !(*this == rhs);
         }

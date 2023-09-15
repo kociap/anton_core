@@ -79,7 +79,7 @@ namespace anton {
 
     String::String(value_type const* first, value_type const* last): String(first, last, allocator_type()) {}
 
-    String::String(value_type const* first, value_type const* last, allocator_type const& allocator) {
+    String::String(value_type const* first, value_type const* last, allocator_type const& allocator): _allocator(allocator) {
         _size = last - first;
         if(_size > 0) {
             _capacity = math::max(min_allocation_size - 1, _size) + 1;

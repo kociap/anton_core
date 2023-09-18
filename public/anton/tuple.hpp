@@ -14,36 +14,26 @@ namespace anton {
             constexpr Tuple_Child() = default;
 
             template<typename T>
-            constexpr Tuple_Child(T&& arg): _element(ANTON_FWD(arg)) {}
+            constexpr Tuple_Child(T&& arg): value(ANTON_FWD(arg)) {}
 
-            Type _element;
+            Type value;
         };
 
         template<typename, typename...>
-        struct Tuple_Expand;
+        struct Tuple_Base;
 
         template<u64... Indices, typename... Types>
-        struct Tuple_Expand<Integer_Sequence<u64, Indices...>, Types...>: public Tuple_Child<Indices, Types>... {
+        struct Tuple_Base<Integer_Sequence<u64, Indices...>, Types...>: public Tuple_Child<Indices, Types>... {
         public:
-            constexpr Tuple_Expand() = default;
+            constexpr Tuple_Base() = default;
 
-            template<typename... Args>
-            constexpr Tuple_Expand(Variadic_Construct_Tag, Args&&... args): Tuple_Child<Indices, Types>(ANTON_FWD(args))... {}
+            template<typename... Args, enable_if<sizeof...(Args) == sizeof...(Ts) && (sizeof...(Args) > 0), int> = 0>
+            constexpr Tuple_Base(Args&&... args): Tuple_Child<Indices, Types>(ANTON_FWD(args))... {}
         };
     } // namespace detail
 
     template<typename... Ts>
-    struct Tuple: public detail::Tuple_Expand<make_integer_sequence<u64, sizeof...(Ts)>, Ts...> {
-    private:
-        using base_t = detail::Tuple_Expand<make_integer_sequence<u64, sizeof...(Ts)>, Ts...>;
-
-    public:
-        constexpr Tuple() = default;
-
-        // TODO: Add conditional explicit
-        template<typename... Args, enable_if<sizeof...(Args) == sizeof...(Ts) && (sizeof...(Args) > 0), int> = 0>
-        constexpr Tuple(Args&&... args): base_t(variadic_construct, ANTON_FWD(args)...) {}
-    };
+    using Tuple = detail::Tuple_Base<make_integer_sequence<u64, sizeof...(Ts)>, Ts...>;
 
     template<typename... Types>
     struct Tuple_Size<Tuple<Types...>>: Integral_Constant<u64, sizeof...(Types)> {};
@@ -79,47 +69,47 @@ namespace anton {
     namespace detail {
         template<typename T, u64 Index>
         constexpr T& get_helper_type(Tuple_Child<Index, T>& element) {
-            return static_cast<T&>(element._element);
+            return static_cast<T&>(element.value);
         }
 
         template<typename T, u64 Index>
         constexpr T const& get_helper_type(Tuple_Child<Index, T> const& element) {
-            return static_cast<T const&>(element._element);
+            return static_cast<T const&>(element.value);
         }
 
         template<typename T, u64 Index>
         constexpr T&& get_helper_type(Tuple_Child<Index, T>&& element) {
-            return static_cast<T&&>(element._element);
+            return static_cast<T&&>(element.value);
         }
 
         template<typename T, u64 Index>
         constexpr T const&& get_helper_type(Tuple_Child<Index, T> const&& element) {
-            return static_cast<T const&&>(element._element);
+            return static_cast<T const&&>(element.value);
         }
     } // namespace detail
 
     template<u64 Index, typename... Types>
     constexpr tuple_element<Index, Tuple<Types...>>& get(Tuple<Types...>& t) {
         using type = tuple_element<Index, Tuple<Types...>>;
-        return static_cast<type&>(static_cast<detail::Tuple_Child<Index, type>&>(t)._element);
+        return static_cast<type&>(static_cast<detail::Tuple_Child<Index, type>&>(t).value);
     }
 
     template<u64 Index, typename... Types>
     constexpr tuple_element<Index, Tuple<Types...>> const& get(Tuple<Types...> const& t) {
         using type = tuple_element<Index, Tuple<Types...>>;
-        return static_cast<type const&>(static_cast<detail::Tuple_Child<Index, type> const&>(t)._element);
+        return static_cast<type const&>(static_cast<detail::Tuple_Child<Index, type> const&>(t).value);
     }
 
     template<u64 Index, typename... Types>
     constexpr tuple_element<Index, Tuple<Types...>>&& get(Tuple<Types...>&& t) {
         using type = tuple_element<Index, Tuple<Types...>>;
-        return static_cast<type&&>(static_cast<detail::Tuple_Child<Index, type>&&>(t)._element);
+        return static_cast<type&&>(static_cast<detail::Tuple_Child<Index, type>&&>(t).value);
     }
 
     template<u64 Index, typename... Types>
     constexpr tuple_element<Index, Tuple<Types...>> const&& get(Tuple<Types...> const&& t) {
         using type = tuple_element<Index, Tuple<Types...>>;
-        return static_cast<type const&&>(static_cast<detail::Tuple_Child<Index, type> const&&>(t)._element);
+        return static_cast<type const&&>(static_cast<detail::Tuple_Child<Index, type> const&&>(t).value);
     }
 
     template<typename T, typename... Types>

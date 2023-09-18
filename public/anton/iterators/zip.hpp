@@ -5,24 +5,24 @@
 
 namespace anton {
     namespace detail {
-        template<typename Tuple, u64... Indices>
-        [[nodiscard]] bool zip_tuple_equal_impl(Tuple const& lhs, Tuple const& rhs, integer_sequence<u64, Indices...>) {
-            return ((get<Indices>(lhs) == get<Indices>(rhs)) || ...);
+        template<typename... Ts, u64... Indices>
+        void zip_increment(Tuple<Ts...>& tuple, integer_sequence<u64, Indices...>) {
+            (++static_cast<Tuple_Child<Indices, Ts>&>(tuple).value, ...);
         }
 
-        template<typename... Types>
-        [[nodiscard]] bool zip_tuple_equal(Tuple<Types...> const& lhs, Tuple<Types...> const& rhs) {
-            return zip_tuple_equal_impl(lhs, rhs, make_integer_sequence<u64, sizeof...(Types)>());
+        template<typename... Ts, u64... Indices>
+        void zip_decrement(Tuple<Ts...>& tuple, integer_sequence<u64, Indices...>) {
+            (--static_cast<Tuple_Child<Indices, Ts>&>(tuple).value, ...);
         }
 
-        template<typename Tuple, u64... Indices>
-        [[nodiscard]] bool zip_tuple_less_impl(Tuple const& lhs, Tuple const& rhs, integer_sequence<u64, Indices...>) {
-            return ((get<Indices>(lhs) < get<Indices>(rhs)) && ...);
+        template<typename Return, typename... Ts, u64... Indices>
+        [[nodiscard]] Return zip_dereference(Tuple<Ts...> const& tuple, integer_sequence<u64, Indices...>) {
+            return Return((*static_cast<Tuple_Child<Indices, Ts> const&>(tuple).value)...);
         }
 
-        template<typename... Types>
-        [[nodiscard]] bool zip_tuple_less(Tuple<Types...> const& lhs, Tuple<Types...> const& rhs) {
-            return zip_tuple_less_impl(lhs, rhs, make_integer_sequence<u64, sizeof...(Types)>());
+        template<typename... Ts, u64... Indices>
+        [[nodiscard]] bool zip_equal(Tuple<Ts...> const& lhs, Tuple<Ts...> const& rhs, integer_sequence<u64, Indices...>) {
+            return ((static_cast<Tuple_Child<Indices, Ts> const&>(lhs).value == static_cast<Tuple_Child<Indices, Ts> const&>(rhs).value) || ...);
         }
     } // namespace detail
 
@@ -42,29 +42,31 @@ namespace anton {
         explicit Zip_Iterator(Iterators const&... iterators): _iterators(iterators...) {}
         explicit Zip_Iterator(Iterators&&... iterators): _iterators(ANTON_MOV(iterators)...) {}
 
-        Tuple<Iterators const&...> base() const {
+        // TODO: Implement the below functions with a flat function call instead of apply. See zip_dereference.
+
+        [[nodiscard]] Tuple<Iterators const&...> base() const {
             return apply(_iterators, [](auto&&... iterators) -> Tuple<Iterators const&...> { return {iterators...}; });
         }
 
         Zip_Iterator& operator++() {
-            apply(_iterators, [](auto&&... iterators) -> void { (++iterators, ...); });
+            detail::zip_increment(_iterators, make_integer_sequence<u64, sizeof...(Iterators)>());
             return *this;
         }
 
         Zip_Iterator& operator--() {
-            apply(_iterators, [](auto&&... iterators) -> void { (--iterators, ...); });
+            detail::zip_decrement(_iterators, make_integer_sequence<u64, sizeof...(Iterators)>());
             return *this;
         }
 
         Zip_Iterator operator++(int) {
             Zip_Iterator copy = *this;
-            apply(_iterators, [](auto&&... iterators) -> void { (++iterators, ...); });
+            ++(*this);
             return copy;
         }
 
         Zip_Iterator operator--(int) {
             Zip_Iterator copy = *this;
-            apply(_iterators, [](auto&&... iterators) -> void { (--iterators, ...); });
+            --(*this);
             return copy;
         }
 
@@ -100,8 +102,8 @@ namespace anton {
             return get<0>(_iterators) - get<0>(other._iterators);
         }
 
-        [[nodiscard]] reference operator*() const {
-            return apply(_iterators, [](auto&&... iterators) -> reference { return {*iterators...}; });
+        [[nodiscard]] ANTON_FORCEINLINE reference operator*() const {
+            return detail::zip_dereference<reference>(_iterators, make_integer_sequence<u64, sizeof...(Iterators)>());
         }
 
         [[nodiscard]] reference operator[](difference_type n) const {
@@ -114,8 +116,8 @@ namespace anton {
         // Returns:
         // true if any of the contained iterators compare equal.
         //
-        [[nodiscard]] bool operator==(Zip_Iterator const& rhs) const {
-            return detail::zip_tuple_equal(_iterators, rhs._iterators);
+        [[nodiscard]] ANTON_FORCEINLINE bool operator==(Zip_Iterator const& rhs) const {
+            return detail::zip_equal(_iterators, rhs._iterators, make_integer_sequence<u64, sizeof...(Iterators)>());
         }
 
         // operator!=
@@ -125,25 +127,27 @@ namespace anton {
         // Returns:
         // false if any of the contained iterators compare equal.
         //
-        [[nodiscard]] bool operator!=(Zip_Iterator const& rhs) const {
-            return !(*this == rhs);
+        [[nodiscard]] ANTON_FORCEINLINE bool operator!=(Zip_Iterator const& rhs) const {
+            return !detail::zip_equal(_iterators, rhs._iterators, make_integer_sequence<u64, sizeof...(Iterators)>());
         }
 
-        [[nodiscard]] bool operator<(Zip_Iterator const& rhs) const {
-            return detail::zip_tuple_less(_iterators, rhs._iterators);
-        }
+        // TODO: Implement.
 
-        [[nodiscard]] bool operator>(Zip_Iterator const& rhs) const {
-            return detail::zip_tuple_less(rhs._iterators, _iterators);
-        }
+        // [[nodiscard]] bool operator<(Zip_Iterator const& rhs) const {
+        //     return detail::zip_tuple_less(_iterators, rhs._iterators);
+        // }
 
-        [[nodiscard]] bool operator<=(Zip_Iterator const& rhs) const {
-            return !(rhs > *this);
-        }
+        // [[nodiscard]] bool operator>(Zip_Iterator const& rhs) const {
+        //     return detail::zip_tuple_less(rhs._iterators, _iterators);
+        // }
 
-        [[nodiscard]] bool operator>=(Zip_Iterator const& rhs) const {
-            return !(rhs < *this);
-        }
+        // [[nodiscard]] bool operator<=(Zip_Iterator const& rhs) const {
+        //     return !(rhs > *this);
+        // }
+
+        // [[nodiscard]] bool operator>=(Zip_Iterator const& rhs) const {
+        //     return !(rhs < *this);
+        // }
 
     private:
         Tuple<Iterators...> _iterators;

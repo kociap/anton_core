@@ -9,11 +9,11 @@ namespace anton {
         Range(T const& begin, T const& end): _begin(begin), _end(end) {}
         Range(T&& begin, T&& end): _begin(ANTON_MOV(begin)), _end(ANTON_MOV(end)) {}
 
-        T begin() {
+        [[nodiscard]] T begin() {
             return _begin;
         }
 
-        T end() {
+        [[nodiscard]] T end() {
             return _end;
         }
 

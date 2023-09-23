@@ -191,6 +191,7 @@ namespace anton {
 
     // TODO: Implement in terms of String_View.
     [[nodiscard]] f32 str_to_f32(String const& string);
+    [[nodiscard]] f64 str_to_f64(String const& string);
 
     // concat
     // Concatenate a slice of strings.

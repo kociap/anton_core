@@ -571,6 +571,10 @@ namespace anton {
         return ::strtof(string.data(), nullptr);
     }
 
+    f64 str_to_f64(String const& string) {
+        return ::strtod(string.data(), nullptr);
+    }
+
     String concat(Slice<String_View const> const strings) {
         return concat(get_default_allocator(), strings);
     }

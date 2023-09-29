@@ -27,7 +27,7 @@ namespace anton {
         public:
             constexpr Tuple_Base() = default;
 
-            template<typename... Args, enable_if<sizeof...(Args) == sizeof...(Ts) && (sizeof...(Args) > 0), int> = 0>
+            template<typename... Args, enable_if<sizeof...(Args) == sizeof...(Types) && (sizeof...(Args) > 0), int> = 0>
             constexpr Tuple_Base(Args&&... args): Tuple_Child<Indices, Types>(ANTON_FWD(args))... {}
         };
     } // namespace detail

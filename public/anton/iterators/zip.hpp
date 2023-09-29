@@ -1,5 +1,6 @@
 #pragma once
 
+#include <anton/intrinsics.hpp>
 #include <anton/iterators/base.hpp>
 #include <anton/tuple.hpp>
 

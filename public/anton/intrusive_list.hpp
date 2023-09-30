@@ -38,9 +38,10 @@ namespace anton {
     // Since this is an intrusive iterator list, the value type is also the node type.
     //
     // Parameters:
-    // Node_Type - node type of the list.
+    //      Node_Type - node type of the list.
+    // Base_Node_Type - base type of the node type.
     //
-    template<typename Node_Type>
+    template<typename Node_Type, typename Base_Node_Type>
     struct Intrusive_List_Iterator {
     public:
         using value_type = Node_Type;
@@ -50,10 +51,10 @@ namespace anton {
         using difference_type = i64;
         using iterator_category = Bidirectional_Iterator_Tag;
 
-        pointer node = nullptr;
+        Base_Node_Type* node = nullptr;
 
         Intrusive_List_Iterator() = default;
-        Intrusive_List_Iterator(pointer node): node(node) {}
+        Intrusive_List_Iterator(Base_Node_Type* node): node(node) {}
         Intrusive_List_Iterator(Intrusive_List_Iterator const&) = default;
         Intrusive_List_Iterator(Intrusive_List_Iterator&&) = default;
         ~Intrusive_List_Iterator() = default;
@@ -61,16 +62,16 @@ namespace anton {
         Intrusive_List_Iterator& operator=(Intrusive_List_Iterator&&) = default;
 
         // Conversion operator to the const version of the iterator.
-        [[nodiscard]] operator Intrusive_List_Iterator<Node_Type const>() const {
+        [[nodiscard]] operator Intrusive_List_Iterator<Node_Type const, Base_Node_Type const>() const {
             return node;
         }
 
         [[nodiscard]] pointer operator->() const {
-            return &node->data;
+            return static_cast<node_type>(node);
         }
 
         [[nodiscard]] reference operator*() const {
-            return node->data;
+            return *static_cast<node_type*>(node);
         }
 
         Intrusive_List_Iterator& operator++() {
@@ -120,11 +121,11 @@ namespace anton {
         using node_type = Node;
         using reference = Node&;
         using pointer = Node*;
-        using iterator = Intrusive_List_Iterator<Node>;
-        using const_iterator = Intrusive_List_Iterator<Node const>;
+        using iterator = Intrusive_List_Iterator<Node, Intrusive_List_Node>;
+        using const_iterator = Intrusive_List_Iterator<Node const, Intrusive_List_Node const>;
 
     private:
-        alignas(alignof(Node)) Intrusive_List_Node _internal_node;
+        Intrusive_List_Node _internal_node;
 
     public:
         Intrusive_List();
@@ -162,7 +163,7 @@ namespace anton {
         // Returns:
         // Iterator to the inserted node.
         //
-        iterator insert(const_iterator position, node_type const& node);
+        iterator insert(const_iterator position, Intrusive_List_Node& node);
 
         // insert_front
         // Insert a node at the front of the list.
@@ -173,7 +174,7 @@ namespace anton {
         // Returns:
         // Iterator to the inserted node.
         //
-        iterator insert_front(node_type const& node);
+        iterator insert_front(Intrusive_List_Node& node);
 
         // insert_back
         // Insert a node at the back of the list.
@@ -184,7 +185,7 @@ namespace anton {
         // Returns:
         // Iterator to the inserted node.
         //
-        iterator insert_back(node_type const& node);
+        iterator insert_back(Intrusive_List_Node& node);
 
         // erase
         // Erase the node at position.
@@ -250,14 +251,14 @@ namespace anton {
 
     template<typename Node>
     Intrusive_List<Node>::Intrusive_List() {
-        node_type* const internal_node = reinterpret_cast<Intrusive_List_Node*>(&_internal_node);
+        Intrusive_List_Node* const internal_node = &_internal_node;
         _internal_node.next = internal_node;
         _internal_node.prev = internal_node;
     }
 
     template<typename Node>
     Intrusive_List<Node>::Intrusive_List(Intrusive_List&& other) {
-        node_type* const internal_node = reinterpret_cast<Intrusive_List_Node*>(&_internal_node);
+        Intrusive_List_Node* const internal_node = &_internal_node;
         _internal_node.next = internal_node;
         _internal_node.prev = internal_node;
         swap(*this, other);
@@ -265,7 +266,7 @@ namespace anton {
 
     template<typename Node>
     Intrusive_List<Node>& Intrusive_List<Node>::operator=(Intrusive_List&& other) {
-        node_type* const internal_node = reinterpret_cast<Intrusive_List_Node*>(&_internal_node);
+        Intrusive_List_Node* const internal_node = &_internal_node;
         _internal_node.next = internal_node;
         _internal_node.prev = internal_node;
         swap(*this, other);
@@ -273,39 +274,39 @@ namespace anton {
 
     template<typename Node>
     auto Intrusive_List<Node>::begin() -> iterator {
-        return reinterpret_cast<node_type*>(_internal_node.next);
+        return static_cast<node_type*>(_internal_node.next);
     }
 
     template<typename Node>
     auto Intrusive_List<Node>::end() -> iterator {
-        return reinterpret_cast<node_type*>(_internal_node);
+        return static_cast<node_type*>(&_internal_node);
     }
 
     template<typename Node>
     auto Intrusive_List<Node>::begin() const -> const_iterator {
-        return reinterpret_cast<node_type*>(_internal_node.next);
+        return static_cast<node_type const*>(_internal_node.next);
     }
 
     template<typename Node>
     auto Intrusive_List<Node>::end() const -> const_iterator {
-        return reinterpret_cast<node_type*>(_internal_node);
+        return static_cast<node_type const*>(&_internal_node);
     }
 
     template<typename Node>
     auto Intrusive_List<Node>::cbegin() const -> const_iterator {
-        return reinterpret_cast<node_type*>(_internal_node.next);
+        return static_cast<node_type const*>(_internal_node.next);
     }
 
     template<typename Node>
     auto Intrusive_List<Node>::cend() const -> const_iterator {
-        return reinterpret_cast<node_type*>(_internal_node);
+        return static_cast<node_type const*>(&_internal_node);
     }
 
     template<typename Node>
     auto Intrusive_List<Node>::size() const -> size_type {
         size_type _size = 0;
-        node_type* const internal_node = reinterpret_cast<node_type*>(&_internal_node);
-        node_type* node = internal_node->next;
+        Intrusive_List_Node const* const internal_node = &_internal_node;
+        Intrusive_List_Node const* node = internal_node->next;
         while(node != internal_node) {
             node = node->next;
             ++_size;
@@ -314,9 +315,9 @@ namespace anton {
     }
 
     template<typename Node>
-    auto Intrusive_List<Node>::insert(const_iterator position, node_type const& node) -> iterator {
-        node_type* const next = position.node;
-        node_type* const prev = next->prev;
+    auto Intrusive_List<Node>::insert(const_iterator position, Intrusive_List_Node& node) -> iterator {
+        Intrusive_List_Node* const next = position.node;
+        Intrusive_List_Node* const prev = next->prev;
         node.prev = prev;
         prev->next = &node;
         node.next = next;
@@ -325,9 +326,9 @@ namespace anton {
     }
 
     template<typename Node>
-    auto Intrusive_List<Node>::insert_front(node_type const& node) -> iterator {
-        node_type* const next = reinterpret_cast<node_type*>(&_internal_node);
-        node_type* const prev = next->prev;
+    auto Intrusive_List<Node>::insert_front(Intrusive_List_Node& node) -> iterator {
+        Intrusive_List_Node* const next = &_internal_node;
+        Intrusive_List_Node* const prev = next->prev;
         node.prev = prev;
         prev->next = &node;
         node.next = next;
@@ -336,9 +337,9 @@ namespace anton {
     }
 
     template<typename Node>
-    auto Intrusive_List<Node>::insert_back(node_type const& node) -> iterator {
-        node_type* const next = reinterpret_cast<node_type*>(&_internal_node);
-        node_type* const prev = next->prev;
+    auto Intrusive_List<Node>::insert_back(Intrusive_List_Node& node) -> iterator {
+        Intrusive_List_Node* const next = &_internal_node;
+        Intrusive_List_Node* const prev = next->prev;
         node.prev = prev;
         prev->next = &node;
         node.next = next;
@@ -348,42 +349,42 @@ namespace anton {
 
     template<typename Node>
     void Intrusive_List<Node>::erase(const_iterator position) {
-        node_type* const node = position.node;
-        node_type* const next = node->next;
-        node_type* const prev = node->prev;
+        Intrusive_List_Node* const node = position.node;
+        Intrusive_List_Node* const next = node->next;
+        Intrusive_List_Node* const prev = node->prev;
         next->prev = prev;
         prev->next = next;
     }
 
     template<typename Node>
     void Intrusive_List<Node>::erase(const_iterator first, const_iterator last) {
-        node_type* const next = last.node->next;
-        node_type* const prev = first.node->prev;
+        Intrusive_List_Node* const next = last.node->next;
+        Intrusive_List_Node* const prev = first.node->prev;
         next->prev = prev;
         prev->next = next;
     }
 
     template<typename Node>
     void Intrusive_List<Node>::erase_front() {
-        node_type* const prev = reinterpret_cast<node_type*>(&_internal_node);
-        node_type* const node = prev->next;
-        node_type* const next = node->next;
+        Intrusive_List_Node* const prev = &_internal_node;
+        Intrusive_List_Node* const node = prev->next;
+        Intrusive_List_Node* const next = node->next;
         next->prev = prev;
         prev->next = next;
     }
 
     template<typename Node>
     void Intrusive_List<Node>::erase_back() {
-        node_type* const next = reinterpret_cast<node_type*>(&_internal_node);
-        node_type* const node = next->prev;
-        node_type* const prev = node->prev;
+        Intrusive_List_Node* const next = &_internal_node;
+        Intrusive_List_Node* const node = next->prev;
+        Intrusive_List_Node* const prev = node->prev;
         next->prev = prev;
         prev->next = next;
     }
 
     template<typename Node>
     void Intrusive_List<Node>::clear() {
-        node_type* const internal_node = reinterpret_cast<Intrusive_List_Node*>(&_internal_node);
+        Intrusive_List_Node* const internal_node = &_internal_node;
         _internal_node.next = internal_node;
         _internal_node.prev = internal_node;
     }

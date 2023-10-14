@@ -23,6 +23,18 @@ namespace anton {
 #    define ANTON_LIKELY(x) __builtin_expect(!!(x), 1)
 #    define ANTON_FORCEINLINE __attribute__((always_inline))
 #    define ANTON_NOINLINE __attribute__((noinline))
+#elif ANTON_COMPILER_GPP
+#    if ANTON_UNREACHABLE_ASSERTS
+#        define ANTON_UNREACHABLE()                                     \
+            ::anton::anton_assert(u8"unreachable", __FILE__, __LINE__); \
+            __builtin_unreachable()
+#    else
+#        define ANTON_UNREACHABLE() __builtin_unreachable()
+#    endif
+#    define ANTON_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#    define ANTON_LIKELY(x) __builtin_expect(!!(x), 1)
+#    define ANTON_FORCEINLINE __attribute__((always_inline))
+#    define ANTON_NOINLINE __attribute__((noinline))
 #elif ANTON_COMPILER_MSVC
 #    if ANTON_UNREACHABLE_ASSERTS
 #        define ANTON_UNREACHABLE()                                     \
@@ -43,6 +55,6 @@ namespace anton {
 #    endif
 #    define ANTON_UNLIKELY(x) x
 #    define ANTON_LIKELY(x) x
-#    define ANTON_FORCEININLINE
+#    define ANTON_FORCEINLINE
 #    define ANTON_NOINLINE
 #endif

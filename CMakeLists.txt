@@ -15,6 +15,7 @@ include(FetchContent)
 FetchContent_Declare(
     anton_math
     GIT_REPOSITORY https://github.com/kociap/anton_math.git
+    GIT_TAG e7997aa294b2e54b177d4f59078e61f90eb23583
 )
 FetchContent_MakeAvailable(anton_math)
 
@@ -156,6 +157,8 @@ target_compile_definitions(anton_core PUBLIC
 
 # Detect compilers
 
+# TODO: Change detection to use CMAKE_CXX_COMPILER_ID and CMAKE_CXX_COMPILER_FRONTEND_VARIANT
+
 # clang++ (CLANG)
 string(FIND "${CMAKE_CXX_COMPILER}" "clang++" ANTON_COMPILER_CLANGPP)
 if(ANTON_COMPILER_CLANGPP GREATER -1)
@@ -172,6 +175,19 @@ else()
   set(ANTON_COMPILER_CLANGCL OFF)
 endif()
 
+if(ANTON_COMPILER_CLANGPP OR ANTON_COMPILER_CLANGCL)
+  set(ANTON_COMPILER_CLANG ON)
+else()
+  set(ANTON_COMPILER_CLANG OFF)
+endif()
+
+# GNU g++
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  set(ANTON_COMPILER_GPP ON)
+else()
+  set(ANTON_COMPILER_GPP OFF)
+endif()
+
 # cl (MSVC)
 string(FIND "${CMAKE_CXX_COMPILER}" "cl" ANTON_COMPILER_CL)
 if(ANTON_COMPILER_CL GREATER -1)
@@ -182,10 +198,13 @@ endif()
 
 # TODO: Add appropriate flags, e.g. no exceptions, no rtti, etc.
 
-if(ANTON_COMPILER_CLANGPP OR ANTON_COMPILER_CLANGCL)
-    target_compile_definitions(anton_core PUBLIC ANTON_COMPILER_CLANG=1 ANTON_COMPILER_MSVC=0)
-elseif(ANTON_COMPILER_CL)
-    target_compile_definitions(anton_core PUBLIC ANTON_COMPILER_CLANG=0 ANTON_COMPILER_MSVC=1)
-else()
-    message(FATAL_ERROR "unrecognized compiler")
+if(NOT ANTON_COMPILER_CLANG AND NOT ANTON_COMPILER_GPP AND NOT ANTON_COMPILER_CL)
+  message(FATAL_ERROR "unrecognized compiler '${CMAKE_CXX_COMPILER}' with ID '${CMAKE_CXX_COMPILER_ID}'")
 endif()
+
+target_compile_definitions(anton_core
+  PUBLIC
+  ANTON_COMPILER_CLANG=$<BOOL:${ANTON_COMPILER_CLANG}>
+  ANTON_COMPILER_GPP=$<BOOL:${ANTON_COMPILER_GPP}>
+  ANTON_COMPILER_CL=$<BOOL:${ANTON_COMPILER_CL}>
+)

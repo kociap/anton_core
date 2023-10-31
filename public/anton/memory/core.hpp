@@ -42,6 +42,20 @@ namespace anton {
         return __builtin_launder(ptr);
     }
 
+    // align_address
+    // Round address up to alignment. If address is already aligned, does not change address.
+    //
+    // Parameters:
+    //   address - address to be aligned.
+    // alignment - target alignment. Must be a power of 2.
+    //
+    // Returns:
+    // Address aligned to alignment.
+    //
+    [[nodiscard]] constexpr u64 align_address(u64 const address, u64 const alignment) {
+        return (address + (alignment - 1)) & ~(alignment - 1);
+    }
+
     // allocate
     // Allocates a block of memory aligned to alignment.
     //

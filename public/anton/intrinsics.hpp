@@ -13,11 +13,11 @@ namespace anton {
 
 #if ANTON_COMPILER_CLANG
 #    if ANTON_UNREACHABLE_ASSERTS
-#        define ANTON_UNREACHABLE()                                     \
-            ::anton::anton_assert(u8"unreachable", __FILE__, __LINE__); \
+#        define ANTON_UNREACHABLE(msg)                      \
+            ::anton::anton_assert(msg, __FILE__, __LINE__); \
             __builtin_unreachable()
 #    else
-#        define ANTON_UNREACHABLE() __builtin_unreachable()
+#        define ANTON_UNREACHABLE(msg) __builtin_unreachable()
 #    endif
 #    define ANTON_UNLIKELY(x) __builtin_expect(!!(x), 0)
 #    define ANTON_LIKELY(x) __builtin_expect(!!(x), 1)
@@ -25,11 +25,11 @@ namespace anton {
 #    define ANTON_NOINLINE __attribute__((noinline))
 #elif ANTON_COMPILER_GPP
 #    if ANTON_UNREACHABLE_ASSERTS
-#        define ANTON_UNREACHABLE()                                     \
-            ::anton::anton_assert(u8"unreachable", __FILE__, __LINE__); \
+#        define ANTON_UNREACHABLE(msg)                      \
+            ::anton::anton_assert(msg, __FILE__, __LINE__); \
             __builtin_unreachable()
 #    else
-#        define ANTON_UNREACHABLE() __builtin_unreachable()
+#        define ANTON_UNREACHABLE(msg) __builtin_unreachable()
 #    endif
 #    define ANTON_UNLIKELY(x) __builtin_expect(!!(x), 0)
 #    define ANTON_LIKELY(x) __builtin_expect(!!(x), 1)
@@ -37,11 +37,11 @@ namespace anton {
 #    define ANTON_NOINLINE __attribute__((noinline))
 #elif ANTON_COMPILER_MSVC
 #    if ANTON_UNREACHABLE_ASSERTS
-#        define ANTON_UNREACHABLE()                                     \
-            ::anton::anton_assert(u8"unreachable", __FILE__, __LINE__); \
+#        define ANTON_UNREACHABLE(msg)                      \
+            ::anton::anton_assert(msg, __FILE__, __LINE__); \
             __assume(0)
 #    else
-#        define ANTON_UNREACHABLE() __assume(0)
+#        define ANTON_UNREACHABLE(msg) __assume(0)
 #    endif
 #    define ANTON_UNLIKELY(x) x
 #    define ANTON_LIKELY(x) x
@@ -49,9 +49,9 @@ namespace anton {
 #    define ANTON_NOINLINE __declspec(noinline)
 #else
 #    if ANTON_UNREACHABLE_ASSERTS
-#        define ANTON_UNREACHABLE() ::anton::anton_assert(u8"unreachable", __FILE__, __LINE__)
+#        define ANTON_UNREACHABLE(msg) ::anton::anton_assert(msg, __FILE__, __LINE__)
 #    else
-#        define ANTON_UNREACHABLE()
+#        define ANTON_UNREACHABLE(msg)
 #    endif
 #    define ANTON_UNLIKELY(x) x
 #    define ANTON_LIKELY(x) x

@@ -37,7 +37,6 @@ set_target_properties(anton_core PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
 target_include_directories(anton_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/public")
 target_sources(anton_core
     PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/algorithm/sort.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/detail/crt.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/detail/string_common.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/detail/string8_common.hpp"
@@ -80,6 +79,7 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/owning_ptr.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/pair.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/slice.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/sort.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/stacktrace.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/stream.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/string_stream.hpp"

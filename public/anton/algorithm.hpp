@@ -1,6 +1,5 @@
 #pragma once
 
-#include <anton/algorithm/sort.hpp>
 #include <anton/array.hpp>
 #include <anton/iterators.hpp>
 #include <anton/math/math.hpp>

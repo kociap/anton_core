@@ -4,7 +4,7 @@
     #define ANTON_CRT_NOEXCEPT
     #define ANTON_CRT_IMPORT __declspec(dllimport)
     #define size_t unsigned long long
-#else 
+#else
     #define ANTON_CRT_NOEXCEPT noexcept
     #define ANTON_CRT_IMPORT
     #define size_t unsigned long int
@@ -25,7 +25,7 @@ extern "C" {
 
     // string.h
     // memset, memmove, memcpy, strlen don't use dllimport on win.
-    
+
     void* memset(void* dest, int value, size_t count);
     void* memcpy(void* dest, void const* src, size_t count);
     void* memmove(void* dest, void const* src, size_t count);
@@ -38,19 +38,19 @@ extern "C" {
         ANTON_CRT_IMPORT void* _aligned_malloc(size_t size, size_t alignment); // malloc.h
         ANTON_CRT_IMPORT void _aligned_free(void* memory); // malloc.h
 
-        #define ALIGNED_ALLOC(size, alignment) _aligned_malloc(size, alignment)
-        #define ALIGNED_FREE(ptr) _aligned_free(ptr)
+        #define ANTON_CRT_ALIGNED_ALLOC(size, alignment) _aligned_malloc(size, alignment)
+        #define ANTON_CRT_ALIGNED_FREE(ptr) _aligned_free(ptr)
     #else
         // aligned_alloc is C11
         void* aligned_alloc(size_t alignment, size_t size) ANTON_CRT_NOEXCEPT;
         void free(void* ptr) ANTON_CRT_NOEXCEPT;
 
-        #define ALIGNED_ALLOC(size, alignment) aligned_alloc(alignment, size)
-        #define ALIGNED_FREE(ptr) free(ptr)
+        #define ANTON_CRT_ALIGNED_ALLOC(size, alignment) aligned_alloc(alignment, size)
+        #define ANTON_CRT_ALIGNED_FREE(ptr) free(ptr)
     #endif
 
     // stdlib.h
-    
+
     ANTON_CRT_IMPORT float strtof(char const*, char**) ANTON_CRT_NOEXCEPT;
     ANTON_CRT_IMPORT double strtod(char const*, char**) ANTON_CRT_NOEXCEPT;
     ANTON_CRT_IMPORT long long strtoll(char const*, char**, int base) ANTON_CRT_NOEXCEPT;
@@ -133,7 +133,7 @@ extern "C" {
 #else
     void* operator new(size_t size, void*) noexcept;
     void operator delete(void* ptr, void* place) noexcept;
-#endif 
+#endif
 
 #undef ANTON_CRT_NOEXCEPT
 #undef ANTON_CRT_IMPORT

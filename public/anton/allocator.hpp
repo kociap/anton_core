@@ -42,63 +42,70 @@ namespace anton {
     [[nodiscard]] bool operator==(Allocator const& lhs, Allocator const& rhs);
     [[nodiscard]] bool operator!=(Allocator const& lhs, Allocator const& rhs);
 
-    // // Buffer_Allocator
-    // struct Buffer_Allocator: public Memory_Allocator {
-    // private:
-    //     struct Block_Data {
-    //         Block_Data* previous_block = nullptr;
-    //         Block_Data* next_block = nullptr;
-    //         bool free = true;
-    //     };
-
-    // public:
-    //     static constexpr usize data_block_size = sizeof(Block_Data);
-
-    //     Buffer_Allocator(char*, char*);
-
-    //     [[nodiscard]] ANTON_DECLSPEC_ALLOCATOR void* allocate(isize size, isize alignment) override;
-    //     void deallocate(void*, isize size, isize alignment) override;
-    //     [[nodiscard]] bool is_equal(Memory_Allocator const& other) const override;
-
-    // private:
-    //     // Store the linked list of blocks in a separate array
-    //     char* begin;
-    //     char* end;
-    // };
-
-    // Stack_Allocator
-    // The effective size of the buffer is smaller due to.
+    // Arena_Allocator
     //
-    // template <usize Size, usize Alignment>
-    // struct Stack_Allocator: public Memory_Allocator {
-    // public:
-    //     [[nodiscard]] ANTON_DECLSPEC_ALLOCATOR void* allocate(isize size, isize alignment) override {}
+    struct Arena_Allocator: public Allocator {
+        Arena_Allocator(i64 default_block_size = 65536, i64 default_block_alignment = 8);
+        Arena_Allocator(Arena_Allocator const& allocator) = delete;
+        Arena_Allocator(Arena_Allocator&& allocator);
+        ~Arena_Allocator();
+        Arena_Allocator& operator=(Arena_Allocator const& allocator) = delete;
+        Arena_Allocator& operator=(Arena_Allocator&& allocator);
 
-    //     void deallocate(void*, isize size, isize alignment) override {}
+        // allocate
+        //
+        [[nodiscard]] ANTON_DECLSPEC_ALLOCATOR virtual void* allocate(i64 size, i64 alignment) override;
 
-    //     [[nodiscard]] bool is_equal(Memory_Allocator const& other) const override {
-    //         return false; // TODO: A way to compare allocators.
-    //     }
+        // deallocate
+        // Does nothing.
+        //
+        virtual void deallocate(void* memory, i64 size, i64 alignment) override;
 
-    // private:
-    //     struct Block_Data {
-    //         void* previous_block;
-    //         void* next_block;
-    //         bool free;
-    //     };
+        // is_equal
+        // Compares two allocators. Two arena allocators are equal if and only if they are the same
+        // object.
+        //
+        // Returns:
+        // true if allocator is the same object as *this.
+        //
+        [[nodiscard]] virtual bool is_equal(Memory_Allocator const& allocator) const override;
 
-    //     Aligned_Buffer<Size, Alignment> stack;
-    // };
+        // reset
+        // Frees all memory owned by the allocator without calling destructors and restores the
+        // allocator to the default state.
+        //
+        void reset();
 
-    // template <usize S1, usize A1, usize S2, usize A2>
-    // [[nodiscard]] constexpr bool operator==(Stack_Allocator<S1, A1> const&, Stack_Allocator<S2, A2> const&) {
-    //     return S1 == S2 && A1 == A2;
-    // }
+        // owned_memory
+        // Obtains the total amount of memory owned by the allocator.
+        //
+        // Returns:
+        // The amount of memory owned by the allocator in bytes.
+        //
+        [[nodiscard]] i64 owned_memory() const;
 
-    // template <usize S1, usize A1, usize S2, usize A2>
-    // [[nodiscard]] constexpr bool operator!=(Stack_Allocator<S1, A1> const&, Stack_Allocator<S2, A2> const&) {
-    //     return S1 != S2 || A1 != A2;
-    // }
+        friend void swap(Arena_Allocator& lhs, Arena_Allocator& rhs);
+
+    private:
+        struct Block {
+            Block* next = nullptr;
+            // Pointer to the first free location in the block.
+            void* free = nullptr;
+            // Pointer to the end of the block.
+            void* end = nullptr;
+        };
+
+        Block* first = nullptr;
+        Block* last = nullptr;
+        i64 default_block_size;
+        i64 default_block_alignment;
+        i64 owned_memory_amount = 0;
+
+        Block* allocate_block(i64 size, i64 alignment);
+    };
+
+    [[nodiscard]] bool operator==(Arena_Allocator const& lhs, Arena_Allocator const& rhs);
+    [[nodiscard]] bool operator!=(Arena_Allocator const& lhs, Arena_Allocator const& rhs);
 
     // Polymorphic_Allocator
     // A wrapper around Memory_Allocator to allow any custom allocator to be used with any

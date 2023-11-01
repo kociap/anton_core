@@ -97,7 +97,8 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/utility.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/array.hpp"
     PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/private/allocator.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/private/allocator/allocator.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/private/allocator/arena.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/assert.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/console.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/filesystem.cpp"

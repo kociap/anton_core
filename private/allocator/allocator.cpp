@@ -30,6 +30,8 @@ namespace anton {
     }
 
     bool Allocator::is_equal(Memory_Allocator const& other) const {
+        // TODO: This should return true when other is an instance of Allocator
+        //       (all instances of Allocator are equal).
         return this == &other;
     }
 
@@ -38,36 +40,14 @@ namespace anton {
     }
 
     bool operator==(Allocator const&, Allocator const&) {
-        return true; // All Allocators are stateless and may always be considered equal.
+        // All Allocators are stateless and may always be considered equal.
+        return true;
     }
 
     bool operator!=(Allocator const&, Allocator const&) {
-        return false; // All Allocators are stateless and may always be considered equal.
+        // All Allocators are stateless and may always be considered equal.
+        return false;
     }
-
-    // Buffer Allocator
-
-    [[maybe_unused]] static char* adjust_to_alignment(char* address, usize alignment) {
-        usize misalignment = (reinterpret_cast<usize>(address) & (alignment - 1));
-        address += (misalignment != 0 ? alignment - misalignment : 0);
-        return address;
-    }
-
-    // Buffer_Allocator::Buffer_Allocator(char* b, char* e): begin(adjust_to_alignment(b, alignof(Block_Data))), end(e) {
-    //     Block_Data* block_data = reinterpret_cast<Block_Data*>(begin);
-    //     *block_data = Block_Data{};
-    // }
-
-    // void* Buffer_Allocator::allocate(isize size, isize alignment) {
-    //     auto aligned_block_size = [](Block_Data* block_begin, Block_Data* block_end, usize alignment) {
-    //         char* begin = adjust_to_alignment(reinterpret_cast<char*>(block_begin + 1), alignment);
-    //         char* end = reinterpret_cast<char*>(block_end);
-    //         return end - begin;
-    //     };
-    // }
-
-    // void Buffer_Allocator::deallocate(void*, isize size, isize alignment);
-    // bool Buffer_Allocator::is_equal(Memory_Allocator const& other) const;
 
     // Polymorphic Allocator
 

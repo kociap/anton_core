@@ -14,16 +14,16 @@ namespace anton {
     }
 
     void fill_memory(void* first, void* last, char8 value) {
-        char8* f = (char8*)first;
-        char8* l = (char8*)last;
+        char8* f = reinterpret_cast<char8*>(first);
+        char8* l = reinterpret_cast<char8*>(last);
         for(; f != l; ++f) {
             *f = value;
         }
     }
 
     void zero_memory(void* first, void* last) {
-        char8* f = (char8*)first;
-        char8* l = (char8*)last;
+        char8* f = reinterpret_cast<char8*>(first);
+        char8* l = reinterpret_cast<char8*>(last);
         for(; f != l; ++f) {
             *f = 0;
         }

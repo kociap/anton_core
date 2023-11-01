@@ -11,7 +11,7 @@
 #include <anton/utility.hpp>
 
 namespace anton {
-#define ANTON_ARRAY_MIN_ALLOCATION_SIZE ((i64)64)
+#define ANTON_ARRAY_MIN_ALLOCATION_SIZE (static_cast<i64>(64))
 
     template<typename T>
     struct Array {
@@ -407,7 +407,7 @@ namespace anton {
     template<typename T>
     auto Array<T>::operator[](size_type index) -> T& {
         if constexpr(ANTON_ITERATOR_DEBUG) {
-            ANTON_FAIL(index < _size && index >= 0, u8"index out of bounds");
+            ANTON_FAIL(index < _size && index >= 0, "index out of bounds");
         }
 
         return _data[index];
@@ -416,7 +416,7 @@ namespace anton {
     template<typename T>
     auto Array<T>::operator[](size_type index) const -> T const& {
         if constexpr(ANTON_ITERATOR_DEBUG) {
-            ANTON_FAIL(index < _size && index >= 0, u8"index out of bounds");
+            ANTON_FAIL(index < _size && index >= 0, "index out of bounds");
         }
 
         return _data[index];
@@ -425,7 +425,7 @@ namespace anton {
     template<typename T>
     auto Array<T>::back() -> T& {
         if constexpr(ANTON_ITERATOR_DEBUG) {
-            ANTON_FAIL(_size > 0, u8"attempting to call back() on empty Array");
+            ANTON_FAIL(_size > 0, "attempting to call back() on empty Array");
         }
 
         return _data[_size - 1];
@@ -434,7 +434,7 @@ namespace anton {
     template<typename T>
     auto Array<T>::back() const -> T const& {
         if constexpr(ANTON_ITERATOR_DEBUG) {
-            ANTON_FAIL(_size > 0, u8"attempting to call back() on empty Array");
+            ANTON_FAIL(_size > 0, "attempting to call back() on empty Array");
         }
 
         return _data[_size - 1];
@@ -573,7 +573,7 @@ namespace anton {
 
     template<typename T>
     void Array<T>::force_size(size_type n) {
-        ANTON_ASSERT(n <= _capacity, u8"requested size is greater than capacity");
+        ANTON_ASSERT(n <= _capacity, "requested size is greater than capacity");
         _size = n;
     }
 
@@ -609,7 +609,7 @@ namespace anton {
     template<typename... Args>
     auto Array<T>::insert(Variadic_Construct_Tag, size_type const position, Args&&... args) -> iterator {
         if constexpr(ANTON_ITERATOR_DEBUG) {
-            ANTON_FAIL(position >= 0 && position <= _size, u8"index out of bounds");
+            ANTON_FAIL(position >= 0 && position <= _size, "index out of bounds");
         }
 
         if(_size == _capacity || position != _size) {
@@ -654,7 +654,7 @@ namespace anton {
     template<typename Input_Iterator>
     auto Array<T>::insert(size_type position, Input_Iterator first, Input_Iterator last) -> iterator {
         if constexpr(ANTON_ITERATOR_DEBUG) {
-            ANTON_FAIL(position >= 0 && position <= _size, u8"index out of bounds");
+            ANTON_FAIL(position >= 0 && position <= _size, "index out of bounds");
         }
 
         // TODO: Distance and actual support for input iterators.
@@ -723,7 +723,7 @@ namespace anton {
     template<typename T>
     auto Array<T>::insert_unsorted(size_type position, value_type const& value) -> iterator {
         if constexpr(ANTON_ITERATOR_DEBUG) {
-            ANTON_FAIL(position >= 0 && position <= _size, u8"index out of bounds");
+            ANTON_FAIL(position >= 0 && position <= _size, "index out of bounds");
         }
 
         ensure_capacity(_size + 1);
@@ -747,7 +747,7 @@ namespace anton {
     template<typename T>
     auto Array<T>::insert_unsorted(size_type position, value_type&& value) -> iterator {
         if constexpr(ANTON_ITERATOR_DEBUG) {
-            ANTON_FAIL(position >= 0 && position <= _size, u8"index out of bounds");
+            ANTON_FAIL(position >= 0 && position <= _size, "index out of bounds");
         }
 
         ensure_capacity(_size + 1);
@@ -799,7 +799,7 @@ namespace anton {
     template<typename T>
     void Array<T>::erase_unsorted(size_type index) {
         if constexpr(ANTON_ITERATOR_DEBUG) {
-            ANTON_FAIL(index <= _size && index >= 0, u8"index out of bounds");
+            ANTON_FAIL(index <= _size && index >= 0, "index out of bounds");
         }
 
         erase_unsorted_unchecked(index);
@@ -868,7 +868,7 @@ namespace anton {
 
     template<typename T>
     void Array<T>::pop_back() {
-        ANTON_VERIFY(_size > 0, u8"pop_back called on an empty Array");
+        ANTON_VERIFY(_size > 0, "pop_back called on an empty Array");
         anton::destruct(_data + _size - 1);
         --_size;
     }

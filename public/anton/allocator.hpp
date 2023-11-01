@@ -48,7 +48,7 @@ namespace anton {
         Arena_Allocator(i64 default_block_size = 65536, i64 default_block_alignment = 8);
         Arena_Allocator(Arena_Allocator const& allocator) = delete;
         Arena_Allocator(Arena_Allocator&& allocator);
-        ~Arena_Allocator();
+        ~Arena_Allocator() override;
         Arena_Allocator& operator=(Arena_Allocator const& allocator) = delete;
         Arena_Allocator& operator=(Arena_Allocator&& allocator);
 

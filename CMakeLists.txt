@@ -15,7 +15,7 @@ include(FetchContent)
 FetchContent_Declare(
     anton_math
     GIT_REPOSITORY https://github.com/kociap/anton_math.git
-    GIT_TAG f9451521291d15732eed98240e43294193f32197
+    GIT_TAG f69f9521cacb1a39fef72f136c3424cff8db09b4
 )
 FetchContent_MakeAvailable(anton_math)
 

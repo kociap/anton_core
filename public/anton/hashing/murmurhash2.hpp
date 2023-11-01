@@ -126,7 +126,7 @@ namespace anton {
             case 1:
                 h ^= u64(data2[0]);
                 h *= m;
-        };
+        }
 
         h ^= h >> r;
         h *= m;
@@ -174,7 +174,7 @@ namespace anton {
             case 1:
                 h ^= u64(data2[0]);
                 h *= m;
-        };
+        }
 
         h ^= h >> r;
         h *= m;

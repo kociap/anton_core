@@ -6,8 +6,8 @@ namespace anton {
 #ifndef ANTON_HAS_NO_BUILTIN_ADDRESSOF
 #    define ANTON_ADDRESSOF(x) __builtin_addressof(x)
 #else
-// decltype(x) will deduce the type of the expression unless it is parenthesised in which case
-// the type will be deudced to be a reference and the compilation will fail
+    // decltype(x) will deduce the type of the expression unless it is parenthesised in which case
+    // the type will be deudced to be a reference and the compilation will fail
 #    define ANTON_ADDRESSOF(x) reinterpret_cast<decltype(x)*>(&const_cast<char&>(reinterpret_cast<char const&>(x)))
 #endif
 
@@ -109,9 +109,9 @@ namespace anton {
         // We use the compiler intrinsic to remove the depencendy on type_traits
         // in order to make this header as lightweight as possible.
         if constexpr(__is_constructible(T, decltype(ANTON_FWD(args))...)) {
-            ::new((void*)pointer) T(ANTON_FWD(args)...);
+            ::new(reinterpret_cast<void*>(pointer)) T(ANTON_FWD(args)...);
         } else {
-            ::new((void*)pointer) T{ANTON_FWD(args)...};
+            ::new(reinterpret_cast<void*>(pointer)) T{ANTON_FWD(args)...};
         }
     }
 
@@ -134,7 +134,7 @@ namespace anton {
     //
     template<typename T, typename... Args>
     [[nodiscard]] T* new_obj(Args&&... args) {
-        T* const p = (T*)allocate(sizeof(T), alignof(T));
+        T* const p = reinterpret_cast<T*>(allocate(sizeof(T), alignof(T)));
         construct(p, ANTON_FWD(args)...);
         return p;
     }

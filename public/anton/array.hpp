@@ -13,11 +13,11 @@
 namespace anton {
 #define ANTON_ARRAY_MIN_ALLOCATION_SIZE ((i64)64)
 
-    template<typename T, typename Allocator = Allocator>
+    template<typename T>
     struct Array {
     public:
         using value_type = T;
-        using allocator_type = Allocator;
+        using allocator_type = Polymorphic_Allocator;
         using size_type = i64;
         using difference_type = i64;
         using iterator = T*;
@@ -28,21 +28,29 @@ namespace anton {
         // Construct an array with n default constructed elements
         explicit Array(size_type n);
         // Construct an array with n default constructed elements
-        explicit Array(size_type n, allocator_type const& allocator);
+        explicit Array(allocator_type const& allocator, size_type n);
         // Construct an array with n copies of value
         explicit Array(size_type n, value_type const& value);
         // Construct an array with n copies of value
-        explicit Array(size_type n, value_type const& value, allocator_type const& allocator);
+        explicit Array(allocator_type const& allocator, size_type n, value_type const& value);
         // Construct an array with capacity to fit at least n elements
         explicit Array(Reserve_Tag, size_type n);
         // Construct an array with capacity to fit at least n elements
-        explicit Array(Reserve_Tag, size_type n, allocator_type const& allocator);
+        explicit Array(allocator_type const& allocator, Reserve_Tag, size_type n);
         // Copies the allocator
         Array(Array const& other);
-        Array(Array const& other, allocator_type const& allocator);
+        Array(allocator_type const& allocator, Array const& other);
         // Moves the allocator
         Array(Array&& other);
-        Array(Array&& other, allocator_type const& allocator);
+        // Array
+        // If the allocators do not compare equal, allocates new memory and
+        // moves the objects.
+        //
+        // Complexity:
+        // O(n) if allocators compare unequal.
+        // O(1) otherwise.
+        //
+        Array(allocator_type const& allocator, Array&& other);
         template<typename Input_Iterator>
         Array(Range_Construct_Tag, Input_Iterator first, Input_Iterator last);
         template<typename Input_Iterator>
@@ -248,7 +256,7 @@ namespace anton {
         }
 
     private:
-        Allocator _allocator;
+        allocator_type _allocator;
         size_type _capacity = 0;
         size_type _size = 0;
         T* _data = nullptr;
@@ -259,45 +267,45 @@ namespace anton {
 } // namespace anton
 
 namespace anton {
-    template<typename T, typename Allocator>
-    Array<T, Allocator>::Array(): _allocator() {}
+    template<typename T>
+    Array<T>::Array(): _allocator() {}
 
-    template<typename T, typename Allocator>
-    Array<T, Allocator>::Array(allocator_type const& allocator): _allocator(allocator) {}
+    template<typename T>
+    Array<T>::Array(allocator_type const& allocator): _allocator(allocator) {}
 
-    template<typename T, typename Allocator>
-    Array<T, Allocator>::Array(size_type const n): Array(n, allocator_type()) {}
+    template<typename T>
+    Array<T>::Array(size_type const n): Array(n, allocator_type()) {}
 
-    template<typename T, typename Allocator>
-    Array<T, Allocator>::Array(size_type const n, allocator_type const& allocator): _allocator(allocator) {
+    template<typename T>
+    Array<T>::Array(allocator_type const& allocator, size_type const n): _allocator(allocator) {
         _capacity = math::max(ANTON_ARRAY_MIN_ALLOCATION_SIZE, n);
         _data = allocate(_capacity);
         anton::uninitialized_default_construct_n(_data, n);
         _size = n;
     }
 
-    template<typename T, typename Allocator>
-    Array<T, Allocator>::Array(size_type n, value_type const& value): Array(n, value, allocator_type()) {}
+    template<typename T>
+    Array<T>::Array(size_type n, value_type const& value): Array(n, value, allocator_type()) {}
 
-    template<typename T, typename Allocator>
-    Array<T, Allocator>::Array(size_type n, value_type const& value, allocator_type const& allocator): _allocator(allocator) {
+    template<typename T>
+    Array<T>::Array(allocator_type const& allocator, size_type n, value_type const& value): _allocator(allocator) {
         _capacity = math::max(ANTON_ARRAY_MIN_ALLOCATION_SIZE, n);
         _data = allocate(_capacity);
         anton::uninitialized_fill_n(_data, n, value);
         _size = n;
     }
 
-    template<typename T, typename Allocator>
-    Array<T, Allocator>::Array(Reserve_Tag, size_type const n): Array(reserve, n, allocator_type()) {}
+    template<typename T>
+    Array<T>::Array(Reserve_Tag, size_type const n): Array(reserve, n, allocator_type()) {}
 
-    template<typename T, typename Allocator>
-    Array<T, Allocator>::Array(Reserve_Tag, size_type const n, allocator_type const& allocator): _allocator(allocator) {
+    template<typename T>
+    Array<T>::Array(allocator_type const& allocator, Reserve_Tag, size_type const n): _allocator(allocator) {
         _capacity = math::max(ANTON_ARRAY_MIN_ALLOCATION_SIZE, n);
         _data = allocate(_capacity);
     }
 
-    template<typename T, typename Allocator>
-    Array<T, Allocator>::Array(Array const& other): _allocator(other._allocator), _capacity(other._capacity) {
+    template<typename T>
+    Array<T>::Array(Array const& other): Array(allocator_type(), other) {
         if(_capacity > 0) {
             _data = allocate(_capacity);
             anton::uninitialized_copy_n(other._data, other._size, _data);
@@ -305,21 +313,48 @@ namespace anton {
         }
     }
 
-    template<typename T, typename Allocator>
-    Array<T, Allocator>::Array(Array&& other): _allocator(ANTON_MOV(other._allocator)), _capacity(other._capacity), _size(other._size), _data(other._data) {
+    template<typename T>
+    Array<T>::Array(allocator_type const& allocator, Array const& other): _allocator(allocator), _capacity(other._capacity) {
+        if(_capacity > 0) {
+            _data = allocate(_capacity);
+            anton::uninitialized_copy_n(other._data, other._size, _data);
+            _size = other._size;
+        }
+    }
+
+    template<typename T>
+    Array<T>::Array(Array&& other): _allocator(ANTON_MOV(other._allocator)), _capacity(other._capacity), _size(other._size), _data(other._data) {
         other._data = nullptr;
         other._capacity = 0;
         other._size = 0;
     }
 
-    template<typename T, typename Allocator>
+    template<typename T>
+    Array<T>::Array(allocator_type const& allocator, Array&& other): _allocator(allocator), _capacity(other._capacity), _size(other._size) {
+        if(allocator == other._allocator) {
+            _data = other._data;
+        } else {
+            _data = allocate(_capacity);
+            // TODO: Assumes elements are movable.
+            anton::uninitialized_move_n(other._data, other._size, _data);
+            anton::destruct_n(other._data, other._size);
+            other.deallocate(other._data, other._capacity);
+        }
+
+        other._data = nullptr;
+        other._capacity = 0;
+        other._size = 0;
+        other._allocator = allocator_type();
+    }
+
+    template<typename T>
     template<typename Input_Iterator>
-    Array<T, Allocator>::Array(Range_Construct_Tag, Input_Iterator first, Input_Iterator last)
+    Array<T>::Array(Range_Construct_Tag, Input_Iterator first, Input_Iterator last)
         : Array(allocator_type(), range_construct, ANTON_MOV(first), ANTON_MOV(last)) {}
 
-    template<typename T, typename Allocator>
+    template<typename T>
     template<typename Input_Iterator>
-    Array<T, Allocator>::Array(allocator_type const& allocator, Range_Construct_Tag, Input_Iterator first, Input_Iterator last): _allocator(allocator) {
+    Array<T>::Array(allocator_type const& allocator, Range_Construct_Tag, Input_Iterator first, Input_Iterator last): _allocator(allocator) {
         // TODO: Use distance?
         size_type const count = last - first;
         _capacity = math::max(ANTON_ARRAY_MIN_ALLOCATION_SIZE, count);
@@ -328,28 +363,30 @@ namespace anton {
         _size = count;
     }
 
-    template<typename T, typename Allocator>
+    template<typename T>
     template<typename... Args>
-    Array<T, Allocator>::Array(Variadic_Construct_Tag, Args&&... args): Array(allocator_type(), variadic_construct, ANTON_FWD(args)...) {}
+    Array<T>::Array(Variadic_Construct_Tag, Args&&... args): Array(allocator_type(), variadic_construct, ANTON_FWD(args)...) {}
 
-    template<typename T, typename Allocator>
+    template<typename T>
     template<typename... Args>
-    Array<T, Allocator>::Array(allocator_type const& allocator, Variadic_Construct_Tag, Args&&... args): _allocator(allocator) {
+    Array<T>::Array(allocator_type const& allocator, Variadic_Construct_Tag, Args&&... args): _allocator(allocator) {
         _capacity = math::max(ANTON_ARRAY_MIN_ALLOCATION_SIZE, static_cast<size_type>(sizeof...(Args)));
         _data = allocate(_capacity);
         anton::uninitialized_variadic_construct(_data, ANTON_FWD(args)...);
         _size = static_cast<size_type>(sizeof...(Args));
     }
 
-    template<typename T, typename Allocator>
-    Array<T, Allocator>::~Array() {
+    template<typename T>
+    Array<T>::~Array() {
         anton::destruct_n(_data, _size);
         deallocate(_data, _capacity);
     }
 
-    template<typename T, typename Allocator>
-    Array<T, Allocator>& Array<T, Allocator>::operator=(Array const& other) {
+    template<typename T>
+    Array<T>& Array<T>::operator=(Array const& other) {
         anton::destruct_n(_data, _size);
+        // TODO: Do not deallocate if capacity equal. Consider not deallocating
+        // at all when current capacity > other capacity.
         deallocate(_data, _capacity);
         _capacity = other._capacity;
         _size = other._size;
@@ -361,14 +398,14 @@ namespace anton {
         return *this;
     }
 
-    template<typename T, typename Allocator>
-    Array<T, Allocator>& Array<T, Allocator>::operator=(Array&& other) {
+    template<typename T>
+    Array<T>& Array<T>::operator=(Array&& other) {
         swap(*this, other);
         return *this;
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::operator[](size_type index) -> T& {
+    template<typename T>
+    auto Array<T>::operator[](size_type index) -> T& {
         if constexpr(ANTON_ITERATOR_DEBUG) {
             ANTON_FAIL(index < _size && index >= 0, u8"index out of bounds");
         }
@@ -376,8 +413,8 @@ namespace anton {
         return _data[index];
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::operator[](size_type index) const -> T const& {
+    template<typename T>
+    auto Array<T>::operator[](size_type index) const -> T const& {
         if constexpr(ANTON_ITERATOR_DEBUG) {
             ANTON_FAIL(index < _size && index >= 0, u8"index out of bounds");
         }
@@ -385,8 +422,8 @@ namespace anton {
         return _data[index];
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::back() -> T& {
+    template<typename T>
+    auto Array<T>::back() -> T& {
         if constexpr(ANTON_ITERATOR_DEBUG) {
             ANTON_FAIL(_size > 0, u8"attempting to call back() on empty Array");
         }
@@ -394,8 +431,8 @@ namespace anton {
         return _data[_size - 1];
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::back() const -> T const& {
+    template<typename T>
+    auto Array<T>::back() const -> T const& {
         if constexpr(ANTON_ITERATOR_DEBUG) {
             ANTON_FAIL(_size > 0, u8"attempting to call back() on empty Array");
         }
@@ -403,72 +440,72 @@ namespace anton {
         return _data[_size - 1];
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::data() -> T* {
+    template<typename T>
+    auto Array<T>::data() -> T* {
         return _data;
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::data() const -> T const* {
+    template<typename T>
+    auto Array<T>::data() const -> T const* {
         return _data;
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::begin() -> iterator {
+    template<typename T>
+    auto Array<T>::begin() -> iterator {
         return _data;
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::end() -> iterator {
+    template<typename T>
+    auto Array<T>::end() -> iterator {
         return _data + _size;
     }
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::begin() const -> const_iterator {
+    template<typename T>
+    auto Array<T>::begin() const -> const_iterator {
         return _data;
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::end() const -> const_iterator {
-        return _data + _size;
-    }
-
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::cbegin() const -> const_iterator {
-        return _data;
-    }
-
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::cend() const -> const_iterator {
+    template<typename T>
+    auto Array<T>::end() const -> const_iterator {
         return _data + _size;
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::size() const -> size_type {
+    template<typename T>
+    auto Array<T>::cbegin() const -> const_iterator {
+        return _data;
+    }
+
+    template<typename T>
+    auto Array<T>::cend() const -> const_iterator {
+        return _data + _size;
+    }
+
+    template<typename T>
+    auto Array<T>::size() const -> size_type {
         return _size;
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::size_bytes() const -> size_type {
+    template<typename T>
+    auto Array<T>::size_bytes() const -> size_type {
         return _size * sizeof(T);
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::capacity() const -> size_type {
+    template<typename T>
+    auto Array<T>::capacity() const -> size_type {
         return _capacity;
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::get_allocator() -> allocator_type& {
+    template<typename T>
+    auto Array<T>::get_allocator() -> allocator_type& {
         return _allocator;
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::get_allocator() const -> allocator_type const& {
+    template<typename T>
+    auto Array<T>::get_allocator() const -> allocator_type const& {
         return _allocator;
     }
 
-    template<typename T, typename Allocator>
-    void Array<T, Allocator>::resize(size_type n, value_type const& value) {
+    template<typename T>
+    void Array<T>::resize(size_type n, value_type const& value) {
         ensure_capacity(n);
         if(n > _size) {
             anton::uninitialized_fill(_data + _size, _data + n, value);
@@ -478,8 +515,8 @@ namespace anton {
         _size = n;
     }
 
-    template<typename T, typename Allocator>
-    void Array<T, Allocator>::resize(size_type n) {
+    template<typename T>
+    void Array<T>::resize(size_type n) {
         ensure_capacity(n);
         if(n > _size) {
             anton::uninitialized_default_construct(_data + _size, _data + n);
@@ -489,8 +526,8 @@ namespace anton {
         _size = n;
     }
 
-    template<typename T, typename Allocator>
-    void Array<T, Allocator>::ensure_capacity(size_type requested_capacity) {
+    template<typename T>
+    void Array<T>::ensure_capacity(size_type requested_capacity) {
         if(requested_capacity > _capacity) {
             size_type new_capacity = (_capacity > 0 ? _capacity : ANTON_ARRAY_MIN_ALLOCATION_SIZE);
             while(new_capacity < requested_capacity) {
@@ -510,8 +547,8 @@ namespace anton {
         }
     }
 
-    template<typename T, typename Allocator>
-    void Array<T, Allocator>::set_capacity(size_type new_capacity) {
+    template<typename T>
+    void Array<T>::set_capacity(size_type new_capacity) {
         ANTON_ASSERT(new_capacity >= 0, "capacity must be greater than or equal 0");
         if(new_capacity != _capacity) {
             i64 const new_size = math::min(new_capacity, _size);
@@ -534,43 +571,43 @@ namespace anton {
         }
     }
 
-    template<typename T, typename Allocator>
-    void Array<T, Allocator>::force_size(size_type n) {
+    template<typename T>
+    void Array<T>::force_size(size_type n) {
         ANTON_ASSERT(n <= _capacity, u8"requested size is greater than capacity");
         _size = n;
     }
 
-    template<typename T, typename Allocator>
+    template<typename T>
     template<typename Input_Iterator>
-    void Array<T, Allocator>::assign(Input_Iterator first, Input_Iterator last) {
+    void Array<T>::assign(Input_Iterator first, Input_Iterator last) {
         anton::destruct_n(_data, _size);
         ensure_capacity(last - first);
         anton::uninitialized_copy(first, last, _data);
         _size = last - first;
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::insert(const_iterator position, T const& value) -> iterator {
+    template<typename T>
+    auto Array<T>::insert(const_iterator position, T const& value) -> iterator {
         size_type const offset = static_cast<size_type>(position - begin());
         return insert(variadic_construct, offset, value);
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::insert(const_iterator position, T&& value) -> iterator {
+    template<typename T>
+    auto Array<T>::insert(const_iterator position, T&& value) -> iterator {
         size_type const offset = static_cast<size_type>(position - begin());
         return insert(variadic_construct, offset, ANTON_MOV(value));
     }
 
-    template<typename T, typename Allocator>
+    template<typename T>
     template<typename... Args>
-    auto Array<T, Allocator>::insert(Variadic_Construct_Tag, const_iterator position, Args&&... args) -> iterator {
+    auto Array<T>::insert(Variadic_Construct_Tag, const_iterator position, Args&&... args) -> iterator {
         size_type const offset = static_cast<size_type>(position - begin());
         return insert(variadic_construct, offset, ANTON_FWD(args)...);
     }
 
-    template<typename T, typename Allocator>
+    template<typename T>
     template<typename... Args>
-    auto Array<T, Allocator>::insert(Variadic_Construct_Tag, size_type const position, Args&&... args) -> iterator {
+    auto Array<T>::insert(Variadic_Construct_Tag, size_type const position, Args&&... args) -> iterator {
         if constexpr(ANTON_ITERATOR_DEBUG) {
             ANTON_FAIL(position >= 0 && position <= _size, u8"index out of bounds");
         }
@@ -606,16 +643,16 @@ namespace anton {
         return _data + position;
     }
 
-    template<typename T, typename Allocator>
+    template<typename T>
     template<typename Input_Iterator>
-    auto Array<T, Allocator>::insert(const_iterator position, Input_Iterator first, Input_Iterator last) -> iterator {
+    auto Array<T>::insert(const_iterator position, Input_Iterator first, Input_Iterator last) -> iterator {
         size_type const offset = static_cast<size_type>(position - begin());
         return insert(offset, first, last);
     }
 
-    template<typename T, typename Allocator>
+    template<typename T>
     template<typename Input_Iterator>
-    auto Array<T, Allocator>::insert(size_type position, Input_Iterator first, Input_Iterator last) -> iterator {
+    auto Array<T>::insert(size_type position, Input_Iterator first, Input_Iterator last) -> iterator {
         if constexpr(ANTON_ITERATOR_DEBUG) {
             ANTON_FAIL(position >= 0 && position <= _size, u8"index out of bounds");
         }
@@ -671,20 +708,20 @@ namespace anton {
         return _data + position;
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::insert_unsorted(const_iterator position, value_type const& value) -> iterator {
+    template<typename T>
+    auto Array<T>::insert_unsorted(const_iterator position, value_type const& value) -> iterator {
         size_type const offset = static_cast<size_type>(position - begin());
         return insert_unsorted(offset, value);
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::insert_unsorted(const_iterator position, value_type&& value) -> iterator {
+    template<typename T>
+    auto Array<T>::insert_unsorted(const_iterator position, value_type&& value) -> iterator {
         size_type const offset = static_cast<size_type>(position - begin());
         return insert_unsorted(offset, ANTON_MOV(value));
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::insert_unsorted(size_type position, value_type const& value) -> iterator {
+    template<typename T>
+    auto Array<T>::insert_unsorted(size_type position, value_type const& value) -> iterator {
         if constexpr(ANTON_ITERATOR_DEBUG) {
             ANTON_FAIL(position >= 0 && position <= _size, u8"index out of bounds");
         }
@@ -707,8 +744,8 @@ namespace anton {
         return elem_ptr;
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::insert_unsorted(size_type position, value_type&& value) -> iterator {
+    template<typename T>
+    auto Array<T>::insert_unsorted(size_type position, value_type&& value) -> iterator {
         if constexpr(ANTON_ITERATOR_DEBUG) {
             ANTON_FAIL(position >= 0 && position <= _size, u8"index out of bounds");
         }
@@ -731,8 +768,8 @@ namespace anton {
         return elem_ptr;
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::push_back(value_type const& value) -> T& {
+    template<typename T>
+    auto Array<T>::push_back(value_type const& value) -> T& {
         ensure_capacity(_size + 1);
         T* const element = _data + _size;
         anton::construct(element, value);
@@ -740,8 +777,8 @@ namespace anton {
         return *element;
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::push_back(value_type&& value) -> T& {
+    template<typename T>
+    auto Array<T>::push_back(value_type&& value) -> T& {
         ensure_capacity(_size + 1);
         T* const element = _data + _size;
         anton::construct(element, ANTON_MOV(value));
@@ -749,9 +786,9 @@ namespace anton {
         return *element;
     }
 
-    template<typename T, typename Allocator>
+    template<typename T>
     template<typename... Args>
-    auto Array<T, Allocator>::emplace_back(Args&&... args) -> T& {
+    auto Array<T>::emplace_back(Args&&... args) -> T& {
         ensure_capacity(_size + 1);
         T* const element = _data + _size;
         anton::construct(element, ANTON_FWD(args)...);
@@ -759,8 +796,8 @@ namespace anton {
         return *element;
     }
 
-    template<typename T, typename Allocator>
-    void Array<T, Allocator>::erase_unsorted(size_type index) {
+    template<typename T>
+    void Array<T>::erase_unsorted(size_type index) {
         if constexpr(ANTON_ITERATOR_DEBUG) {
             ANTON_FAIL(index <= _size && index >= 0, u8"index out of bounds");
         }
@@ -768,8 +805,8 @@ namespace anton {
         erase_unsorted_unchecked(index);
     }
 
-    template<typename T, typename Allocator>
-    void Array<T, Allocator>::erase_unsorted_unchecked(size_type index) {
+    template<typename T>
+    void Array<T>::erase_unsorted_unchecked(size_type index) {
         T* const element = _data + index;
         T* const last_element = _data + _size - 1;
         if(element != last_element) { // Prevent self assignment
@@ -779,8 +816,8 @@ namespace anton {
         --_size;
     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::erase_unsorted(const_iterator iter) -> iterator {
+    template<typename T>
+    auto Array<T>::erase_unsorted(const_iterator iter) -> iterator {
         if constexpr(ANTON_ITERATOR_DEBUG) {
             ANTON_FAIL(iter - _data >= 0 && iter - _data <= _size, "iterator out of bounds");
         }
@@ -795,8 +832,8 @@ namespace anton {
         return position;
     }
 
-    //     template <typename T, typename Allocator>
-    //     auto Array<T, Allocator>::erase_unsorted(const_iterator first, const_iterator last) -> iterator {
+    //     template <typename T>
+    //     auto Array<T>::erase_unsorted(const_iterator first, const_iterator last) -> iterator {
     // #if ANTON_ITERATOR_DEBUG
 
     // #endif // ANTON_ITERATOR_DEBUG
@@ -813,8 +850,8 @@ namespace anton {
     //         return first;
     //     }
 
-    template<typename T, typename Allocator>
-    auto Array<T, Allocator>::erase(const_iterator first, const_iterator last) -> iterator {
+    template<typename T>
+    auto Array<T>::erase(const_iterator first, const_iterator last) -> iterator {
         if constexpr(ANTON_ITERATOR_DEBUG) {
             ANTON_FAIL(first - _data >= 0 && first - _data <= _size, "iterator out of bounds");
             ANTON_FAIL(last - _data >= 0 && last - _data <= _size, "iterator out of bounds");
@@ -829,27 +866,27 @@ namespace anton {
         return const_cast<value_type*>(first);
     }
 
-    template<typename T, typename Allocator>
-    void Array<T, Allocator>::pop_back() {
+    template<typename T>
+    void Array<T>::pop_back() {
         ANTON_VERIFY(_size > 0, u8"pop_back called on an empty Array");
         anton::destruct(_data + _size - 1);
         --_size;
     }
 
-    template<typename T, typename Allocator>
-    void Array<T, Allocator>::clear() {
+    template<typename T>
+    void Array<T>::clear() {
         anton::destruct(_data, _data + _size);
         _size = 0;
     }
 
-    template<typename T, typename Allocator>
-    T* Array<T, Allocator>::allocate(size_type const size) {
+    template<typename T>
+    T* Array<T>::allocate(size_type const size) {
         void* mem = _allocator.allocate(size * static_cast<isize>(sizeof(T)), static_cast<isize>(alignof(T)));
         return static_cast<T*>(mem);
     }
 
-    template<typename T, typename Allocator>
-    void Array<T, Allocator>::deallocate(void* mem, size_type const size) {
+    template<typename T>
+    void Array<T>::deallocate(void* mem, size_type const size) {
         _allocator.deallocate(mem, size * static_cast<isize>(sizeof(T)), static_cast<isize>(alignof(T)));
     }
 } // namespace anton

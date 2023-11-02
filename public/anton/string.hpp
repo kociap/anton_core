@@ -225,9 +225,9 @@ namespace anton {
     // Returns:
     // Concatenated string.
     //
-    template<typename... T>
-    [[nodiscard]] String concat(String_View const first, String_View const second, T&&... rest) {
-        String_View strings[2 + sizeof...(rest)] = {first, second, String_View(rest)...};
+    template<typename T1, typename T2, typename... T>
+    [[nodiscard]] String concat(T1&& first, T2&& second, T&&... rest) {
+        String_View strings[2 + sizeof...(rest)] = {String_View(first), String_View(second), String_View(rest)...};
         return concat(Slice<String_View>{strings});
     }
 
@@ -241,9 +241,9 @@ namespace anton {
     // Returns:
     // Concatenated string.
     //
-    template<typename... T>
-    [[nodiscard]] String concat(Memory_Allocator* const allocator, String_View const first, String_View const second, T&&... rest) {
-        String_View strings[2 + sizeof...(rest)] = {first, second, String_View(rest)...};
+    template<typename T1, typename T2, typename... T>
+    [[nodiscard]] String concat(Memory_Allocator* const allocator, T1&& first, T2&& second, T&&... rest) {
+        String_View strings[2 + sizeof...(rest)] = {String_View(first), String_View(second), String_View(rest)...};
         return concat(allocator, Slice<String_View>{strings});
     }
 

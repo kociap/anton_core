@@ -274,7 +274,7 @@ namespace anton {
     Array<T>::Array(allocator_type const& allocator): _allocator(allocator) {}
 
     template<typename T>
-    Array<T>::Array(size_type const n): Array(n, allocator_type()) {}
+    Array<T>::Array(size_type const n): Array(allocator_type(), n) {}
 
     template<typename T>
     Array<T>::Array(allocator_type const& allocator, size_type const n): _allocator(allocator) {
@@ -285,7 +285,7 @@ namespace anton {
     }
 
     template<typename T>
-    Array<T>::Array(size_type n, value_type const& value): Array(n, value, allocator_type()) {}
+    Array<T>::Array(size_type n, value_type const& value): Array(allocator_type(), n, value) {}
 
     template<typename T>
     Array<T>::Array(allocator_type const& allocator, size_type n, value_type const& value): _allocator(allocator) {
@@ -296,7 +296,7 @@ namespace anton {
     }
 
     template<typename T>
-    Array<T>::Array(Reserve_Tag, size_type const n): Array(reserve, n, allocator_type()) {}
+    Array<T>::Array(Reserve_Tag, size_type const n): Array(allocator_type(), reserve, n) {}
 
     template<typename T>
     Array<T>::Array(allocator_type const& allocator, Reserve_Tag, size_type const n): _allocator(allocator) {

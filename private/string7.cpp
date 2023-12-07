@@ -1,3 +1,4 @@
+#include "anton/allocator.hpp"
 #include <anton/string7.hpp>
 
 #include <anton/assert.hpp>
@@ -486,5 +487,33 @@ namespace anton {
 
     f32 str_to_f32(String7 const& string) {
         return ::strtof(string.data(), nullptr);
+    }
+
+    String7 to_lower(Memory_Allocator* const allocator, String7_View const string) {
+        String7 result{string, allocator};
+        for(char8& c: result) {
+            if(c <= 'Z' && c >= 'A') {
+                c = c | 0x20;
+            }
+        }
+        return result;
+    }
+
+    String7 to_lower(String7_View string) {
+        return to_lower(get_default_allocator(), string);
+    }
+
+    String7 to_upper(Memory_Allocator* const allocator, String7_View const string) {
+        String7 result{string, allocator};
+        for(char8& c: result) {
+            if(c <= 'z' && c >= 'a') {
+                c = c & 0xDF;
+            }
+        }
+        return result;
+    }
+
+    String7 to_upper(String7_View string) {
+        return to_lower(get_default_allocator(), string);
     }
 } // namespace anton

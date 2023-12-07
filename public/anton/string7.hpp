@@ -142,6 +142,11 @@ namespace anton {
     // TODO: Implement in terms of String_View.
     [[nodiscard]] f32 str_to_f32(String7 const& string);
 
+    [[nodiscard]] String7 to_lower(Memory_Allocator* allocator, String7_View string);
+    [[nodiscard]] String7 to_lower(String7_View string);
+    [[nodiscard]] String7 to_upper(Memory_Allocator* allocator, String7_View string);
+    [[nodiscard]] String7 to_upper(String7_View string);
+
     template<>
     struct Default_Hash<String7> {
         using transparent = void;

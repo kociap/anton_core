@@ -1,5 +1,7 @@
 #pragma once
 
+#include "anton/type_traits/base.hpp"
+#include "anton/type_traits/properties.hpp"
 #include <anton/allocator.hpp>
 #include <anton/functors.hpp>
 #include <anton/iterators.hpp>
@@ -226,7 +228,7 @@ namespace anton {
     // Concatenated string.
     //
     template<typename T1, typename T2, typename... T>
-    [[nodiscard]] String concat(T1&& first, T2&& second, T&&... rest) {
+    [[nodiscard]] enable_if<is_constructible<String_View, T1&&>, String> concat(T1&& first, T2&& second, T&&... rest) {
         String_View strings[2 + sizeof...(rest)] = {String_View(first), String_View(second), String_View(rest)...};
         return concat(Slice<String_View>{strings});
     }

@@ -1,4 +1,4 @@
-#include <anton/console.hpp>
+#include <anton/stdio.hpp>
 
 #include <stdio.h>
 
@@ -8,6 +8,14 @@
 #endif
 
 namespace anton {
+    void print(String_View const string) {
+        fwrite(string.data(), string.size_bytes(), 1, stdout);
+    }
+
+    void print(String7_View const string) {
+        fwrite(string.data(), string.size(), 1, stdout);
+    }
+
     STDOUT_Stream::operator bool() const {
         return true;
     }

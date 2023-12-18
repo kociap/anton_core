@@ -1,8 +1,16 @@
 #pragma once
 
 #include <anton/stream.hpp>
+#include <anton/string7_view.hpp>
 
 namespace anton {
+    // print
+    void print(String_View string);
+    void print(String7_View string);
+
+    // STDOUT_Stream
+    // Stateless stream representing the STDOUT. Multiple instances may coexist.
+    //
     struct STDOUT_Stream: public Output_Stream {
     public:
         virtual ~STDOUT_Stream() override = default;
@@ -18,6 +26,9 @@ namespace anton {
         virtual i64 tell() override;
     };
 
+    // STDERR_Stream
+    // Stateless stream representing the STDERR. Multiple instances may coexist.
+    //
     struct STDERR_Stream: public Output_Stream {
     public:
         virtual ~STDERR_Stream() override = default;

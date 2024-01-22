@@ -53,7 +53,6 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/iterators/base.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/iterators/enumerate.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/iterators/move.hpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/iterators/range.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/iterators/reverse.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/iterators/zip.hpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/public/anton/memory/core.hpp"

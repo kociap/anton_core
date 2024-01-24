@@ -230,7 +230,23 @@ namespace anton {
         // iterator erase_unsorted(const_iterator first, const_iterator last);
 
         void pop_back();
+
+        // clear
+        // Destruct all objects contained in the array.
+        //
         void clear();
+
+        // reset
+        // Destruct all objects contained in the array and free the memory,
+        // essentially resetting the state to initial empty state.
+        //
+        void reset();
+
+        // reset_lose_memory
+        // Unilateral reset of the array. No destructors are invoked,
+        // deallocation does not occur. The container is reset to the initial
+        // empty state.
+        void reset_lose_memory();
 
         // swap
         // Exchanges the contents of the two arrays without copying,
@@ -877,6 +893,22 @@ namespace anton {
     void Array<T>::clear() {
         anton::destruct(_data, _data + _size);
         _size = 0;
+    }
+
+    template<typename T>
+    void Array<T>::reset() {
+        anton::destruct(_data, _data + _size);
+        deallocate(_data, _capacity);
+        _size = 0;
+        _capacity = 0;
+        _data = nullptr;
+    }
+
+    template<typename T>
+    void Array<T>::reset_lose_memory() {
+        _size = 0;
+        _capacity = 0;
+        _data = nullptr;
     }
 
     template<typename T>

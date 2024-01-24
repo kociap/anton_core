@@ -31,11 +31,11 @@ namespace anton {
             return copy;
         }
 
-        [[nodiscard]] bool operator==(Enumerate_Iterator& other) const {
+        [[nodiscard]] bool operator==(Enumerate_Iterator const& other) const {
             return value == other.value;
         }
 
-        [[nodiscard]] bool operator!=(Enumerate_Iterator& other) const {
+        [[nodiscard]] bool operator!=(Enumerate_Iterator const& other) const {
             return value != other.value;
         }
     };

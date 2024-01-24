@@ -34,13 +34,25 @@ namespace anton {
         explicit Contiguous_Iterator_Tag() = default;
     };
 
+    namespace detail {
+        template<typename T, typename = void>
+        struct Get_Pointer {
+            using type = void;
+        };
+
+        template<typename T>
+        struct Get_Pointer<T, void_sink<typename T::pointer>> {
+            using type = typename T::pointer;
+        };
+    } // namespace detail
+
     // Iterator_Traits
     //
     template<typename T>
     struct Iterator_Traits {
         using difference_type = typename T::difference_type;
         using value_type = typename T::value_type;
-        using pointer = typename T::pointer;
+        using pointer = typename detail::Get_Pointer<T>::type;
         using reference = typename T::reference;
         using iterator_category = typename T::iterator_category;
     };

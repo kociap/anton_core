@@ -396,16 +396,13 @@ namespace anton {
     template<typename T>
     Array<T>& Array<T>::operator=(Array const& other) {
         anton::destruct_n(_data, _size);
-        // TODO: Do not deallocate if capacity equal. Consider not deallocating
-        // at all when current capacity > other capacity.
-        deallocate(_data, _capacity);
-        _capacity = other._capacity;
+        _size = 0;
+        // We do not shrink the container to fit as it is faster that way - we
+        // avoid an allocation after all! Shrinking may be requested by the user
+        // explicitly.
+        ensure_capacity(other._size);
+        anton::uninitialized_copy_n(other._data, other._size, _data);
         _size = other._size;
-        _allocator = other._allocator;
-        if(_capacity > 0) {
-            _data = allocate(_capacity);
-            anton::uninitialized_copy_n(other._data, other._size, _data);
-        }
         return *this;
     }
 

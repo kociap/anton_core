@@ -321,13 +321,7 @@ namespace anton {
     }
 
     template<typename T>
-    Array<T>::Array(Array const& other): Array(allocator_type(), other) {
-        if(_capacity > 0) {
-            _data = allocate(_capacity);
-            anton::uninitialized_copy_n(other._data, other._size, _data);
-            _size = other._size;
-        }
-    }
+    Array<T>::Array(Array const& other): Array(allocator_type(), other) {}
 
     template<typename T>
     Array<T>::Array(allocator_type const& allocator, Array const& other): _allocator(allocator), _capacity(other._capacity) {
@@ -343,6 +337,7 @@ namespace anton {
         other._data = nullptr;
         other._capacity = 0;
         other._size = 0;
+        other._allocator = allocator_type();
     }
 
     template<typename T>

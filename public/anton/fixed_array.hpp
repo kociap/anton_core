@@ -10,7 +10,7 @@
 namespace anton {
     template<typename T, i64 Capacity>
     struct Fixed_Array {
-        static_assert(Capacity > 0, u8"Fixed_Array's capacity must be greater than 0");
+        static_assert(Capacity > 0, "Fixed_Array's capacity must be greater than 0");
 
     public:
         using value_type = T;
@@ -125,7 +125,7 @@ namespace anton {
     template<typename T, i64 Capacity>
     template<typename... Args>
     Fixed_Array<T, Capacity>::Fixed_Array(Variadic_Construct_Tag, Args&&... args): _size(sizeof...(Args)) {
-        static_assert(sizeof...(Args) <= Capacity, u8"attempting to construct Fixed_Array with more elements than capacity");
+        static_assert(sizeof...(Args) <= Capacity, "attempting to construct Fixed_Array with more elements than capacity");
         anton::uninitialized_variadic_construct(reinterpret_cast<T*>(_data), ANTON_FWD(args)...);
     }
 

@@ -26,12 +26,12 @@ extern "C" {
     // string.h
     // memset, memmove, memcpy, strlen don't use dllimport on win.
 
-    void* memset(void* dest, int value, size_t count);
-    void* memcpy(void* dest, void const* src, size_t count);
-    void* memmove(void* dest, void const* src, size_t count);
-    int memcmp(void const* lhs, void const* rhs, size_t count);
+    void* memset(void* dest, int value, size_t count) ANTON_CRT_NOEXCEPT;
+    void* memcpy(void* dest, void const* src, size_t count) ANTON_CRT_NOEXCEPT;
+    void* memmove(void* dest, void const* src, size_t count) ANTON_CRT_NOEXCEPT;
+    int memcmp(void const* lhs, void const* rhs, size_t count) ANTON_CRT_NOEXCEPT;
 
-    size_t strlen(char const* string);
+    size_t strlen(char const* string) ANTON_CRT_NOEXCEPT;
 
     // Aligned allocation functions
     #if defined(_WIN64)

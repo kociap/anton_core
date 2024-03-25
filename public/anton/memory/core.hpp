@@ -105,7 +105,7 @@ namespace anton {
     // args... - arguments to forward to the constructor.
     //
     template<typename T, typename... Args>
-    void construct(T* pointer, Args&&... args) {
+    auto construct(T* pointer, Args&&... args) -> T* {
         // We use the compiler intrinsic to remove the depencendy on type_traits
         // in order to make this header as lightweight as possible.
         if constexpr(__is_constructible(T, decltype(ANTON_FWD(args))...)) {
@@ -113,6 +113,7 @@ namespace anton {
         } else {
             ::new(reinterpret_cast<void*>(pointer)) T{ANTON_FWD(args)...};
         }
+        return pointer;
     }
 
     // destruct

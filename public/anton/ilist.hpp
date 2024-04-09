@@ -134,11 +134,11 @@ namespace anton {
         }
 
         [[nodiscard]] pointer operator->() const {
-            return static_cast<node_type>(node);
+            return static_cast<pointer>(node);
         }
 
         [[nodiscard]] reference operator*() const {
-            return static_cast<node_type*>(node);
+            return *static_cast<pointer>(node);
         }
 
         IList_Iterator& operator++() {

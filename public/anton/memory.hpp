@@ -107,6 +107,8 @@ namespace anton {
         (..., anton::construct(ANTON_ADDRESSOF(*(first++)), ANTON_FWD(vals)));
     }
 
+    // TODO: "Secure" overloads of the below functions taking a destination range.
+
     // copy
     // Copy assigns elements from [first, last[ to dest.
     //

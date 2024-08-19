@@ -105,6 +105,7 @@ target_sources(anton_core
     "${CMAKE_CURRENT_SOURCE_DIR}/private/filesystem.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/format.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/memory.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/private/ranges.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string_stream.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string_view.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/private/string.cpp"

@@ -30,10 +30,7 @@ namespace anton {
   template<typename T>
   Range(T&&, T&&) -> Range<remove_reference<T>>;
 
-  auto irange(isize begin, isize end)
-  {
-    return Range(Enumerate_Iterator(begin), Enumerate_Iterator(end));
-  }
+  Range<Enumerate_Iterator> irange(isize begin, isize end);
 
   template<typename... Rangelike>
   auto zip(Rangelike&&... rangelike)

@@ -1,5 +1,7 @@
 .vscode/
 .cache/
 build/
+dump/
+
 build.bat
 buildf.bat

@@ -147,6 +147,7 @@ namespace anton {
 
   // Is_Void
   //
+  template<typename T>
   struct Is_Void: Bool_Constant<is_same<void, remove_const<T>>> {};
 
   template<typename T>

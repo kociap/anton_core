@@ -3,183 +3,187 @@
 #include <anton/types.hpp>
 
 namespace anton {
-    //-----------------------------------------------------------------------------
-    // MurmurHash2 was written by Austin Appleby, and is placed in the public
-    // domain. The author hereby disclaims copyright to this source code.
-    //
-    // Note - This code makes a few assumptions about how your machine behaves -
-    //
-    // 1. We can read a 4-byte value from any address without crashing
-    // 2. sizeof(int) == 4
-    //
-    // And it has a few limitations -
-    //
-    // 1. It will not work incrementally.
-    // 2. It will not produce the same results on little-endian and big-endian
-    //    machines.
-    //
-    // len - size of the data pointed to by key in bytes.
-    // seed - 0x7FBD4396 is the value use by https://github.com/aappleby/smhasher
-    //
-    constexpr u32 murmurhash2_32(void const* key, i32 len, u32 seed = 0x7FBD4396) {
-#define mmix(h, k)   \
-    {                \
-        k *= m;      \
-        k ^= k >> r; \
-        k *= m;      \
-        h *= m;      \
-        h ^= k;      \
+  //----------------------------------------------------------------------------
+  // MurmurHash2 was written by Austin Appleby, and is placed in the public
+  // domain. The author hereby disclaims copyright to this source code.
+  //
+  // Note - This code makes a few assumptions about how your machine behaves -
+  //
+  // 1. We can read a 4-byte value from any address without crashing
+  // 2. sizeof(int) == 4
+  //
+  // And it has a few limitations -
+  //
+  // 1. It will not work incrementally.
+  // 2. It will not produce the same results on little-endian and big-endian
+  //    machines.
+  //
+  // len - size of the data pointed to by key in bytes.
+  // seed - 0x7FBD4396 is the value use by https://github.com/aappleby/smhasher
+  //
+  constexpr u32 murmurhash2_32(void const* key, i32 len, u32 seed = 0x7FBD4396)
+  {
+#define mmix(h, k) \
+  {                \
+    k *= m;        \
+    k ^= k >> r;   \
+    k *= m;        \
+    h *= m;        \
+    h ^= k;        \
+  }
+
+    // 'm' and 'r' are mixing constants generated offline.
+    // They're not really 'magic', they just happen to work well.
+    u32 const m = 0x5bd1e995;
+    i32 const r = 24;
+    u32 l = len;
+
+    // Mix 4 bytes at a time into the hash
+
+    unsigned char const* data = (unsigned char const*)key;
+
+    u32 h = seed;
+
+    while(len >= 4) {
+      u32 k = *(u32*)data;
+
+      mmix(h, k);
+
+      data += 4;
+      len -= 4;
     }
 
-        // 'm' and 'r' are mixing constants generated offline.
-        // They're not really 'magic', they just happen to work well.
-        u32 const m = 0x5bd1e995;
-        i32 const r = 24;
-        u32 l = len;
+    u32 t = 0;
 
-        // Mix 4 bytes at a time into the hash
+    // Handle the last few bytes of the input array
 
-        unsigned char const* data = (unsigned char const*)key;
+    switch(len) {
+    case 3:
+      t ^= data[2] << 16;
+    case 2:
+      t ^= data[1] << 8;
+    case 1:
+      t ^= data[0];
+    }
 
-        u32 h = seed;
+    mmix(h, t);
+    mmix(h, l);
 
-        while(len >= 4) {
-            u32 k = *(u32*)data;
+    // Do a few final mixes of the hash to ensure the last few
+    // bytes are well-incorporated.
 
-            mmix(h, k);
-
-            data += 4;
-            len -= 4;
-        }
-
-        u32 t = 0;
-
-        // Handle the last few bytes of the input array
-
-        switch(len) {
-            case 3:
-                t ^= data[2] << 16;
-            case 2:
-                t ^= data[1] << 8;
-            case 1:
-                t ^= data[0];
-        }
-
-        mmix(h, t);
-        mmix(h, l);
-
-        // Do a few final mixes of the hash to ensure the last few
-        // bytes are well-incorporated.
-
-        h ^= h >> 13;
-        h *= m;
-        h ^= h >> 15;
+    h ^= h >> 13;
+    h *= m;
+    h ^= h >> 15;
 
 #undef mmix
 
-        return h;
+    return h;
+  }
+
+  // MurmurHash2, 64-bit hash, by Austin Appleby
+  //
+  // The same caveats as 32-bit MurmurHash2 apply here - beware of alignment
+  // and endian-ness issues if used across multiple platforms.
+  //
+  // len - size of the data pointed to by key in bytes.
+  // seed - 0x1F0D3804 is the value use by https://github.com/aappleby/smhasher
+  //
+  constexpr u64 murmurhash2_64(void const* key, i64 len, u64 seed = 0x1F0D3804)
+  {
+    u64 const m = 0xc6a4a7935bd1e995;
+    i64 const r = 47;
+
+    u64 h = seed ^ (len * m);
+
+    u64 const* data = (u64 const*)key;
+    u64 const* end = data + (len / 8);
+
+    while(data != end) {
+      u64 k = *data++;
+
+      k *= m;
+      k ^= k >> r;
+      k *= m;
+
+      h ^= k;
+      h *= m;
     }
 
-    // MurmurHash2, 64-bit hash, by Austin Appleby
-    //
-    // The same caveats as 32-bit MurmurHash2 apply here - beware of alignment
-    // and endian-ness issues if used across multiple platforms.
-    //
-    // len - size of the data pointed to by key in bytes.
-    // seed - 0x1F0D3804 is the value use by https://github.com/aappleby/smhasher
-    //
-    constexpr u64 murmurhash2_64(void const* key, i64 len, u64 seed = 0x1F0D3804) {
-        u64 const m = 0xc6a4a7935bd1e995;
-        i64 const r = 47;
+    unsigned char const* data2 = (unsigned char const*)data;
 
-        u64 h = seed ^ (len * m);
-
-        u64 const* data = (u64 const*)key;
-        u64 const* end = data + (len / 8);
-
-        while(data != end) {
-            u64 k = *data++;
-
-            k *= m;
-            k ^= k >> r;
-            k *= m;
-
-            h ^= k;
-            h *= m;
-        }
-
-        unsigned char const* data2 = (unsigned char const*)data;
-
-        switch(len & 7) {
-            case 7:
-                h ^= u64(data2[6]) << 48;
-            case 6:
-                h ^= u64(data2[5]) << 40;
-            case 5:
-                h ^= u64(data2[4]) << 32;
-            case 4:
-                h ^= u64(data2[3]) << 24;
-            case 3:
-                h ^= u64(data2[2]) << 16;
-            case 2:
-                h ^= u64(data2[1]) << 8;
-            case 1:
-                h ^= u64(data2[0]);
-                h *= m;
-        }
-
-        h ^= h >> r;
-        h *= m;
-        h ^= h >> r;
-
-        return h;
+    switch(len & 7) {
+    case 7:
+      h ^= u64(data2[6]) << 48;
+    case 6:
+      h ^= u64(data2[5]) << 40;
+    case 5:
+      h ^= u64(data2[4]) << 32;
+    case 4:
+      h ^= u64(data2[3]) << 24;
+    case 3:
+      h ^= u64(data2[2]) << 16;
+    case 2:
+      h ^= u64(data2[1]) << 8;
+    case 1:
+      h ^= u64(data2[0]);
+      h *= m;
     }
 
-    constexpr u64 murmurhash2_64(char const* key, i64 len, u64 seed = 0x1F0D3804) {
-        u64 const m = 0xc6a4a7935bd1e995;
-        i64 const r = 47;
+    h ^= h >> r;
+    h *= m;
+    h ^= h >> r;
 
-        u64 h = seed ^ (len * m);
+    return h;
+  }
 
-        char const* data = key;
-        char const* end = data + 8 * (len / 8);
+  constexpr u64 murmurhash2_64(char const* key, i64 len, u64 seed = 0x1F0D3804)
+  {
+    u64 const m = 0xc6a4a7935bd1e995;
+    i64 const r = 47;
 
-        while(data != end) {
-            u64 k = (u64)data[0] | (u64)data[1] << 8 | (u64)data[2] << 16 | (u64)data[3] << 24 | (u64)data[4] << 32 | (u64)data[5] << 40 | (u64)data[6] << 48 |
-                    (u64)data[7] << 56;
-            data += 8;
-            k *= m;
-            k ^= k >> r;
-            k *= m;
+    u64 h = seed ^ (len * m);
 
-            h ^= k;
-            h *= m;
-        }
+    char const* data = key;
+    char const* end = data + 8 * (len / 8);
 
-        char const* data2 = data;
+    while(data != end) {
+      u64 k = (u64)data[0] | (u64)data[1] << 8 | (u64)data[2] << 16 |
+              (u64)data[3] << 24 | (u64)data[4] << 32 | (u64)data[5] << 40 |
+              (u64)data[6] << 48 | (u64)data[7] << 56;
+      data += 8;
+      k *= m;
+      k ^= k >> r;
+      k *= m;
 
-        switch(len & 7) {
-            case 7:
-                h ^= u64(data2[6]) << 48;
-            case 6:
-                h ^= u64(data2[5]) << 40;
-            case 5:
-                h ^= u64(data2[4]) << 32;
-            case 4:
-                h ^= u64(data2[3]) << 24;
-            case 3:
-                h ^= u64(data2[2]) << 16;
-            case 2:
-                h ^= u64(data2[1]) << 8;
-            case 1:
-                h ^= u64(data2[0]);
-                h *= m;
-        }
-
-        h ^= h >> r;
-        h *= m;
-        h ^= h >> r;
-
-        return h;
+      h ^= k;
+      h *= m;
     }
+
+    char const* data2 = data;
+
+    switch(len & 7) {
+    case 7:
+      h ^= u64(data2[6]) << 48;
+    case 6:
+      h ^= u64(data2[5]) << 40;
+    case 5:
+      h ^= u64(data2[4]) << 32;
+    case 4:
+      h ^= u64(data2[3]) << 24;
+    case 3:
+      h ^= u64(data2[2]) << 16;
+    case 2:
+      h ^= u64(data2[1]) << 8;
+    case 1:
+      h ^= u64(data2[0]);
+      h *= m;
+    }
+
+    h ^= h >> r;
+    h *= m;
+    h ^= h >> r;
+
+    return h;
+  }
 } // namespace anton

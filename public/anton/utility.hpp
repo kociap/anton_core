@@ -3,23 +3,27 @@
 #include <anton/types.hpp>
 
 namespace anton {
-    template<typename C>
-    constexpr auto size(C& c) -> decltype(c.size()) {
-        return c.size();
-    }
+  template<typename C>
+  constexpr auto size(C& c) -> decltype(c.size())
+  {
+    return c.size();
+  }
 
-    template<typename T, isize N>
-    constexpr isize size(T (&)[N]) {
-        return N;
-    }
+  template<typename T, isize N>
+  constexpr isize size(T (&)[N])
+  {
+    return N;
+  }
 
-    template<typename C>
-    constexpr auto data(C& c) -> decltype(c.data()) {
-        return c.data();
-    }
+  template<typename C>
+  constexpr auto data(C& c) -> decltype(c.data())
+  {
+    return c.data();
+  }
 
-    template<typename T, usize N>
-    constexpr T* data(T (&array)[N]) {
-        return array;
-    }
+  template<typename T, usize N>
+  constexpr T* data(T (&array)[N])
+  {
+    return array;
+  }
 } // namespace anton

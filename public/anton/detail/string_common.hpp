@@ -3,5 +3,5 @@
 #include <anton/types.hpp>
 
 namespace anton {
-    constexpr i64 npos = -1;
+  constexpr i64 npos = -1;
 }

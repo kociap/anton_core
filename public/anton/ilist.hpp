@@ -5,6 +5,9 @@
 #include <anton/types.hpp>
 
 namespace anton {
+  // TODO: Change all external functions to have a template parameter for the
+  //       type within the IList_Node instead of parameter Base.
+
   // IList_Node
   //
   // A tagged POD base type of IList's nodes.
@@ -39,6 +42,74 @@ namespace anton {
   T const* ilist_prev(T const* node)
   {
     return static_cast<T const*>(static_cast<Base const*>(node)->prev);
+  }
+
+  // ilist_begin
+  //
+  // Find the begin of an intrusive list, that is a node whose the prev member
+  // is nullptr. This is an external management function. The node must not be
+  // a part of a list object.
+  //
+  // Parameters:
+  // node - node of an intrusive list. May be nullptr.
+  //
+  // Returns:
+  // The node whose the prev member is nullptr.
+  //
+  template<typename Base = IList_DNode, typename T>
+  T* ilist_begin(T* node)
+  {
+    T* previous = node;
+    while(node != nullptr) {
+      previous = node;
+      node = ilist_prev<Base>(node);
+    }
+    return previous;
+  }
+
+  template<typename Base = IList_DNode, typename T>
+  T const* ilist_begin(T const* node)
+  {
+    T const* previous = node;
+    while(node != nullptr) {
+      previous = node;
+      node = ilist_prev<Base>(node);
+    }
+    return previous;
+  }
+
+  // ilist_end
+  //
+  // Find the end of an intrusive list, that is a node whose the next member is
+  // nullptr. This is an external management function. The node must not be a
+  // part of a list object.
+  //
+  // Parameters:
+  // node - node of an intrusive list. May be nullptr.
+  //
+  // Returns:
+  // The node whose the next member is nullptr.
+  //
+  template<typename Base = IList_DNode, typename T>
+  T* ilist_end(T* node)
+  {
+    T* previous = node;
+    while(node != nullptr) {
+      previous = node;
+      node = ilist_next<Base>(node);
+    }
+    return previous;
+  }
+
+  template<typename Base = IList_DNode, typename T>
+  T const* ilist_end(T const* node)
+  {
+    T const* previous = node;
+    while(node != nullptr) {
+      previous = node;
+      node = ilist_next<Base>(node);
+    }
+    return previous;
   }
 
   // ilist_insert_before
@@ -106,6 +177,21 @@ namespace anton {
     if(next != nullptr) {
       next->prev = prev;
     }
+  }
+
+  // ilist_splice
+  //
+  // Attach the nodes of list2 to the end of this list1. The nodes must point
+  // to disjoint lists. This is an external management function. The nodes must
+  // not be a part of any list object.
+  //
+  template<typename Base = IList_DNode, typename T>
+  void ilist_splice(T* list1, T* list2)
+  {
+    T* const end = ilist_end<Base>(list1);
+    T* const begin = ilist_begin<Base>(list2);
+    static_cast<Base*>(end)->next = static_cast<Base*>(begin);
+    static_cast<Base*>(begin)->prev = static_cast<Base*>(end);
   }
 
   // IList_Iterator
@@ -228,6 +314,12 @@ namespace anton {
     IList& operator=(IList&& other);
     ~IList();
 
+    // IList
+    //
+    // Construct an IList from an unlinked chain of nodes.
+    //
+    IList(base_node_type* first, base_node_type* last);
+
     [[nodiscard]] iterator begin();
     [[nodiscard]] iterator end();
     [[nodiscard]] const_iterator begin() const;
@@ -236,6 +328,7 @@ namespace anton {
     [[nodiscard]] const_iterator cend() const;
 
     // size
+    //
     // Calculates the size of the list by traversing the nodes.
     //
     // Returns:
@@ -247,6 +340,7 @@ namespace anton {
     [[nodiscard]] size_type size() const;
 
     // insert
+    //
     // Insert a node before position.
     //
     // Parameters:
@@ -259,6 +353,7 @@ namespace anton {
     iterator insert(const_iterator position, base_node_type& node);
 
     // insert_front
+    //
     // Insert a node at the front of the list.
     //
     // Parameters:
@@ -270,6 +365,7 @@ namespace anton {
     iterator insert_front(base_node_type& node);
 
     // insert_back
+    //
     // Insert a node at the back of the list.
     //
     // Parameters:
@@ -280,7 +376,15 @@ namespace anton {
     //
     iterator insert_back(base_node_type& node);
 
+    // splice
+    //
+    // Attach the nodes of the other list to the end of this list. Unlinks the
+    // other list.
+    //
+    void splice(IList& other);
+
     // erase
+    //
     // Erase the node at position.
     //
     // Parameters:
@@ -289,6 +393,7 @@ namespace anton {
     void erase(const_iterator position);
 
     // erase
+    //
     // Erase a range of nodes defined by [first, last[.
     //
     // Parameters:
@@ -298,23 +403,37 @@ namespace anton {
     void erase(const_iterator first, const_iterator last);
 
     // erase_front
+    //
     // Erase the first node from the list.
     // If the list is empty, the behaviour is undefined.
     //
     void erase_front();
 
     // erase_back
+    //
     // Erase the last node from the list.
     // If the list is empty, the behaviour is undefined.
     //
     void erase_back();
 
+    // unlink
+    //
+    // Unlink (disconnect) the nodes from the list while maintaining their chain
+    // structure.
+    //
+    // Returns:
+    // The first node of the unlinked list.
+    //
+    [[nodiscard]] pointer unlink();
+
     // clear
+    //
     // Unlink all nodes present in the list.
     //
     void clear();
 
     // swap
+    //
     // Swaps the contents of 2 lists.
     //
     // Compexity:
@@ -363,19 +482,24 @@ namespace anton {
   template<typename Node, typename Tag>
   IList<Node, Tag>& IList<Node, Tag>::operator=(IList&& other)
   {
-    base_node_type* const internal_node = &_internal_node;
-    _internal_node.next = internal_node;
-    _internal_node.prev = internal_node;
+    clear();
     swap(*this, other);
   }
 
   template<typename Node, typename Tag>
   IList<Node, Tag>::~IList()
   {
-    base_node_type* const next = _internal_node.next;
-    base_node_type* const prev = _internal_node.prev;
-    next->prev = nullptr;
-    prev->next = nullptr;
+    clear();
+  }
+
+  template<typename Node, typename Tag>
+  IList<Node, Tag>::IList(base_node_type* first, base_node_type* last)
+  {
+    base_node_type* const internal_node = &_internal_node;
+    first->prev = internal_node;
+    internal_node->next = first;
+    last->next = internal_node;
+    internal_node->prev = last;
   }
 
   template<typename Node, typename Tag>
@@ -465,6 +589,23 @@ namespace anton {
   }
 
   template<typename Node, typename Tag>
+  void IList<Node, Tag>::splice(IList& other)
+  {
+    auto const b = other.begin();
+    auto const e = other.end();
+    if(b != e) {
+      base_node_type* const first = b.node;
+      base_node_type* const last = e.node->prev;
+      other.clear();
+      base_node_type* const our_last = _internal_node.prev;
+      first->prev = last;
+      our_last->next = first;
+      last->next = &_internal_node;
+      _internal_node.prev = last;
+    }
+  }
+
+  template<typename Node, typename Tag>
   void IList<Node, Tag>::erase(const_iterator position)
   {
     base_node_type* const node = position.node;
@@ -504,9 +645,26 @@ namespace anton {
   }
 
   template<typename Node, typename Tag>
+  typename IList<Node, Tag>::pointer IList<Node, Tag>::unlink()
+  {
+    base_node_type* const internal_node = &_internal_node;
+    base_node_type* const next = internal_node->next;
+    base_node_type* const prev = internal_node->prev;
+    next->prev = nullptr;
+    prev->next = nullptr;
+    _internal_node.next = internal_node;
+    _internal_node.prev = internal_node;
+    return static_cast<pointer>(next);
+  }
+
+  template<typename Node, typename Tag>
   void IList<Node, Tag>::clear()
   {
     base_node_type* const internal_node = &_internal_node;
+    base_node_type* const next = internal_node->next;
+    base_node_type* const prev = internal_node->prev;
+    next->prev = nullptr;
+    prev->next = nullptr;
     _internal_node.next = internal_node;
     _internal_node.prev = internal_node;
   }

@@ -169,8 +169,8 @@ namespace anton {
   template<typename T>
   void ilist_erase(IList_Node<T>* const node)
   {
-    T* const next = node->next;
-    T* const prev = node->prev;
+    IList_Node<T>* const next = node->next;
+    IList_Node<T>* const prev = node->prev;
     if(prev != nullptr) {
       prev->next = next;
     }
@@ -181,8 +181,8 @@ namespace anton {
 
   // ilist_splice
   //
-  // Attach the nodes of list2 to the end of this list1. The nodes must point
-  // to disjoint lists. This is an external management function. The nodes must
+  // Attach the nodes of list2 to the end of list1. The nodes must point to
+  // disjoint lists. This is an external management function. The nodes must
   // not be a part of any list object.
   //
   template<typename Base = IList_DNode, typename T>
@@ -552,8 +552,8 @@ namespace anton {
   }
 
   template<typename Node, typename Tag>
-  auto IList<Node, Tag>::insert(const_iterator position,
-                                base_node_type& node) -> iterator
+  auto IList<Node, Tag>::insert(const_iterator position, base_node_type& node)
+    -> iterator
   {
     base_node_type* const next = position.node;
     base_node_type* const prev = next->prev;

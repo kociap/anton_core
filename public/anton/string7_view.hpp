@@ -4,6 +4,7 @@
 #include <anton/detail/string_common.hpp>
 #include <anton/hashing/murmurhash2.hpp>
 #include <anton/iterators.hpp>
+#include <anton/math/math.hpp>
 #include <anton/swap.hpp>
 #include <anton/types.hpp>
 
@@ -262,6 +263,90 @@ namespace anton {
       }
     }
     return substr_begin == substr_end;
+  }
+
+  // shrink_front
+  //
+  // Shrink the string from the front by count bytes.
+  //
+  // Parameters:
+  // string - the source string.
+  //  count - the number of bytes to shave off the front of the string. Must be
+  //          positive.
+  //
+  // Returns:
+  // String shrunk at the front by count bytes.
+  //
+  [[nodiscard]] constexpr String7_View shrink_front(String7_View const string,
+                                                    i64 const count)
+  {
+    ANTON_ASSERT(count >= 0, "shrink count must be positive");
+    i64 const shrink_size = math::min(string.size(), count);
+    return String7_View{string.begin() + shrink_size, string.end()};
+  }
+
+  // shrink_back
+  //
+  // Shrink the string from the back by count bytes.
+  //
+  // Parameters:
+  // string - the source string.
+  //  count - the number of bytes to shave off the back of the string. Must be
+  //          positive.
+  //
+  // Returns:
+  // String shrunk at the back by count bytes.
+  //
+  [[nodiscard]] constexpr String7_View shrink_back(String7_View const string,
+                                                   i64 const count)
+  {
+    ANTON_ASSERT(count >= 0, "shrink count must be positive");
+    i64 const shrink_size = math::min(string.size(), count);
+    return String7_View{string.begin(), string.end() - shrink_size};
+  }
+
+  // shrink
+  //
+  // Shrink the string from both ends by front_count and back_count bytes
+  // respectively.
+  //
+  // Parameters:
+  //      string - the source string.
+  // front_count - the number of bytes to shave off the front of the string.
+  //               Must be positive.
+  //  back_count - the number of bytes to shave off the back of the string. Must
+  //               be positive.
+  //
+  // Returns:
+  // String shrunk on both ends by front_count and back_count bytes
+  // respectively.
+  //
+  [[nodiscard]] constexpr String7_View
+  shrink(String7_View const string, i64 const front_count, i64 const back_count)
+  {
+    ANTON_ASSERT(front_count >= 0, "shrink front_count must be positive");
+    ANTON_ASSERT(back_count >= 0, "shrink back_count must be positive");
+    return shrink_back(shrink_front(string, front_count), back_count);
+  }
+
+  // substring_front
+  //
+  // Take a substring from the front, that is starting from the first character
+  // of the source string.
+  //
+  // Parameters:
+  // string - the source string.
+  //  count - the length of the substring.
+  //
+  // Returns:
+  // Substring of length count taken from the front of string.
+  //
+  [[nodiscard]] constexpr String7_View
+  substring_front(String7_View const string, i64 const count)
+  {
+    ANTON_ASSERT(count >= 0, "substring length must be positive");
+    i64 const substring_length = math::min(string.size(), count);
+    return String7_View{string.begin(), string.begin() + substring_length};
   }
 
   // str_to_i64

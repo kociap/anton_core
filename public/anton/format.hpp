@@ -3,6 +3,7 @@
 #include <anton/allocator.hpp>
 #include <anton/slice.hpp>
 #include <anton/string.hpp>
+#include <anton/string7_view.hpp>
 #include <anton/string_view.hpp>
 #include <anton/type_traits/utility.hpp>
 
@@ -44,6 +45,8 @@ namespace anton {
                      void const* value);
     void format_type(Memory_Allocator* const allocator, Format_Buffer& buffer,
                      String_View value);
+    void format_type(Memory_Allocator* const allocator, Format_Buffer& buffer,
+                     String7_View value);
   } // namespace detail
 
   struct Formatter_Base {

@@ -110,6 +110,13 @@ namespace anton {
     {
       format_buffer.write(value);
     }
+
+    void format_type([[maybe_unused]] Memory_Allocator* const allocator,
+                     Format_Buffer& format_buffer, String7_View value)
+    {
+      anton::String_View string{value.begin(), value.end()};
+      format_buffer.write(string);
+    }
   } // namespace detail
 
   struct Format_Field {

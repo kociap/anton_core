@@ -11,7 +11,9 @@
 #include <anton/utility.hpp>
 
 namespace anton {
-#define ANTON_ARRAY_MIN_ALLOCATION_SIZE (static_cast<i64>(64))
+#ifndef ANTON_ARRAY_MIN_ALLOCATION_SIZE
+  #define ANTON_ARRAY_MIN_ALLOCATION_SIZE (static_cast<i64>(1))
+#endif
 
   template<typename T>
   struct Array {

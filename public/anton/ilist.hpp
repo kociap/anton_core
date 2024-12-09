@@ -44,6 +44,27 @@ namespace anton {
     return static_cast<T const*>(static_cast<Base const*>(node)->prev);
   }
 
+  // ilist_size
+  //
+  // Calculates the size of the list by traversing the nodes.
+  //
+  // Returns:
+  // The number of nodes in the list.
+  //
+  // Complexity:
+  // O(n) where n is the number of nodes in the list.
+  //
+  template<typename Base = IList_DNode, typename T>
+  isize ilist_size(T const* node)
+  {
+    isize size = 0;
+    while(node != nullptr) {
+      node = ilist_next(node);
+      ++size;
+    }
+    return size;
+  }
+
   // ilist_begin
   //
   // Find the begin of an intrusive list, that is a node whose the prev member
@@ -188,10 +209,34 @@ namespace anton {
   template<typename Base = IList_DNode, typename T>
   void ilist_splice(T* list1, T* list2)
   {
-    T* const end = ilist_end<Base>(list1);
-    T* const begin = ilist_begin<Base>(list2);
-    static_cast<Base*>(end)->next = static_cast<Base*>(begin);
-    static_cast<Base*>(begin)->prev = static_cast<Base*>(end);
+    Base* const end = ilist_end<Base>(list1);
+    Base* const begin = ilist_begin<Base>(list2);
+    end->next = begin;
+    begin->prev = end;
+  }
+
+  // ilist_splice_after
+  //
+  // Attach the nodes of list2 after the node list1. The nodes must point to
+  // disjoint lists. This is an external management function. The nodes must
+  // not be a part of any list object.
+  //
+  template<typename Base = IList_DNode, typename T>
+  void ilist_splice_after(T* list1, T* list2)
+  {
+    Base* const begin = ilist_begin<Base>(list2);
+    Base* const end = ilist_end<Base>(list2);
+    Base* const next = ilist_next<Base>(list1);
+    Base* const prev = ilist_prev<Base>(list1);
+    if(next != nullptr) {
+      end->next = next;
+      next->prev = end;
+    }
+
+    if(prev != nullptr) {
+      begin->prev = prev;
+      prev->next = begin;
+    }
   }
 
   // IList_Iterator
@@ -327,6 +372,9 @@ namespace anton {
     [[nodiscard]] const_iterator cbegin() const;
     [[nodiscard]] const_iterator cend() const;
 
+    [[nodiscard]] pointer front() const;
+    [[nodiscard]] pointer back() const;
+
     // size
     //
     // Calculates the size of the list by traversing the nodes.
@@ -363,6 +411,7 @@ namespace anton {
     // Iterator to the inserted node.
     //
     iterator insert_front(base_node_type& node);
+    iterator insert_front(base_node_type* node);
 
     // insert_back
     //
@@ -375,6 +424,7 @@ namespace anton {
     // Iterator to the inserted node.
     //
     iterator insert_back(base_node_type& node);
+    iterator insert_back(base_node_type* node);
 
     // splice
     //
@@ -539,6 +589,22 @@ namespace anton {
   }
 
   template<typename Node, typename Tag>
+  auto IList<Node, Tag>::front() const -> pointer
+  {
+    ANTON_ASSERT(&_internal_node != _internal_node->next,
+                 "front called on empty IList");
+    return static_cast<node_type const*>(&_internal_node->next);
+  }
+
+  template<typename Node, typename Tag>
+  auto IList<Node, Tag>::back() const -> pointer
+  {
+    ANTON_ASSERT(&_internal_node != _internal_node->prev,
+                 "back called on empty IList");
+    return static_cast<node_type const*>(&_internal_node->prev);
+  }
+
+  template<typename Node, typename Tag>
   auto IList<Node, Tag>::size() const -> size_type
   {
     size_type _size = 0;
@@ -567,13 +633,26 @@ namespace anton {
   template<typename Node, typename Tag>
   auto IList<Node, Tag>::insert_front(base_node_type& node) -> iterator
   {
-    base_node_type* const next = &_internal_node;
+    base_node_type* const next = _internal_node.next;
     base_node_type* const prev = next->prev;
     node.prev = prev;
     prev->next = &node;
     node.next = next;
     next->prev = &node;
     return &node;
+  }
+
+  template<typename Node, typename Tag>
+  auto IList<Node, Tag>::insert_front(base_node_type* node) -> iterator
+  {
+    ANTON_ASSERT(node != nullptr, "cannot insert nullptr into IList");
+    base_node_type* const next = _internal_node.next;
+    base_node_type* const prev = next->prev;
+    node->prev = prev;
+    prev->next = node;
+    node->next = next;
+    next->prev = node;
+    return node;
   }
 
   template<typename Node, typename Tag>
@@ -586,6 +665,19 @@ namespace anton {
     node.next = next;
     next->prev = &node;
     return &node;
+  }
+
+  template<typename Node, typename Tag>
+  auto IList<Node, Tag>::insert_back(base_node_type* node) -> iterator
+  {
+    ANTON_ASSERT(node != nullptr, "cannot insert nullptr into IList");
+    base_node_type* const next = &_internal_node;
+    base_node_type* const prev = next->prev;
+    node->prev = prev;
+    prev->next = node;
+    node->next = next;
+    next->prev = node;
+    return node;
   }
 
   template<typename Node, typename Tag>
@@ -654,7 +746,11 @@ namespace anton {
     prev->next = nullptr;
     _internal_node.next = internal_node;
     _internal_node.prev = internal_node;
-    return static_cast<pointer>(next);
+    if(next != internal_node) {
+      return static_cast<pointer>(next);
+    } else {
+      return nullptr;
+    }
   }
 
   template<typename Node, typename Tag>

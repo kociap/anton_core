@@ -604,7 +604,7 @@ namespace anton {
   template<typename Node, typename Tag>
   auto IList<Node, Tag>::front() const -> pointer
   {
-    ANTON_ASSERT(&_internal_node != _internal_node->next,
+    ANTON_ASSERT(&_internal_node != _internal_node.next,
                  "front called on empty IList");
     return static_cast<node_type const*>(&_internal_node->next);
   }
@@ -612,7 +612,7 @@ namespace anton {
   template<typename Node, typename Tag>
   auto IList<Node, Tag>::back() const -> pointer
   {
-    ANTON_ASSERT(&_internal_node != _internal_node->prev,
+    ANTON_ASSERT(&_internal_node != _internal_node.prev,
                  "back called on empty IList");
     return static_cast<node_type const*>(&_internal_node->prev);
   }

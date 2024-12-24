@@ -444,6 +444,7 @@ namespace anton {
     // other list.
     //
     void splice(IList& other);
+    void splice(base_node_type* other);
 
     // erase
     //
@@ -709,11 +710,25 @@ namespace anton {
       base_node_type* const last = e.node->prev;
       other.clear();
       base_node_type* const our_last = _internal_node.prev;
-      first->prev = last;
+      first->prev = our_last;
       our_last->next = first;
       last->next = &_internal_node;
       _internal_node.prev = last;
     }
+  }
+
+  template<typename Node, typename Tag>
+  void IList<Node, Tag>::splice(base_node_type* other)
+  {
+    ANTON_ASSERT(other != nullptr, "other must not be nullptr");
+    auto const first = ilist_begin(other);
+    auto const last = ilist_end(other);
+    base_node_type* const our_last = _internal_node.prev;
+    base_node_type* const our_first = &_internal_node;
+    first->prev = our_last;
+    our_last->next = first;
+    last->next = our_first;
+    our_first->prev = last;
   }
 
   template<typename Node, typename Tag>

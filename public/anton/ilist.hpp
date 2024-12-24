@@ -387,6 +387,18 @@ namespace anton {
     //
     [[nodiscard]] size_type size() const;
 
+    // empty
+    //
+    // Checks whether the list contains no elements, i.e. size() == 0.
+    //
+    // Complexity:
+    // O(1)
+    //
+    // Returns:
+    // true when the list is empty (contains no elements).
+    //
+    [[nodiscard]] bool empty() const;
+
     // insert
     //
     // Insert a node before position.
@@ -618,8 +630,15 @@ namespace anton {
   }
 
   template<typename Node, typename Tag>
-  auto IList<Node, Tag>::insert(const_iterator position, base_node_type& node)
-    -> iterator
+  bool IList<Node, Tag>::empty() const
+  {
+    base_node_type const* const internal_node = &_internal_node;
+    return internal_node->next == internal_node;
+  }
+
+  template<typename Node, typename Tag>
+  auto IList<Node, Tag>::insert(const_iterator position,
+                                base_node_type& node) -> iterator
   {
     base_node_type* const next = position.node;
     base_node_type* const prev = next->prev;

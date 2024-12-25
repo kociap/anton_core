@@ -1,5 +1,6 @@
 #pragma once
 
+#include <anton/assert.hpp>
 #include <anton/iterators.hpp>
 #include <anton/swap.hpp>
 #include <anton/types.hpp>

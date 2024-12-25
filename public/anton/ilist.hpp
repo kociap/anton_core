@@ -15,8 +15,8 @@ namespace anton {
   //
   template<typename T>
   struct IList_Node {
-    IList_Node* prev;
-    IList_Node* next;
+    IList_Node* prev = nullptr;
+    IList_Node* next = nullptr;
   };
 
   using IList_DNode = IList_Node<void>;

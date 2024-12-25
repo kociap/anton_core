@@ -638,7 +638,6 @@ namespace anton {
   template<typename T>
   void Array<T>::set_capacity(size_type new_capacity)
   {
-    ANTON_ASSERT(new_capacity >= 0, "capacity must be greater than or equal 0");
     if(new_capacity != _capacity) {
       i64 const new_size = math::min(new_capacity, _size);
       T* new_data = nullptr;

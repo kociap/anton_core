@@ -550,6 +550,7 @@ namespace anton {
   {
     clear();
     swap(*this, other);
+    return *this;
   }
 
   template<typename Node, typename Tag>

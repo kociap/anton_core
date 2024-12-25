@@ -70,7 +70,8 @@ namespace anton {
   // Allocates a block of memory aligned to alignment.
   //
   // Parameters:
-  //     size  - the number of bytes to allocate.
+  //     size  - the number of bytes to allocate. Must be an integral multiple
+  //             of alignment.
   // alignment - alignment of the memory block. Must be a power of 2.
   //
   // Returns:

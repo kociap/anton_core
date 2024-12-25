@@ -59,7 +59,8 @@ namespace anton {
       anton::math::max(alignment, default_block_alignment);
     i64 const header = align_address(sizeof(Block), allocation_alignment);
     i64 const allocation_size =
-      anton::math::max(size + header, default_block_size);
+      align_address(anton::math::max(size + header, default_block_size),
+                    allocation_alignment);
     void* const memory = anton::allocate(allocation_size, allocation_alignment);
     Block* const block = reinterpret_cast<Block*>(memory);
     block->next = nullptr;

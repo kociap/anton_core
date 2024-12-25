@@ -24,8 +24,9 @@ namespace anton {
 
   // Allocator
 
-  void* Allocator::allocate(isize const bytes, isize const alignment)
+  void* Allocator::allocate(isize bytes, isize const alignment)
   {
+    bytes = align_address(bytes, alignment);
     return anton::allocate(bytes, alignment);
   }
 

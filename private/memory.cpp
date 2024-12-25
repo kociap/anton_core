@@ -7,7 +7,8 @@ namespace anton {
   {
     ANTON_VERIFY(alignment > 0 && !(alignment & (alignment - 1)),
                  "alignment is not a power of 2");
-    // TODO: Ensure size is multiple of alignment?
+    ANTON_VERIFY((size / alignment) * alignment == size,
+                 "size is not an integral multiple of alignment");
     return ANTON_CRT_ALIGNED_ALLOC(size, alignment);
   }
 

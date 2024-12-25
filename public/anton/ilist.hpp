@@ -344,6 +344,7 @@ namespace anton {
     using base_node_type = IList_Node<Tag>;
     using reference = Node&;
     using pointer = Node*;
+    using const_pointer = node_type const*;
     using iterator = IList_Iterator<node_type, base_node_type>;
     using const_iterator =
       IList_Iterator<node_type const, base_node_type const>;
@@ -372,8 +373,10 @@ namespace anton {
     [[nodiscard]] const_iterator cbegin() const;
     [[nodiscard]] const_iterator cend() const;
 
-    [[nodiscard]] pointer front() const;
-    [[nodiscard]] pointer back() const;
+    [[nodiscard]] pointer front();
+    [[nodiscard]] const_pointer front() const;
+    [[nodiscard]] pointer back();
+    [[nodiscard]] const_pointer back() const;
 
     // size
     //
@@ -602,19 +605,35 @@ namespace anton {
   }
 
   template<typename Node, typename Tag>
-  auto IList<Node, Tag>::front() const -> pointer
+  auto IList<Node, Tag>::front() -> pointer
   {
     ANTON_ASSERT(&_internal_node != _internal_node.next,
                  "front called on empty IList");
-    return static_cast<node_type const*>(&_internal_node->next);
+    return static_cast<pointer>(_internal_node.next);
   }
 
   template<typename Node, typename Tag>
-  auto IList<Node, Tag>::back() const -> pointer
+  auto IList<Node, Tag>::front() const -> const_pointer
+  {
+    ANTON_ASSERT(&_internal_node != _internal_node.next,
+                 "front called on empty IList");
+    return static_cast<const_pointer>(_internal_node.next);
+  }
+
+  template<typename Node, typename Tag>
+  auto IList<Node, Tag>::back() -> pointer
   {
     ANTON_ASSERT(&_internal_node != _internal_node.prev,
                  "back called on empty IList");
-    return static_cast<node_type const*>(&_internal_node->prev);
+    return static_cast<pointer>(_internal_node.prev);
+  }
+
+  template<typename Node, typename Tag>
+  auto IList<Node, Tag>::back() const -> const_pointer
+  {
+    ANTON_ASSERT(&_internal_node != _internal_node.prev,
+                 "back called on empty IList");
+    return static_cast<const_pointer>(_internal_node.prev);
   }
 
   template<typename Node, typename Tag>
